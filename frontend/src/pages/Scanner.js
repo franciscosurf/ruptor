@@ -72,9 +72,7 @@ export default function Scanner() {
                 <span className="text-sm font-medium">ATS Scanner impulsado por IA</span>
               </div>
               <h1 className="text-6xl md:text-7xl font-black tracking-tight leading-none mb-8">
-                Descubre cómo
-                <span className="gradient-text"> te filtra</span>
-                la IA.
+                Descubre cómo <span className="gradient-text"> te filtra</span> la IA.
               </h1>
               <p className="text-xl md:text-2xl text-black/60 leading-relaxed mb-10 max-w-2xl">
                 Tu CV probablemente está siendo rechazado antes de que un humano lo vea.
