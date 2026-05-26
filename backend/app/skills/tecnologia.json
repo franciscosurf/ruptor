@@ -1,0 +1,56 @@
+{
+  "sector": "tecnologia",
+  "version": "1.0",
+  "skills": {
+   "en": [
+      "python", "java", "javascript", "typescript", "react", "angular", "vue",
+      "node", "express", "django", "flask", "spring", ".net", "c#", "php",
+      "rust", "swift", "kotlin", "flutter", "react native",
+      "aws", "azure", "gcp", "docker", "kubernetes", "terraform", "ansible",
+      "sql", "postgresql", "mysql", "mongodb", "redis", "elasticsearch",
+      "git", "github", "gitlab", "bitbucket", "jenkins", "gitlab ci", "github actions",
+      "agile", "scrum", "kanban", "jira", "confluence", "trello",
+      "rest api", "graphql", "grpc", "websockets",
+      "html5", "css3", "sass", "scss", "tailwind", "bootstrap",
+      "machine learning", "deep learning", "tensorflow", "pytorch", "keras",
+      "data science", "pandas", "numpy", "scikit-learn", "jupyter",
+      "devops", "ci/cd", "monitoring", "prometheus", "grafana", "datadog",
+      "security", "penetration testing", "owasp", "ssl/tls", "oauth", "jwt",
+      "microservices", "serverless", "lambda", "kafka", "rabbitmq",
+      "vitest", "testing library", "vite", "turbo", "pnpm", "storybook"
+    ],
+    "es": [
+      "python", "java", "javascript", "typescript", "react", "angular", "vue",
+      "node", "express", "django", "flask", "spring", ".net", "c#", "php",
+      "rust", "swift", "kotlin", "flutter", "react native",
+      "aws", "azure", "gcp", "docker", "kubernetes", "terraform", "ansible",
+      "sql", "postgresql", "mysql", "mongodb", "redis", "elasticsearch",
+      "git", "github", "gitlab", "bitbucket", "jenkins", "gitlab ci", "github actions",
+      "agile", "scrum", "kanban", "jira", "confluence", "trello",
+      "api rest", "graphql", "grpc", "websockets",
+      "html5", "css3", "sass", "scss", "tailwind", "bootstrap",
+      "aprendizaje automático", "deep learning", "tensorflow", "pytorch", "keras",
+      "ciencia de datos", "pandas", "numpy", "scikit-learn", "jupyter",
+      "devops", "ci/cd", "monitoreo", "prometheus", "grafana", "datadog",
+      "seguridad", "pruebas de penetración", "owasp", "ssl/tls", "oauth", "jwt",
+      "microservicios", "serverless", "lambda", "kafka", "rabbitmq",
+      "vitest", "testing library", "vite", "turbo", "pnpm", "storybook"
+    ]
+  },
+  "tools": {
+    "en": ["vscode", "intellij", "pycharm", "eclipse", "postman", "insomnia", "docker desktop", "kubectl"],
+    "es": ["vscode", "intellij", "pycharm", "eclipse", "postman", "insomnia", "docker desktop", "kubectl"]
+  },
+  "responsibilities": {
+    "en": [
+      "develop", "implement", "design", "architect", "maintain", "deploy",
+      "test", "debug", "refactor", "optimize", "document", "review code",
+      "lead team", "mentor juniors", "technical design", "solution architecture"
+    ],
+    "es": [
+      "desarrollar", "implementar", "diseñar", "arquitecturar", "mantener", "desplegar",
+      "testear", "depurar", "refactorizar", "optimizar", "documentar", "revisar código",
+      "liderar equipo", "mentorizar juniors", "diseño técnico", "arquitectura de solución"
+    ]
+  }
+}

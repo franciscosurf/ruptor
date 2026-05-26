@@ -1,0 +1,26 @@
+{
+  "sector": "general",
+  "version": "1.0",
+  "skills": {
+    "en": [
+      "communication", "teamwork", "problem solving", "leadership", "critical thinking",
+      "time management", "organization", "adaptability", "flexibility", "initiative",
+      "proactive", "self motivated", "project management", "planning", "coordination",
+      "execution", "customer focus", "client orientation", "service mindset",
+      "analytical thinking", "data driven", "attention to detail", "creativity",
+      "innovation", "continuous improvement", "conflict resolution", "negotiation",
+      "persuasion", "emotional intelligence", "empathy", "collaboration",
+      "english", "spanish", "multilingual", "mentoring", "coaching", "feedback"
+    ],
+    "es": [
+      "comunicación", "trabajo en equipo", "resolución de problemas", "liderazgo", "pensamiento crítico",
+      "gestión del tiempo", "organización", "adaptabilidad", "flexibilidad", "iniciativa",
+      "proactividad", "automotivación", "gestión de proyectos", "planificación", "coordinación",
+      "ejecución", "orientación al cliente", "enfoque al cliente", "mentalidad de servicio",
+      "pensamiento analítico", "orientación a datos", "atención al detalle", "creatividad",
+      "innovación", "mejora continua", "resolución de conflictos", "negociación",
+      "persuasión", "inteligencia emocional", "empatía", "colaboración",
+      "inglés", "español", "multilingüe", "mentoría", "coaching", "retroalimentación"
+    ]
+  }
+}

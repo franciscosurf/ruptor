@@ -1,0 +1,48 @@
+{
+  "sector": "ventas",
+  "version": "1.0",
+  "skills": {
+    "en": [
+      "salesforce", "hubspot sales", "pipedrive", "zoho crm", "dynamics 365", "close.io", "freshsales",
+      "cold calling", "warm calling", "telemarketing", "outbound sales", "inbound sales",
+      "lead generation", "prospecting", "qualification", "bant", "chant", "meddic",
+      "negotiation", "closing", "deal management", "contract negotiation", "proposal writing",
+      "account management", "key account management", "strategic account planning",
+      "upselling", "cross-selling", "renewals", "expansions",
+      "sales pipeline", "forecasting", "quota attainment", "territory management",
+      "crm management", "sales reporting", "sales analytics", "win/loss analysis",
+      "objection handling", "solution selling", "value selling", "challenger sale",
+      "b2b sales", "b2c sales", "saas sales", "enterprise sales", "sme sales",
+      "sdr", "bdr", "account executive", "sales development", "business development"
+    ],
+    "es": [
+      "salesforce", "hubspot sales", "pipedrive", "zoho crm", "dynamics 365", "close.io", "freshsales",
+      "llamadas en frío", "llamadas cálidas", "telemarketing", "ventas salientes", "ventas entrantes",
+      "generación de leads", "prospección", "calificación", "bant", "chant", "meddic",
+      "negociación", "cierre", "gestión de acuerdos", "negociación de contratos", "escritura de propuestas",
+      "gestión de cuentas", "gestión de cuentas clave", "planificación estratégica de cuentas",
+      "venta adicional", "venta cruzada", "renovaciones", "expansiones",
+      "pipeline de ventas", "pronóstico", "cumplimiento de cuota", "gestión de territorio",
+      "gestión de crm", "reportes de ventas", "analítica de ventas", "análisis de ganados/perdidos",
+      "manejo de objeciones", "venta de soluciones", "venta por valor", "venta desafiante",
+      "ventas b2b", "ventas b2c", "ventas saas", "ventas empresariales", "ventas pymes",
+      "sdr", "bdr", "ejecutivo de cuentas", "desarrollo de ventas", "desarrollo de negocio"
+    ]
+  },
+  "tools": {
+    "en": ["salesforce", "hubspot", "linkedin sales navigator", "zoom info", "apollo", "lusha", "calendly", "outreach", "salesloft"],
+    "es": ["salesforce", "hubspot", "linkedin sales navigator", "zoom info", "apollo", "lusha", "calendly", "outreach", "salesloft"]
+  },
+  "responsibilities": {
+    "en": [
+      "sell", "negotiate", "close", "prospect", "qualify", "forecast", "report",
+      "achieve quota", "build pipeline", "manage accounts", "develop relationships",
+      "present demos", "prepare proposals", "handle objections", "expand accounts"
+    ],
+    "es": [
+      "vender", "negociar", "cerrar", "prospeccionar", "calificar", "pronosticar", "reportar",
+      "alcanzar cuota", "construir pipeline", "gestionar cuentas", "desarrollar relaciones",
+      "presentar demos", "preparar propuestas", "manejar objeciones", "expandir cuentas"
+    ]
+  }
+}

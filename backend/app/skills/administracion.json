@@ -1,0 +1,46 @@
+{
+  "sector": "administracion",
+  "version": "1.0",
+  "skills": {
+    "en": [
+      "oracle", "sap", "excel", "word", "outlook", "powerpoint", "teams", "sharepoint",
+      "erp", "crm", "salesforce", "hubspot", "zoho", "dynamics",
+      "inventory management", "warehouse management", "logistics", "supply chain",
+      "order processing", "invoicing", "billing", "accounts payable", "accounts receivable",
+      "vendor management", "procurement", "purchasing", "sourcing",
+      "data entry", "filing", "documentation", "record keeping", "archiving",
+      "scheduling", "calendar management", "travel arrangements", "event planning",
+      "customer service", "client relations", "complaint resolution",
+      "reporting", "kpi tracking", "dashboards", "power bi", "tableau",
+      "office management", "facility management", "supplies management"
+    ],
+    "es": [
+      "oracle", "sap", "excel", "word", "outlook", "powerpoint", "teams", "sharepoint",
+      "erp", "crm", "salesforce", "hubspot", "zoho", "dynamics",
+      "gestión de inventario", "gestión de almacén", "logística", "cadena de suministro",
+      "procesamiento de pedidos", "facturación", "cuentas por pagar", "cuentas por cobrar",
+      "gestión de proveedores", "compras", "abastecimiento",
+      "ingreso de datos", "archivo", "documentación", "registro", "mantenimiento de archivos",
+      "programación", "gestión de calendarios", "arreglos de viaje", "planificación de eventos",
+      "atención al cliente", "relaciones con clientes", "resolución de quejas",
+      "reportes", "seguimiento de kpi", "dashboards", "power bi", "tableau",
+      "gestión de oficina", "gestión de instalaciones", "gestión de suministros"
+    ]
+  },
+  "tools": {
+    "en": ["microsoft office", "google workspace", "oracle ebs", "sap fico", "quickbooks", "slack"],
+    "es": ["microsoft office", "google workspace", "oracle ebs", "sap fico", "quickbooks", "slack"]
+  },
+  "responsibilities": {
+    "en": [
+      "manage", "coordinate", "organize", "plan", "schedule", "supervise",
+      "process", "verify", "update", "maintain", "track", "monitor",
+      "prepare reports", "analyze data", "communicate", "negotiate"
+    ],
+    "es": [
+      "gestionar", "coordinar", "organizar", "planificar", "programar", "supervisar",
+      "procesar", "verificar", "actualizar", "mantener", "rastrear", "monitorear",
+      "preparar informes", "analizar datos", "comunicar", "negociar"
+    ]
+  }
+}

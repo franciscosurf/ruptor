@@ -1,0 +1,50 @@
+{
+  "sector": "marketing",
+  "version": "1.0",
+  "skills": {
+    "en": [
+      "seo", "sem", "google analytics", "google ads", "google tag manager", "search console",
+      "meta ads", "facebook ads", "instagram ads", "tiktok ads", "linkedin ads", "twitter ads",
+      "email marketing", "mailchimp", "hubspot", "salesforce marketing cloud", "klaviyo", "activecampaign",
+      "social media management", "hootsuite", "buffer", "sprout social", "later",
+      "content marketing", "copywriting", "storytelling", "script writing", "blogging",
+      "crm", "marketing automation", "lead scoring", "lead nurturing", "drip campaigns",
+      "analytics", "data studio", "looker", "tableau", "power bi",
+      "kpi", "roi", "cac", "ltv", "conversion rate", "ctr", "cpc", "cpm", "roas",
+      "a/b testing", "conversion optimization", "landing page optimization", "funnel analysis",
+      "market research", "competitor analysis", "customer profiling", "persona development",
+      "brand strategy", "positioning", "messaging", "value proposition", "go to market",
+      "community management", "influencer marketing", "affiliate marketing"
+    ],
+    "es": [
+      "seo", "sem", "google analytics", "google ads", "google tag manager", "search console",
+      "meta ads", "facebook ads", "instagram ads", "tiktok ads", "linkedin ads", "twitter ads",
+      "email marketing", "mailchimp", "hubspot", "salesforce marketing cloud", "klaviyo", "activecampaign",
+      "gestión de redes sociales", "hootsuite", "buffer", "sprout social", "later",
+      "marketing de contenidos", "copywriting", "storytelling", "escritura de guiones", "blogging",
+      "crm", "automatización de marketing", "scoring de leads", "nutrición de leads", "campañas drip",
+      "analítica", "data studio", "looker", "tableau", "power bi",
+      "kpi", "roi", "cac", "ltv", "tasa de conversión", "ctr", "cpc", "cpm", "roas",
+      "pruebas a/b", "optimización de conversión", "optimización de landing pages", "análisis de embudo",
+      "investigación de mercado", "análisis de competencia", "perfilado de clientes", "desarrollo de buyer persona",
+      "estrategia de marca", "posicionamiento", "mensajes clave", "propuesta de valor", "go to market",
+      "gestión de comunidades", "marketing de influencers", "marketing de afiliación"
+    ]
+  },
+  "tools": {
+    "en": ["canva", "adobe creative suite", "figma", "semrush", "ahrefs", "moz", "screaming frog", "hotjar", "crazy egg"],
+    "es": ["canva", "adobe creative suite", "figma", "semrush", "ahrefs", "moz", "screaming frog", "hotjar", "crazy egg"]
+  },
+  "responsibilities": {
+    "en": [
+      "create", "develop", "execute", "manage", "analyze", "optimize", "report",
+      "plan campaigns", "create content", "manage social media", "run ads",
+      "analyze metrics", "improve roi", "lead generation", "brand awareness"
+    ],
+    "es": [
+      "crear", "desarrollar", "ejecutar", "gestionar", "analizar", "optimizar", "reportar",
+      "planificar campañas", "crear contenido", "gestionar redes sociales", "ejecutar anuncios",
+      "analizar métricas", "mejorar roi", "generación de leads", "conciencia de marca"
+    ]
+  }
+}

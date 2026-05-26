@@ -1,0 +1,77 @@
+version: "3.8"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# IMPORTANTE - Windows 11 con proyecto en disco Windows (no en WSL2):
+#   Los bind mounts de Windows → Docker son lentos (NTFS + Hyper-V overhead).
+#   Para máximo rendimiento mueve el proyecto dentro de WSL2:
+#     cp -r /mnt/c/tu-proyecto ~/ats-beater
+#   Si prefieres quedarte en Windows, la configuración actual funciona pero
+#   el hot-reload puede tardar 1-3s extra.
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      # Activa BuildKit para que funcione --mount=type=cache en el Dockerfile
+      args:
+        BUILDKIT_INLINE_CACHE: "1"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      # Volumen dedicado para modelos HuggingFace:
+      # persiste aunque hagas docker-compose down y rebuild.
+      # Los modelos (~400MB) se descargan UNA sola vez.
+      - hf_cache:/app/.hf_cache
+    environment:
+      - PYTHONUNBUFFERED=1
+      - HF_HOME=/app/.hf_cache
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      # Necesario para HMR en Windows con WSL2/Hyper-V
+      - CHOKIDAR_USEPOLLING=true
+      - WDS_SOCKET_PORT=0
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=ats_beater
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  # Caché pip: gestionada por BuildKit (--mount=type=cache en Dockerfile)
+  # NO hace falta declararla aquí, BuildKit la maneja solo.
+
+  # Caché modelos HuggingFace / sentence-transformers:
+  # Sobrevive a docker-compose down, docker image rm, docker build, etc.
+  hf_cache:
