@@ -130,6 +130,15 @@ async def analyze_cv_logic(
 
     confidence = calculate_confidence_score(cv_text, job_text_clean)
 
+    # --- 7. Skills técnicas (regex) ---
+    extracted_skills_cv = extract_technical_skills(cv_text)
+    extracted_skills_job = extract_technical_skills(job_text_clean)
+
+    # Calcular habilidades técnicas que faltan en el CV
+    missing_tech_skills = list(set(extracted_skills_job) - set(extracted_skills_cv))
+
+    sector_skills_suggestions = get_relevant_skills_for_sector(job_sector, main_lang, limit=10)
+
     # --- 6. Feedback (13 argumentos) ---
     feedback = generate_detailed_feedback(
         similarity_scores,
@@ -145,14 +154,9 @@ async def analyze_cv_logic(
         education_job,
         confidence,
         sector_comparison,
-        culture_phrases
+        culture_phrases,
+        missing_tech_skills   
     )
-
-    # --- 7. Skills técnicas (regex) ---
-    extracted_skills_cv = extract_technical_skills(cv_text)
-    extracted_skills_job = extract_technical_skills(job_text_clean)
-
-    sector_skills_suggestions = get_relevant_skills_for_sector(job_sector, main_lang, limit=10)
 
     return {
         **feedback,

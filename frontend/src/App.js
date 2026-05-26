@@ -32,6 +32,13 @@ export default function App() {
     }
   }, [result]);
 
+  const scrollToSuggestions = () => {
+    const element = document.getElementById('suggestions-section');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   const handleNewAnalysis = () => {
     setShowForm(true);
     setResult(null); // Limpia el resultado para que desaparezcan los datos previos
@@ -143,7 +150,11 @@ export default function App() {
               </Card>
             )}
 
-            {result.recommendations && result.recommendations.length > 0 && <Recommendations recommendations={result.recommendations} />}
+            {result.recommendations && result.recommendations.length > 0 && 
+              <Recommendations 
+                recommendations={result.recommendations} 
+                onScrollToSuggestions={scrollToSuggestions} />
+            }
 
             {result.culture_suggestions?.length > 0 && (
               <Card title="🌱 Valores y cultura de la empresa">
@@ -184,9 +195,11 @@ export default function App() {
               </Card>
             )}
 
-            <Card title="❌SUGERENCIAS">
+            <div id="suggestions-section">
+              <Card title="❌SUGERENCIAS">
               <MissingTermsWithContext items={result.missing_terms_with_context || result.priority_missing_terms?.map(t => ({ term: t })) || []} />
             </Card>
+            </div>
 
             <Card title="Términos que ya tienes">
               <TagList items={result.matched_terms} color={colors.success} emptyText="No se detectaron coincidencias directas." />

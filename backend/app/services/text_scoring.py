@@ -175,6 +175,14 @@ IRRELEVANT_PHRASES = re.compile(
     |\b(comisiones\s+altas|comisión\s+por\s+reunión|comisión\s+adicional|facturación\s+estimada)
     |\b(incentive\s+awards|performance\s+bonus)
     |\b(initial\s+call|recruiter\s+call|technical\s+interview|final\s+interview|behavioural\s+interview|system\s+design\s+interview)
+    # Proceso de entrevista y tiempos (inglés)
+    |\b(final\s+interview|behavioural\s+interview|system\s+design\s+interview|technical\s+interview|recruiter\s+call|initial\s+call)
+    |\b(our\s+average\s+process\s+takes|around\s+\d+[-–]\d+\s+weeks|work\s+around\s+your\s+availability)
+    |\b(you\s+will\s+be\s+interviewed|interview\s+process\s+involves|stages?\s+of\s+the\s+process)
+    # Español
+    |\b(entrevista\s+final|entrevista\s+de\s+sistema|entrevista\s+técnica|entrevista\s+conductual|llamada\s+inicial|reclutamiento)
+    |\b(nuestro\s+proceso\s+tiene\s+una\s+duración|alrededor\s+de\s+\d+[-–]\d+\s+semanas|adaptarnos\s+a\s+tu\s+disponibilidad)
+    |\b(serás\s+entrevistado|proceso\s+de\s+selección\s+consta\s+de|etapas\s+del\s+proceso)
     """,
     re.IGNORECASE | re.VERBOSE
 )
@@ -203,7 +211,70 @@ def extract_culture_phrases(text: str, lang: str = "en") -> List[Tuple[str, floa
             phrases.append((line, 0.5))
     return phrases
 
+
 def score_sentence(sentence: str, lang: str = "en") -> float:
+    s = sentence.strip()
+    if not s or len(s) < 3:
+        return 0.0
+
+    # ============================================================
+    # 1. Detectar encabezados de sección (formato)
+    # ============================================================
+    # Características de encabezado:
+    # - Línea corta (< 50 caracteres o < 6 palabras)
+    # - Termina en ':' o '...'
+    # - Está en mayúsculas o tiene mayúscula inicial en cada palabra (title case)
+    # - No tiene términos técnicos (simplificado)
+    is_short = len(s) < 50 or len(s.split()) < 6
+    ends_with_colon = s.endswith(':') or s.endswith('...')
+    is_upper = s.isupper()
+    is_title = s.istitle() and len(s.split()) <= 6  # ej: "About The Job"
+    # Detectar si tiene al menos una palabra técnica (para no filtrar frases técnicas cortas)
+    has_tech = bool(TECHNICAL_SIGNALS.search(s) or TEAMWORK_SIGNALS.search(s) or LEVEL_SIGNALS.search(s))
+    
+    if is_short and (ends_with_colon or is_upper or is_title) and not has_tech:
+        return 0.0
+
+    # ============================================================
+    # 2. Filtrar frases que son listas de skills (score máximo)
+    # ============================================================
+    if SKILL_LIST_PATTERN.match(s):
+        # Asegurar que no sea un encabezado camuflado (ej: "Initial Call")
+        if is_short and not has_tech:
+            return 0.0
+        return 1.0
+
+    # ============================================================
+    # 3. Penalización por palabras de empresa/beneficios (lista pequeña)
+    # ============================================================
+    # Nota: Esta lista se mantiene pequeña con términos muy genéricos
+    company_penalty = 0.0
+    generic_company_words = re.compile(
+        r'\b(what we offer|benefits|salary|bonus|perks|diversity|inclusion|equal opportunity|how to apply|send your cv|ofrecemos|beneficios|salario|bonus|diversidad|inclusión|cómo aplicar|proceso de selección)\b',
+        re.IGNORECASE
+    )
+    if generic_company_words.search(s):
+        company_penalty = 0.5
+
+    # ============================================================
+    # 4. Puntuación por señales (igual que antes)
+    # ============================================================
+    base = 0.35 if lang == "en" else 0.40
+    tech = min(1.0, base + len(TECHNICAL_SIGNALS.findall(s)) * 0.1)
+    team = min(1.0, base + len(TEAMWORK_SIGNALS.findall(s)) * 0.1)
+    culture = min(1.0, base + len(CULTURE_SIGNALS.findall(s)) * 0.1)
+    level = min(1.0, base + len(LEVEL_SIGNALS.findall(s)) * 0.1)
+
+    total = (
+        tech * DEFAULT_WEIGHTS["technical"] +
+        team * DEFAULT_WEIGHTS["teamwork"] +
+        culture * DEFAULT_WEIGHTS["culture"] +
+        level * DEFAULT_WEIGHTS["level"]
+    )
+    total = total * (1 - company_penalty)
+    return min(1.0, max(0.0, total))
+
+def score_sentence2(sentence: str, lang: str = "en") -> float:
     """
     Evalúa una frase y devuelve un score entre 0 y 1.
     El idioma (lang) puede ser 'en' o 'es'.

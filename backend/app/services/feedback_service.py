@@ -8,7 +8,7 @@ def generate_detailed_feedback(
     scores: Dict[str, float], missing_terms: List[str], matched_terms: List[str],
     cv_text: str, job_text: str, cv_sector_info: Dict[str, Any], job_sector_info: Dict[str, Any],
     experience_cv: int, experience_job: int, education_cv: Tuple[str, int], education_job: Tuple[str, int],
-    confidence: float, sector_comparison: Dict[str, Any] = None, culture_phrases=None
+    confidence: float, sector_comparison: Dict[str, Any] = None, culture_phrases=None, missing_tech_skills=None
 ) -> Dict[str, Any]:
     overall = scores['overall']
     job_sector = job_sector_info.get("sector", "general")
@@ -39,16 +39,24 @@ def generate_detailed_feedback(
     
     if scores.get('keyword_exact', 0) < 50 and missing_terms:
         recommendations.append({
-            "priority": "Alta", "action": "Añadir palabras clave de la oferta",
+            "priority": "Alta", "action": "Añadir sugerencias clave de la oferta",
             "examples": missing_terms[:5], "impact": "Aumentará el match con el ATS"
         })
     
+    # Recomendación de habilidades técnicas faltantes
     if scores.get('technical_skills', 0) < 50:
-        tech_needed = extract_technical_skills(job_text)[:5]
+        # Usar missing_tech_skills si se proporciona, si no, calcular con extract_technical_skills
+        if missing_tech_skills:
+            tech_needed = missing_tech_skills[:8]   # muestra hasta 8
+        else:
+            tech_needed = extract_technical_skills(job_text)[:5]
+        
         if tech_needed:
             recommendations.append({
-                "priority": "Alta", "action": "Incluir habilidades técnicas específicas",
-                "examples": tech_needed, "impact": "Los ATS buscan skills técnicas exactas"
+                "priority": "Alta",
+                "action": "Incluir habilidades técnicas específicas",
+                "examples": tech_needed,
+                "impact": "Los ATS buscan skills técnicas exactas"
             })
     
     if sector_comparison and sector_comparison.get("missing_skills"):
@@ -64,6 +72,8 @@ def generate_detailed_feedback(
             "examples": [f"La oferta pide {experience_job} años, tu CV muestra {experience_cv} años"],
             "impact": "Destaca proyectos y logros equivalentes"
         })
+
+    
 
     # Procesar frases de cultura
     culture_suggestions = []

@@ -3,7 +3,7 @@ import { colors } from '../../styles/colors';
 import { Card } from '../common/Card';
 import { TagList } from '../common/TagList';
 
-export function Recommendations({ recommendations }) {
+export function Recommendations({ recommendations, onScrollToSuggestions }) {
   if (!recommendations?.length) return null;
   const priorityConfig = {
     Alta: { icon: '⚡', color: colors.danger, bg: colors.dangerSoft },
@@ -39,7 +39,7 @@ export function Recommendations({ recommendations }) {
               {rec.examples && rec.examples.length > 0 && (
                 <div style={{ marginTop: 8, marginLeft: 30 }}>
                   <span style={{ fontSize: 11, color: colors.textMuted }}>Ejemplos: </span>
-                  <TagList items={rec.examples.slice(0, 3)} color={config.color} />
+                  <TagList items={rec.examples.slice(0, 10)} color={config.color} />
                 </div>
               )}
               <div style={{ marginTop: 8, marginLeft: 30 }}>
@@ -49,6 +49,26 @@ export function Recommendations({ recommendations }) {
           );
         })}
       </div>
+      {onScrollToSuggestions && (
+        <div style={{ marginTop: 16, textAlign: 'center' }}>
+          <button
+            onClick={onScrollToSuggestions}
+            style={{
+              background: colors.primary,
+              color: 'white',
+              border: 'none',
+              borderRadius: 20,
+              padding: '8px 16px',
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'background 0.2s'
+            }}
+          >
+            🔍 Ver sugerencias detalladas
+          </button>
+        </div>
+      )}
     </Card>
   );
 }
