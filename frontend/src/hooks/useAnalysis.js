@@ -72,6 +72,7 @@ export function useAnalysis() {
 
   return {
     file, fileName, jobDescription, analysisMode, result, loading, error,
-    handleFileChange, setJobDescription, setAnalysisMode, handleSubmit, handleExportReport
+    handleFileChange, setJobDescription, setAnalysisMode, handleSubmit, handleExportReport,
+    setResult
   };
 }

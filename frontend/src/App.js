@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAnalysis } from './hooks/useAnalysis';
 import { useOptimizer } from './hooks/useOptimizer';
 import { colors } from './styles/colors';
@@ -17,28 +17,68 @@ import { OptimizerModal } from './components/optimizer/OptimizerModal';
 export default function App() {
   const {
     file, fileName, jobDescription, analysisMode, result, loading, error,
-    handleFileChange, setJobDescription, setAnalysisMode, handleSubmit, handleExportReport
+    handleFileChange, setJobDescription, setAnalysisMode, handleSubmit, handleExportReport,
+    setResult   // nuevo: permite resetear el resultado
   } = useAnalysis();
 
   const { showOptimizer, cvOptimizations, loadingOptimizer, handleOptimizeCV, closeOptimizer } = useOptimizer(file, jobDescription);
+
+  const [showForm, setShowForm] = useState(true);
+
+  // Ocultar formulario cuando hay un resultado (análisis completado)
+  useEffect(() => {
+    if (result) {
+      setShowForm(false);
+    }
+  }, [result]);
+
+  const handleNewAnalysis = () => {
+    setShowForm(true);
+    setResult(null); // Limpia el resultado para que desaparezcan los datos previos
+    // Opcional: resetear también el archivo y la descripción? Se mantienen para comodidad.
+  };
 
   return (
     <div style={{ minHeight: '100vh', background: colors.bgCard, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: colors.text }}>
       <div style={{ maxWidth: 880, margin: '0 auto', padding: '48px 24px' }}>
         <Header />
 
-        <JobForm
-          fileName={fileName}
-          jobDescription={jobDescription}
-          analysisMode={analysisMode}
-          onFileChange={handleFileChange}
-          onJobDescriptionChange={setJobDescription}
-          onModeChange={setAnalysisMode}
-          onSubmit={handleSubmit}
-          onExport={handleExportReport}
-          loading={loading}
-          resultExists={!!result}
-        />
+        {showForm && (
+          <JobForm
+            fileName={fileName}
+            jobDescription={jobDescription}
+            analysisMode={analysisMode}
+            onFileChange={handleFileChange}
+            onJobDescriptionChange={setJobDescription}
+            onModeChange={setAnalysisMode}
+            onSubmit={handleSubmit}
+            onExport={handleExportReport}
+            loading={loading}
+            resultExists={!!result}
+          />
+        )}
+
+        {/* Botón para mostrar el formulario nuevamente, solo cuando hay resultado y el formulario está oculto */}
+        {result && !showForm && (
+          <button
+            onClick={handleNewAnalysis}
+            style={{
+              width: '100%',
+              padding: '12px 0',
+              marginBottom: 20,
+              background: colors.primary,
+              color: 'white',
+              border: 'none',
+              borderRadius: 12,
+              fontWeight: 600,
+              fontSize: 14,
+              cursor: 'pointer',
+              transition: 'background 0.2s ease'
+            }}
+          >
+            🔍 Analizar otro CV
+          </button>
+        )}
 
         {error && (
           <div style={{ padding: '14px 20px', borderRadius: 12, marginBottom: 20, background: colors.dangerSoft, border: `1px solid ${colors.danger}30`, color: colors.danger, fontSize: 13, fontWeight: 500 }}>
