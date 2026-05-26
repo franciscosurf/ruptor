@@ -105,6 +105,18 @@ export default function App() {
 
             {result.recommendations && result.recommendations.length > 0 && <Recommendations recommendations={result.recommendations} />}
 
+            {result.culture_suggestions?.length > 0 && (
+              <Card title="🌱 Valores y cultura de la empresa">
+                <ul style={{ margin: 0, paddingLeft: 20 }}>
+                  {result.culture_suggestions.map((item, idx) => (
+                    <li key={idx} style={{ marginBottom: 8, fontSize: 13 }}>
+                      {item.text}
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            )}
+            
             {result.ats_score < 65 && (
               <button onClick={handleOptimizeCV} disabled={loadingOptimizer} style={{
                 width: '100%', padding: '14px 20px', background: loadingOptimizer ? colors.textMuted : colors.warning, color: 'white', border: 'none', borderRadius: 12, fontWeight: 600, fontSize: 14, cursor: loadingOptimizer ? 'not-allowed' : 'pointer', marginBottom: 20

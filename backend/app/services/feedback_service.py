@@ -8,7 +8,7 @@ def generate_detailed_feedback(
     scores: Dict[str, float], missing_terms: List[str], matched_terms: List[str],
     cv_text: str, job_text: str, cv_sector_info: Dict[str, Any], job_sector_info: Dict[str, Any],
     experience_cv: int, experience_job: int, education_cv: Tuple[str, int], education_job: Tuple[str, int],
-    confidence: float, sector_comparison: Dict[str, Any] = None
+    confidence: float, sector_comparison: Dict[str, Any] = None, culture_phrases=None
 ) -> Dict[str, Any]:
     overall = scores['overall']
     job_sector = job_sector_info.get("sector", "general")
@@ -64,6 +64,14 @@ def generate_detailed_feedback(
             "examples": [f"La oferta pide {experience_job} años, tu CV muestra {experience_cv} años"],
             "impact": "Destaca proyectos y logros equivalentes"
         })
+
+    # Procesar frases de cultura
+    culture_suggestions = []
+    for phrase, score in (culture_phrases or []):
+        culture_suggestions.append({
+            "text": phrase,
+            "score": score
+        })
     
     return {
         "ats_score": overall, "level": level, "summary": summary, "detailed_scores": scores,
@@ -76,5 +84,6 @@ def generate_detailed_feedback(
                             "match": round(min(100, (experience_cv / max(experience_job, 1)) * 100), 2)},
         "education_match": {"required_level": education_job[0], "detected_level": education_cv[0],
                            "match": round(min(100, (education_cv[1] / max(education_job[1], 1)) * 100), 2)},
-        "confidence_score": round(confidence, 2)
+        "confidence_score": round(confidence, 2),
+        "culture_suggestions": culture_suggestions[:10]   # top 10
     }

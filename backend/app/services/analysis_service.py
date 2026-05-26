@@ -30,6 +30,7 @@ from app.experience_analyzer import (
 
 from app.services.education_service import extract_education_level
 from app.services.scoring_service import calculate_confidence_score
+from app.services.text_scoring import extract_culture_phrases  # ← añadir este import
 
 def get_threshold_by_sector(sector: str, mode: str = "balanced") -> float:
     """Devuelve umbral semántico según el sector"""
@@ -43,7 +44,6 @@ def get_threshold_by_sector(sector: str, mode: str = "balanced") -> float:
     sector_thresholds = thresholds.get(sector, thresholds["default"])
     return sector_thresholds.get(mode, sector_thresholds["balanced"])
 
-from app.services.text_scoring import extract_relevant_text  # ← añadir este import
 
 async def analyze_cv_logic(
     cv_file: UploadFile,
@@ -90,6 +90,10 @@ async def analyze_cv_logic(
 
     from app.services.text_scoring import extract_relevant_phrases
     job_phrases = extract_relevant_phrases(job_text_clean, min_score=0.4, lang=job_lang)
+
+    # Extraer frases de cultura/valores (sin filtrar por min_score, se incluyen todas)
+    culture_phrases = extract_culture_phrases(job_text_clean, lang=job_lang)
+
     # Eliminar duplicados manteniendo el mayor score
     unique = {}
     for phrase, score in job_phrases:
@@ -140,7 +144,8 @@ async def analyze_cv_logic(
         education_cv,
         education_job,
         confidence,
-        sector_comparison
+        sector_comparison,
+        culture_phrases
     )
 
     # --- 7. Skills técnicas (regex) ---

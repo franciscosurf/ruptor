@@ -108,10 +108,12 @@ COMPANY_SIGNALS = re.compile(
     r"""
     \b(what\s+we\s+offer|benefits|about\s+us|our\s+culture|why\s+join\s+us)
     |\b(salary|bonus|pension|insurance|canteen|gym|parking|flexible\s+working)
-    |\b(diversity|inclusion|equal\s+opportunity|how\s+to\s+apply|send\s+your\s+cv)
+    # |\b(diversity|inclusion|equal\s+opportunity|how\s+to\s+apply|send\s+your\s+cv)
+    |\b(how\s+to\s+apply|send\s+your\s+cv)
     |\b(ofrecemos|beneficios|sobre\s+nosotros|cultura|proceso\s+de\s+selección)
     |\b(salario|bonus|pensión|seguro|comedor|gimnasio|parking|jornada\s+flexible)
-    |\b(diversidad|inclusión|igualdad\s+de\s+oportunidades|cómo\s+aplicar|envía\s+tu\s+cv)
+    # |\b(diversidad|inclusión|igualdad\s+de\s+oportunidades|cómo\s+aplicar|envía\s+tu\s+cv)
+    |\b(cómo\s+aplicar|envía\s+tu\s+cv)
     """,
     re.IGNORECASE | re.VERBOSE
 )
@@ -140,14 +142,16 @@ IRRELEVANT_PHRASES = re.compile(
     |\b(hybrid\s+model|\d+\s+days?\s+a\s+week\s+in\s+the\s+office|fully\s+remote|work\s+from\s+home)
     |\b(kids|children|16-17\s+year\s+olds|free\s+kids\s+account|young\s+people)
     |\b(perks|benefits|salary|bonus|pension|insurance|canteen|gym|parking|flexible\s+working|learning\s+budget)
-    |\b(diversity|inclusion|equal\s+opportunity|how\s+to\s+apply|send\s+your\s+cv)
+    # |\b(diversity|inclusion|equal\s+opportunity|how\s+to\s+apply|send\s+your\s+cv)
+    |\b(how\s+to\s+apply|send\s+your\s+cv)
     # Español (añadimos muchos términos)
     |\b(proceso\s+de\s+selección|entrevista\s+técnica|entrevista\s+final|llamada\s+de\s+reclutamiento)
     |\b(tu\s+día\s+a\s+día|qué\s+harás|tus\s+funciones)
     |\b(modelo\s+híbrido|\d+\s+días\s+a\s+la\s+semana\s+en\s+oficina|completo\s+remoto|trabajo\s+desde\s+casa)
     |\b(niños|pequeños|menores|criaturas|hijos|kínder)
     |\b(beneficios|salario|bonus|pensión|seguro|comedor|gimnasio|parking|jornada\s+flexible|presupuesto\s+de\s+formación)
-    |\b(diversidad|inclusión|igualdad\s+de\s+oportunidades|cómo\s+aplicar|envía\s+tu\s+cv)
+    # |\b(diversidad|inclusión|igualdad\s+de\s+oportunidades|cómo\s+aplicar|envía\s+tu\s+cv)
+    |\b(cómo\s+aplicar|envía\s+tu\s+cv)
     # NUEVOS: encabezados y metadatos
     |\b(estudios\s+mínimos|educación\s+secundaria|experiencia\s+mínima|conocimientos\s+necesarios|sector|otras\s+actividades)
     |\b(categoría|nivel|vacantes|inscritos|salario\s+(?:no\s+disponible|bruto|neto)|ubicación\s+del\s+trabajo|jornada|horario)
@@ -162,10 +166,42 @@ IRRELEVANT_PHRASES = re.compile(
     |\b(al\s+menos\s+\d+\s+año|años?\s+de\s+experiencia\s+mínima|experiencia\s+mínima)
     |\b(qué\s+harás|qué\s+buscamos|perfil\s+ideal|qué\s+ofrecemos)
     |\b(colaboración\s+comercial\s+con\s+una\s+marca\s+reconocida|facturación\s+estimada)
+    # Sueldos y compensaciones (inglés)
+    |\b(salary\s*[:]?\s*[\d\.,€$£]+\s*(?:-|a)?\s*[\d\.,€$£]*|bonus|commission|base\s+salary)
+    |\b(remuneration|compensation|pay|wage|hourly\s+rate|annual\s+salary|monthly\s+salary)
+    # Sueldos y compensaciones (español)
+    |\b(salario\s*[:]?\s*[\d\.,€\$]+\s*(?:-|a)?\s*[\d\.,€\$]*|sueldo|comisión|retribución)
+    |\b(base\s+salarial|salario\s+base|bruto|neto|mensual|anual|por\s+hora)
+    |\b(comisiones\s+altas|comisión\s+por\s+reunión|comisión\s+adicional|facturación\s+estimada)
+    |\b(incentive\s+awards|performance\s+bonus)
+    |\b(initial\s+call|recruiter\s+call|technical\s+interview|final\s+interview|behavioural\s+interview|system\s+design\s+interview)
     """,
     re.IGNORECASE | re.VERBOSE
 )
 
+
+def extract_culture_phrases(text: str, lang: str = "en") -> List[Tuple[str, float]]:
+    """
+    Extrae frases relacionadas con cultura, diversidad, inclusión, etc.
+    """
+    lines = text.splitlines()
+    phrases = []
+    # Usamos CULTURE_SIGNALS (ya definido) y algunas palabras adicionales
+    culture_pattern = re.compile(
+        r'\b(diversity|inclusion|equal opportunity|belonging|respect|open.minded|'
+        r'growth mindset|continuous learning|empathy|accessibility|a11y|'
+        r'diversidad|inclusión|igualdad de oportunidades|pertenencia|respeto|mente abierta|'
+        r'mentalidad de crecimiento|aprendizaje continuo|empatía|accesibilidad)\b',
+        re.IGNORECASE
+    )
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+        if culture_pattern.search(line):
+            # Asignamos un score fijo para que no interfiera con las señales técnicas
+            phrases.append((line, 0.5))
+    return phrases
 
 def score_sentence(sentence: str, lang: str = "en") -> float:
     """

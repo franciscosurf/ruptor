@@ -178,8 +178,91 @@ def semantic_term_coverage(
     return coverage, matched, missing_sorted
 
 
-
 def semantic_phrase_coverage(
+    cv_terms: List[str],
+    job_phrases_with_scores: List[Tuple[str, float]],
+    job_text: str,
+    threshold: float = 0.60
+) -> Tuple[float, List[str], List[Dict[str, Any]]]:
+    """
+    Compara frases de la oferta (con señales) con términos del CV.
+    job_phrases_with_scores: lista de (frase, score_signal)
+    threshold: umbral de similitud coseno (0.6 por defecto)
+    """
+    if not cv_terms or not job_phrases_with_scores:
+        return 0.0, [], []
+
+    _init_models()
+    emb_model = get_embedding_model()
+
+    # --- 1. Eliminar duplicados exactos (mismo texto) ---
+    unique = {}
+    for phrase, score in job_phrases_with_scores:
+        if phrase not in unique or score > unique[phrase]:
+            unique[phrase] = score
+    job_phrases_with_scores = [(p, s) for p, s in unique.items()]
+
+    # --- 2. Eliminar frases que son subcadenas de otras más largas ---
+    to_remove = set()
+    items = list(job_phrases_with_scores)  # copia para iterar
+    for i, (phrase_i, score_i) in enumerate(items):
+        for j, (phrase_j, score_j) in enumerate(items):
+            if i == j:
+                continue
+            # Si phrase_i está contenida en phrase_j y phrase_i es más corta, marcar para eliminar
+            if phrase_i in phrase_j and len(phrase_i) < len(phrase_j):
+                to_remove.add(phrase_i)
+            # También si son igual de largas pero una tiene mayor score, mantener la de mayor score
+            # (esto ya lo maneja el diccionario unique, pero aquí reforzamos)
+            if phrase_i == phrase_j and score_i < score_j:
+                to_remove.add(phrase_i)
+    job_phrases_with_scores = [(p, s) for p, s in job_phrases_with_scores if p not in to_remove]
+
+    # Extraer solo las frases y sus scores
+    job_phrases = [phrase for phrase, _ in job_phrases_with_scores]
+    original_scores = [score for _, score in job_phrases_with_scores]
+
+    if not job_phrases:
+        return 0.0, [], []
+
+    try:
+        cv_embs = emb_model.encode(cv_terms)
+        job_embs = emb_model.encode(job_phrases)
+        sim_matrix = cosine_similarity(job_embs, cv_embs)
+    except Exception as e:
+        print(f"Error en embeddings: {e}")
+        return 0.0, [], []
+
+    matched = []
+    missing = []
+
+    for i, (phrase, orig_score) in enumerate(zip(job_phrases, original_scores)):
+        best_sim = float(sim_matrix[i].max()) if i < len(sim_matrix) else 0.0
+
+        term_info = {
+            "term": phrase,
+            "score": round(orig_score, 3),
+            "semantic_score": round(best_sim, 3),
+            "context": phrase  # la propia frase como contexto
+        }
+
+        if best_sim >= threshold:
+            matched.append(phrase)
+        else:
+            # Solo añadir si el score de señal es >= 0.4 (evita frases muy irrelevantes)
+            if orig_score >= 0.4:
+                missing.append(term_info)
+
+    # Ordenar por score de señal (mayor primero)
+    missing_sorted = sorted(missing, key=lambda x: x['score'], reverse=True)[:15]
+
+    coverage = round(len(matched) / len(job_phrases) * 100, 2) if job_phrases else 0.0
+    print(f"📊 Frases relevantes: {len(job_phrases)} | Matched: {len(matched)} | Missing: {len(missing)}")
+
+    return coverage, matched, missing_sorted
+
+
+def semantic_phrase_coverage2(
     cv_terms: List[str],
     job_phrases_with_scores: List[Tuple[str, float]],
     job_text: str,
