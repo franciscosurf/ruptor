@@ -21,7 +21,19 @@ export function MissingTermsWithContext({ items }) {
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <span style={{ fontSize: 16 }}>⚠️</span>
-              <span style={{ fontWeight: 600, fontSize: 14, color: colors.danger }}>{item.term}</span>
+              <span style={{ 
+                fontWeight: 600, 
+                fontSize: 14, 
+                color: colors.danger,
+                display: 'inline-block',
+                maxWidth: '100%',
+                width: '610px',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap'
+              }}>
+                {item.term}
+              </span>
               <span style={{ fontSize: 11, background: colors.danger + '20', padding: '2px 8px', borderRadius: 20, color: colors.danger }}>
                 score: {item.score?.toFixed(2) || 'N/A'}
               </span>
