@@ -68,3 +68,29 @@ logs/
 *.dll
 *.test
 *.pyd
+
+# Cachés de Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+
+# Cachés de modelos (Hugging Face, sentence-transformers, spaCy)
+.hf_cache/
+.cache/
+models/
+*.bin
+*.safetensors
+
+# Caché de KeyBERT / sentence-transformers
+sentence_transformers_cache/
+
+# Caché de spaCy
+.cache_spacy/
+spacy_models/
+
+# Otros
+*.log
+*.pid
+*.seed
+*.pid
