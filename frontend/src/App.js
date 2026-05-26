@@ -1,225 +1,185 @@
 import React, { useState, useEffect } from 'react';
 import { useAnalysis } from './hooks/useAnalysis';
 import { useOptimizer } from './hooks/useOptimizer';
-import { colors } from './styles/colors';
-import { ScoreCircle } from './components/common/ScoreCircle';
-import { Card } from './components/common/Card';
-import { TagList } from './components/common/TagList';
-import { LoadingSpinner } from './components/common/LoadingSpinner';
-import { DetailedScores } from './components/analysis/DetailedScores';
-import { Recommendations } from './components/analysis/Recommendations';
-import { MissingTermsWithContext } from './components/analysis/MissingTermsWithContext';
-import { JobSkillsList } from './components/analysis/JobSkillsList';
-import { Header } from './components/analysis/Header';
-import { JobForm } from './components/forms/JobForm';
-import { OptimizerModal } from './components/optimizer/OptimizerModal';
+import { Header } from './components/layout/Header';
+import { Link } from 'react-router-dom';
 
 export default function App() {
   const {
     file, fileName, jobDescription, analysisMode, result, loading, error,
     handleFileChange, setJobDescription, setAnalysisMode, handleSubmit, handleExportReport,
-    setResult   // nuevo: permite resetear el resultado
+    setResult
   } = useAnalysis();
 
   const { showOptimizer, cvOptimizations, loadingOptimizer, handleOptimizeCV, closeOptimizer } = useOptimizer(file, jobDescription);
 
-  const [showForm, setShowForm] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [showResults, setShowResults] = useState(false);
 
-  // Ocultar formulario cuando hay un resultado (análisis completado)
   useEffect(() => {
-    if (result) {
-      setShowForm(false);
-    }
+    if (result) setShowResults(true);
   }, [result]);
 
-  const scrollToSuggestions = () => {
-    const element = document.getElementById('suggestions-section');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+  const handleNewAnalysis = () => {
+    setResult(null);
+    setShowResults(false);
   };
 
-  const handleNewAnalysis = () => {
-    setShowForm(true);
-    setResult(null); // Limpia el resultado para que desaparezcan los datos previos
-    // Opcional: resetear también el archivo y la descripción? Se mantienen para comodidad.
+  const closeModal = () => setShowModal(false);
+
+  const scrollToSuggestions = () => {
+    const el = document.getElementById('suggestions-section');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: colors.bgCard, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: colors.text }}>
-      <div style={{ maxWidth: 880, margin: '0 auto', padding: '48px 24px' }}>
+    <>
+      {/* Tailwind CSS CDN y estilos personalizados */}
+      <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+      <style>{`
+        body {
+          font-family: 'Inter', sans-serif;
+          background: #ffffff;
+          color: #0b1020;
+        }
+        .gradient-text {
+          background: linear-gradient(90deg, #7c3aed, #2563eb);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+        .hero-glow {
+          position: absolute;
+          width: 500px;
+          height: 500px;
+          background: radial-gradient(circle, rgba(99,102,241,0.20) 0%, rgba(255,255,255,0) 70%);
+          top: -120px;
+          right: -120px;
+          z-index: 0;
+        }
+        .grid-bg {
+          background-image: linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+                            linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+          background-size: 40px 40px;
+        }
+        .card {
+          background: rgba(255,255,255,0.8);
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(0,0,0,0.06);
+        }
+      `}</style>
+
+      <div className="font-['Inter',sans-serif] bg-white text-[#0b1020] overflow-x-hidden">
+        {/* HEADER */}
         <Header />
 
-        {showForm && (
-          <JobForm
-            fileName={fileName}
-            jobDescription={jobDescription}
-            analysisMode={analysisMode}
-            onFileChange={handleFileChange}
-            onJobDescriptionChange={setJobDescription}
-            onModeChange={setAnalysisMode}
-            onSubmit={handleSubmit}
-            onExport={handleExportReport}
-            loading={loading}
-            resultExists={!!result}
-          />
-        )}
+        {/* HERO */}
+        <section className="relative overflow-hidden grid-bg">
+          <div className="hero-glow"></div>
+          <div className="max-w-7xl mx-auto px-6 py-28 relative z-10">
+            <div className="max-w-4xl">
+              <div className="inline-flex items-center gap-2 bg-black/5 border border-black/5 rounded-full px-4 py-2 mb-8">
+                <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                <span className="text-sm font-medium">Optimizado para ATS modernos con IA</span>
+              </div>
+              <h1 className="text-6xl md:text-8xl font-black tracking-tight leading-none mb-8">
+                Supera el filtro.
+                <span className="gradient-text block">Llega al humano.</span>
+              </h1>
+              <p className="text-xl md:text-2xl text-black/60 leading-relaxed max-w-3xl mb-12">
+                Tu CV está compitiendo primero contra algoritmos, no personas.
+                <strong className="text-black"> ruptor</strong> optimiza tu candidatura
+                para que atraviese filtros ATS y consiga entrevistas reales.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link to="/scanner" className="px-8 py-5 rounded-2xl bg-black text-white text-lg font-semibold hover:scale-105 transition shadow-2xl inline-block">
+                  Analizar mi CV
+                </Link>
+                <button className="px-8 py-5 rounded-2xl border border-black/10 bg-white text-lg font-semibold hover:bg-black/5 transition">
+                  Ver demo
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
 
-        {/* Botón para mostrar el formulario nuevamente, solo cuando hay resultado y el formulario está oculto */}
-        {result && !showForm && (
-          <button
-            onClick={handleNewAnalysis}
-            style={{
-              width: '100%',
-              padding: '12px 0',
-              marginBottom: 20,
-              background: colors.primary,
-              color: 'white',
-              border: 'none',
-              borderRadius: 12,
-              fontWeight: 600,
-              fontSize: 14,
-              cursor: 'pointer',
-              transition: 'background 0.2s ease'
-            }}
-          >
-            🔍 Analizar otro CV
-          </button>
-        )}
+        {/* FEATURES - Cómo funciona */}
+        <section className="py-28">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="text-center mb-20">
+              <span className="gradient-text font-bold uppercase tracking-widest text-sm">Cómo funciona</span>
+              <h2 className="text-5xl font-black mt-4 mb-6">Hackea el proceso ATS</h2>
+              <p className="text-xl text-black/60 max-w-2xl mx-auto">Convierte un CV invisible para IA en una candidatura optimizada para superar filtros automáticos.</p>
+            </div>
+            <div className="grid md:grid-cols-3 gap-8">
+              <div className="card rounded-3xl p-8 shadow-xl">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center text-2xl mb-6">📄</div>
+                <h3 className="text-2xl font-bold mb-4">Escaneo ATS</h3>
+                <p className="text-black/60 leading-relaxed">Analizamos cómo interpreta tu CV un sistema ATS moderno y detectamos puntos débiles automáticamente.</p>
+              </div>
+              <div className="card rounded-3xl p-8 shadow-xl">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center text-2xl mb-6">⚡</div>
+                <h3 className="text-2xl font-bold mb-4">Optimización IA</h3>
+                <p className="text-black/60 leading-relaxed">Mejoramos keywords, estructura y compatibilidad para aumentar tu score ATS y pasar filtros.</p>
+              </div>
+              <div className="card rounded-3xl p-8 shadow-xl">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center text-2xl mb-6">🎯</div>
+                <h3 className="text-2xl font-bold mb-4">Más entrevistas</h3>
+                <p className="text-black/60 leading-relaxed">Porque el objetivo real no es “tener un CV bonito”, sino llegar al recruiter humano.</p>
+              </div>
+            </div>
+          </div>
+        </section>
 
+        {/* SOCIAL PROOF - El mercado cambió */}
+        <section className="py-24 bg-black text-white relative overflow-hidden">
+          <div className="absolute inset-0 opacity-20">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full bg-purple-600 blur-3xl"></div>
+          </div>
+          <div className="max-w-6xl mx-auto px-6 relative z-10 text-center">
+            <h2 className="text-5xl font-black mb-8">El mercado cambió.</h2>
+            <p className="text-2xl text-white/70 max-w-3xl mx-auto leading-relaxed mb-16">
+              Hoy la mayoría de candidatos son rechazados antes de que un humano lea su CV. ruptor nace para cambiar eso.
+            </p>
+            <div className="grid md:grid-cols-3 gap-8">
+              <div><div className="text-6xl font-black gradient-text mb-3">75%</div><p className="text-white/60">de CVs nunca llegan a un recruiter</p></div>
+              <div><div className="text-6xl font-black gradient-text mb-3">+3x</div><p className="text-white/60">más posibilidades de pasar ATS</p></div>
+              <div><div className="text-6xl font-black gradient-text mb-3">IA</div><p className="text-white/60">optimizando cada candidatura</p></div>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA - Tu próximo trabajo */}
+        <section className="py-28">
+          <div className="max-w-5xl mx-auto px-6">
+            <div className="rounded-[40px] p-14 bg-gradient-to-br from-purple-600 to-blue-500 text-white text-center shadow-2xl">
+              <h2 className="text-5xl font-black mb-6">Tu próximo trabajo no debería perderse en un algoritmo.</h2>
+              <p className="text-xl text-white/80 max-w-2xl mx-auto mb-10">Empieza gratis y descubre cómo los ATS están leyendo realmente tu CV.</p>
+              <button onClick={() => setShowModal(true)} className="px-10 py-5 bg-white text-black rounded-2xl text-lg font-bold hover:scale-105 transition">
+                Probar ruptor gratis
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* FOOTER */}
+        <footer className="border-t border-black/5 py-10">
+          <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center text-white font-bold">⚡</div>
+              <span className="font-bold text-lg">ruptor</span>
+            </div>
+            <p className="text-black/40 text-sm">© 2026 ruptor — Supera el filtro. Llega al humano.</p>
+          </div>
+        </footer>
+
+        {/* Loading y error */}
+        {loading && <LoadingSpinner />}
         {error && (
-          <div style={{ padding: '14px 20px', borderRadius: 12, marginBottom: 20, background: colors.dangerSoft, border: `1px solid ${colors.danger}30`, color: colors.danger, fontSize: 13, fontWeight: 500 }}>
+          <div className="fixed bottom-4 right-4 bg-red-100 border border-red-300 text-red-700 px-4 py-2 rounded-lg shadow-lg">
             ⚠️ {error}
           </div>
         )}
-
-        {loading && <LoadingSpinner />}
-
-        {result && !loading && (
-          <>
-            <Card>
-              <ScoreCircle score={result.ats_score} level={result.level} />
-              <p style={{ textAlign: 'center', margin: '0 auto', color: colors.text, fontSize: 14, lineHeight: 1.5, maxWidth: 450 }}>{result.summary}</p>
-
-              {result.profession_detected && (
-                <div style={{ marginTop: 20, textAlign: 'center', padding: '10px 16px', background: colors.primarySoft, borderRadius: 12, display: 'inline-block', width: 'auto', margin: '20px auto 0' }}>
-                  <span style={{ fontSize: 12, color: colors.textMuted }}>🎯 Profesión detectada: </span>
-                  <span style={{ fontWeight: 600, color: colors.primaryDark }}>{result.profession_detected.profession?.toUpperCase()}</span>
-                  <span style={{ fontSize: 11, color: colors.textMuted, marginLeft: 8 }}>· confianza {result.confidence_score}%</span>
-                </div>
-              )}
-
-              <div style={{ display: 'flex', gap: 24, marginTop: 24, justifyContent: 'center', paddingTop: 20, borderTop: `1px solid ${colors.border}` }}>
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: 28, fontWeight: 700, color: colors.primary }}>{result.detailed_scores?.semantic || 0}%</div>
-                  <div style={{ fontSize: 11, color: colors.textMuted }}>Semántico</div>
-                </div>
-                <div style={{ width: 1, background: colors.border }} />
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: 28, fontWeight: 700, color: colors.primary }}>{result.detailed_scores?.keyword_exact || 0}%</div>
-                  <div style={{ fontSize: 11, color: colors.textMuted }}>Cobertura</div>
-                </div>
-              </div>
-              {result.detailed_scores && <DetailedScores scores={result.detailed_scores} />}
-            </Card>
-
-            {(result.experience_match || result.education_match) && (
-              <Card title="Experiencia y Educación">
-                {result.experience_match && (
-                  <div style={{ marginBottom: 20 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-                      <span style={{ color: colors.textMuted, fontSize: 13 }}>Años de experiencia</span>
-                      <span style={{ fontWeight: 600 }}>{result.experience_match.detected} / {result.experience_match.required} años</span>
-                    </div>
-                    <div style={{ background: colors.border, borderRadius: 100, height: 6, overflow: 'hidden' }}>
-                      <div style={{ width: `${result.experience_match.match}%`, background: colors.primary, height: '100%', borderRadius: 100, transition: 'width 0.3s ease' }} />
-                    </div>
-                  </div>
-                )}
-                {result.education_match && (
-                  <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-                      <span style={{ color: colors.textMuted, fontSize: 13 }}>Nivel educativo</span>
-                      <span style={{ fontWeight: 600 }}>{result.education_match.detected_level} / {result.education_match.required_level}</span>
-                    </div>
-                    <div style={{ background: colors.border, borderRadius: 100, height: 6, overflow: 'hidden' }}>
-                      <div style={{ width: `${result.education_match.match}%`, background: colors.success, height: '100%', borderRadius: 100, transition: 'width 0.3s ease' }} />
-                    </div>
-                  </div>
-                )}
-              </Card>
-            )}
-
-            {result.recommendations && result.recommendations.length > 0 && 
-              <Recommendations 
-                recommendations={result.recommendations} 
-                onScrollToSuggestions={scrollToSuggestions} />
-            }
-
-            {result.culture_suggestions?.length > 0 && (
-              <Card title="🌱 Valores y cultura de la empresa">
-                <ul style={{ margin: 0, paddingLeft: 20 }}>
-                  {result.culture_suggestions.map((item, idx) => (
-                    <li key={idx} style={{ marginBottom: 8, fontSize: 13 }}>
-                      {item.text}
-                    </li>
-                  ))}
-                </ul>
-              </Card>
-            )}
-            
-            {result.ats_score < 65 && (
-              <button onClick={handleOptimizeCV} disabled={loadingOptimizer} style={{
-                width: '100%', padding: '14px 20px', background: loadingOptimizer ? colors.textMuted : colors.warning, color: 'white', border: 'none', borderRadius: 12, fontWeight: 600, fontSize: 14, cursor: loadingOptimizer ? 'not-allowed' : 'pointer', marginBottom: 20
-              }}>
-                {loadingOptimizer ? 'Generando optimizaciones...' : '✨ Optimizar Mi CV'}
-              </button>
-            )}
-
-            {(result.extracted_skills_cv?.length > 0 || result.extracted_skills_job?.length > 0) && (
-              <Card title="Habilidades Técnicas">
-                <div style={{ marginBottom: 20 }}>
-                  <div style={{ fontSize: 12, fontWeight: 500, marginBottom: 10, color: colors.textMuted }}>✅ Tu CV detecta</div>
-                  <TagList items={result.extracted_skills_cv} color={colors.success} emptyText="No se detectaron skills específicas" />
-                </div>
-                <div>
-                  <div style={{ fontSize: 12, fontWeight: 500, marginBottom: 10, color: colors.textMuted }}>🎯 La oferta requiere</div>
-                  <JobSkillsList cvSkills={result.extracted_skills_cv || []} jobSkills={result.extracted_skills_job || []} />
-                </div>
-              </Card>
-            )}
-
-            {result.profession_skills_suggestions?.length > 0 && (
-              <Card title="💡 Skills sugeridas para tu perfil">
-                <TagList items={result.profession_skills_suggestions} color={colors.warning} />
-              </Card>
-            )}
-
-            <div id="suggestions-section">
-              <Card title="❌SUGERENCIAS">
-              <MissingTermsWithContext items={result.missing_terms_with_context || result.priority_missing_terms?.map(t => ({ term: t })) || []} />
-            </Card>
-            </div>
-
-            <Card title="Términos que ya tienes">
-              <TagList items={result.matched_terms} color={colors.success} emptyText="No se detectaron coincidencias directas." />
-            </Card>
-
-            <details style={{ marginTop: 12 }}>
-              <summary style={{ cursor: 'pointer', color: colors.primary, fontWeight: 500, padding: '12px 0', fontSize: 13, listStyle: 'none' }}>🔍 Ver análisis completo de palabras clave</summary>
-              <div style={{ marginTop: 16 }}>
-                <Card title="Palabras clave del CV">
-                  <TagList items={result.cv_terms} color={colors.textMuted} />
-                </Card>
-                <Card title="Palabras clave de la oferta">
-                  <TagList items={result.job_terms} color={colors.primary} />
-                </Card>
-              </div>
-            </details>
-          </>
-        )}
       </div>
-      <OptimizerModal show={showOptimizer} data={cvOptimizations} onClose={closeOptimizer} />
-    </div>
+    </>
   );
 }
