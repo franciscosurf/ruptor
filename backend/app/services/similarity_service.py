@@ -63,45 +63,6 @@ def calculate_weighted_similarity(
     }
 
 
-def _find_term_context(term: str, job_text: str) -> str:
-    """
-    Devuelve la primera línea (hasta salto de línea) que contiene el término.
-    Contexto limpio y legible para el usuario.
-    """
-    term_lower = term.lower()
-    for line in job_text.splitlines():
-        if term_lower in line.lower():
-            return line.strip()
-    return term
-
-def _find_term_context2(term: str, job_text: str) -> str:
-    """
-    Devuelve el párrafo completo (hasta el siguiente punto y aparte) donde aparece el término.
-    """
-    term_lower = term.lower()
-    text_lower = job_text.lower()
-    idx = text_lower.find(term_lower)
-    if idx == -1:
-        return term
-
-    # Buscar el inicio del párrafo: saltos de línea dobles o inicio del texto
-    start = max(0, text_lower.rfind('\n\n', 0, idx))
-    if start == 0 and text_lower[0] != '\n':
-        start = 0
-    else:
-        start += 2  # saltar los dos saltos de línea
-
-    # Buscar el final del párrafo: siguiente doble salto de línea o fin del texto
-    end = text_lower.find('\n\n', idx)
-    if end == -1:
-        end = len(job_text)
-
-    context = job_text[start:end].strip()
-    # Limpiar saltos de línea internos (opcional, para que se vea como frase continua)
-    context = ' '.join(context.split())
-    return context
-
-
 def semantic_term_coverage(
     cv_terms: List[str],
     job_terms_with_scores: List[Tuple[str, float]],
@@ -215,147 +176,70 @@ def semantic_term_coverage(
     
     return coverage, matched, missing_sorted
 
-def semantic_term_coverage2(
+
+def semantic_phrase_coverage(
     cv_terms: List[str],
-    job_terms_with_scores: List[Tuple[str, float]],
+    job_phrases_with_scores: List[Tuple[str, float]],
     job_text: str,
-    threshold: float = 0.50
+    threshold: float = 0.60
 ) -> Tuple[float, List[str], List[Dict[str, Any]]]:
-    """Versión robusta con filtro técnico usando skills del sector."""
-    if not cv_terms:
+    """
+    Compara frases de la oferta (con señales) con términos del CV.
+    job_phrases_with_scores: lista de (frase, score_signal)
+    threshold: umbral de similitud coseno (0.6 por defecto)
+    """
+
+    # Eliminar frases duplicadas exactas (mismo texto)
+    unique_phrases = {}
+    for phrase, score in job_phrases_with_scores:
+        if phrase not in unique_phrases or score > unique_phrases[phrase]:
+            unique_phrases[phrase] = score
+    job_phrases_with_scores = [(p, s) for p, s in unique_phrases.items()]
+
+
+    if not cv_terms or not job_phrases_with_scores:
         return 0.0, [], []
-    
-    # Fallback si no hay términos de oferta
-    if not job_terms_with_scores:
-        fallback_skills = extract_technical_skills(job_text)
-        if fallback_skills:
-            job_terms_with_scores = [(skill, 0.5) for skill in fallback_skills[:40]]
-        else:
-            sector = detect_sector_from_text(job_text).get("sector", "general")
-            lang = detect_language(job_text)
-            sector_skills = get_skill_sector(sector, lang)
-            if sector_skills:
-                job_terms_with_scores = [(skill, 0.4) for skill in list(sector_skills)[:40]]
-            else:
-                return 0.0, [], [{
-                    "term": "NO_SE_EXTRAJERON_TERMINOS",
-                    "score": 0,
-                    "semantic_score": 0,
-                    "context": "No se detectaron términos técnicos en la oferta."
-                }]
-    
+
     _init_models()
     emb_model = get_embedding_model()
-    
-    # Filtrar ruido básico
-    filtered_terms = []
-    filtered_scores = []
-    lang = detect_language(job_text)
-    for term, score in job_terms_with_scores:
-        term_lower = term.lower()
-        if len(term_lower) < 3:
-            continue
-        if term_lower in NOISE_TERMS:
-            continue
-        if len(term_lower.split()) > 3:
-            continue
-        if re.search(r'\d{3,}', term_lower):
-            continue
-        # (Opcional: más filtros lingüísticos)
-        filtered_terms.append(term)
-        filtered_scores.append(score)
-    
-    if not filtered_terms:
-        filtered_terms = [t for t, _ in job_terms_with_scores[:30]]
-        filtered_scores = [0.3] * len(filtered_terms)
-    
+
+    # Extraer solo las frases
+    job_phrases = [phrase for phrase, _ in job_phrases_with_scores]
+    original_scores = [score for _, score in job_phrases_with_scores]
+
     try:
         cv_embs = emb_model.encode(cv_terms)
-        job_embs = emb_model.encode(filtered_terms)
+        job_embs = emb_model.encode(job_phrases)
         sim_matrix = cosine_similarity(job_embs, cv_embs)
     except Exception as e:
         print(f"Error en embeddings: {e}")
         return 0.0, [], []
-    
+
     matched = []
     missing = []
-    sentences = re.split(r'[.!?\n]+', job_text)
-    
-    for i, (job_term, original_score) in enumerate(zip(filtered_terms, filtered_scores)):
+
+    for i, (phrase, orig_score) in enumerate(zip(job_phrases, original_scores)):
         best_sim = float(sim_matrix[i].max()) if i < len(sim_matrix) else 0.0
-        context = ""
-        context = _find_term_context(job_term, job_text)  # incluye una oración antes y después
-
-
 
         term_info = {
-            "term": job_term,
-            "score": round(original_score, 3),
+            "term": phrase,
+            "score": round(orig_score, 3),
             "semantic_score": round(best_sim, 3),
-            "context": context or job_term
+            "context": phrase  # la propia frase como contexto
         }
+
         if best_sim >= threshold:
-            matched.append(job_term)
+            matched.append(phrase)
         else:
             missing.append(term_info)
-    
-    # ========== FILTRO TÉCNICO ==========
-    # Obtener sector y skills de referencia
-    sector_info = detect_sector_from_text(job_text)
-    sector = sector_info.get("sector", "general")
-    sector_skills = get_skill_sector(sector, lang)
-    
-    def is_technical(term: str) -> bool:
-        term_low = term.lower()
-        # Coincidencia exacta o parcial con skills del sector
-        if term_low in sector_skills:
-            return True
-        words = term_low.split()
-        if any(w in sector_skills and len(w) >= 3 for w in words):
-            return True
-        # Palabras claramente no técnicas
-        non_tech = {
-            "colectivo", "lgtb", "fisio", "yoga", "gourmet", "retribución", "familia",
-            "aventura", "discriminación", "primando", "ofrecemos", "tenemos", "celebramos",
-            "organizamos", "cosquilleo", "tripa", "millones", "personas", "jornada",
-            "turnos", "presencial", "remoto", "hacemos", "meetups", "mogollón", "sacamos"
-        }
-        return not any(w in non_tech for w in words)
-    
-    missing = [item for item in missing if is_technical(item['term'])]
-    
 
-    # Eliminar términos redundantes dentro del mismo contexto
-    def filter_redundant_terms(missing_list):
-        """
-        Agrupa por contexto y, dentro de cada grupo, elimina términos que son
-        subcadenas de otro término más largo o que tienen un score menor.
-        """
-        # Agrupar por contexto
-        context_groups = {}
-        for item in missing_list:
-            ctx = item['context']
-            if ctx not in context_groups:
-                context_groups[ctx] = []
-            context_groups[ctx].append(item)
-        
-        filtered = []
-        for ctx, items in context_groups.items():
-            # Ordenar por longitud del término (descendente) y luego por score (descendente)
-            items.sort(key=lambda x: (len(x['term']), x['score']), reverse=True)
-            best = items[0]  # el más largo y con mayor score
-            filtered.append(best)
-            # Opcional: si hay otros que no son subcadenas del mejor, podrían añadirse, pero es raro
-            # Para este caso, nos quedamos solo con el mejor por contexto.
-        return filtered
+    # Filtrar por puntuación de señal (solo frases con señal mínima)
+    missing = [item for item in missing if item["score"] >= 0.4]
 
-    missing = filter_redundant_terms(missing)
-
-    # Ordenar por relevancia
+    # Ordenar por score de señal (mayor primero)
     missing_sorted = sorted(missing, key=lambda x: x['score'], reverse=True)[:15]
-    coverage = round(len(matched) / len(filtered_terms) * 100, 2) if filtered_terms else 0.0
-    print(f"📊 Términos relevantes: {len(filtered_terms)} | Matched: {len(matched)} | Missing: {len(missing)}")
-    
+
+    coverage = round(len(matched) / len(job_phrases) * 100, 2) if job_phrases else 0.0
+    print(f"📊 Frases relevantes: {len(job_phrases)} | Matched: {len(matched)} | Missing: {len(missing)}")
+
     return coverage, matched, missing_sorted
-
-

@@ -167,11 +167,7 @@ def score_sentence(sentence: str, lang: str = "en") -> float:
     return min(1.0, max(0.0, total))
 
 
-
 def extract_relevant_text(text: str, min_score: float = 0.45, sector: str = "general", lang: str = "en") -> str:
-    """
-    Extrae líneas relevantes, repite las de alto valor y devuelve el texto filtrado.
-    """
     lines = text.splitlines()
     scored_lines = []
     for line in lines:
@@ -180,11 +176,12 @@ def extract_relevant_text(text: str, min_score: float = 0.45, sector: str = "gen
             continue
         score = score_sentence(line, lang=lang)
         if score >= min_score:
-            repeats = 3 if score >= 0.9 else (2 if score >= 0.7 else 1)
-            scored_lines.extend([line] * repeats)
+            # 🔥 ELIMINA LOS REPEATS: añade la línea solo una vez
+            scored_lines.append(line)
     if not scored_lines:
         return " ".join(text.split()[:500])
     return "\n".join(scored_lines)[:15000]
+
 
 def extract_relevant_phrases(text: str, min_score: float = 0.45, lang: str = "en") -> List[Tuple[str, float]]:
     """
@@ -200,3 +197,4 @@ def extract_relevant_phrases(text: str, min_score: float = 0.45, lang: str = "en
         if score >= min_score:
             phrases.append((line, score))
     return phrases
+
