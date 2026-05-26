@@ -63,6 +63,7 @@ def calculate_weighted_similarity(
     }
 
 
+
 def semantic_term_coverage(
     cv_terms: List[str],
     job_terms_with_scores: List[Tuple[str, float]],
@@ -175,6 +176,7 @@ def semantic_term_coverage(
     print(f"📊 Términos relevantes: {len(filtered_terms)} | Matched: {len(matched)} | Missing: {len(missing)}")
     
     return coverage, matched, missing_sorted
+
 
 
 def semantic_phrase_coverage(

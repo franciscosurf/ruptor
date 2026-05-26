@@ -131,6 +131,41 @@ SKILL_LIST_PATTERN = re.compile(
     re.VERBOSE
 )
 
+# Frases/encabezados completamente irrelevantes (entrevista, beneficios, modalidad, metadatos, etc.) - bilingüe
+IRRELEVANT_PHRASES = re.compile(
+    r"""
+    # Inglés
+    \b(interview\s+process|recruiter\s+call|technical\s+interview|final\s+interview|behavioural\s+interview)
+    |\b(your\s+day\-to\-day|what\s+you'll\s+do|day\s+in\s+the\s+life)
+    |\b(hybrid\s+model|\d+\s+days?\s+a\s+week\s+in\s+the\s+office|fully\s+remote|work\s+from\s+home)
+    |\b(kids|children|16-17\s+year\s+olds|free\s+kids\s+account|young\s+people)
+    |\b(perks|benefits|salary|bonus|pension|insurance|canteen|gym|parking|flexible\s+working|learning\s+budget)
+    |\b(diversity|inclusion|equal\s+opportunity|how\s+to\s+apply|send\s+your\s+cv)
+    # Español (añadimos muchos términos)
+    |\b(proceso\s+de\s+selección|entrevista\s+técnica|entrevista\s+final|llamada\s+de\s+reclutamiento)
+    |\b(tu\s+día\s+a\s+día|qué\s+harás|tus\s+funciones)
+    |\b(modelo\s+híbrido|\d+\s+días\s+a\s+la\s+semana\s+en\s+oficina|completo\s+remoto|trabajo\s+desde\s+casa)
+    |\b(niños|pequeños|menores|criaturas|hijos|kínder)
+    |\b(beneficios|salario|bonus|pensión|seguro|comedor|gimnasio|parking|jornada\s+flexible|presupuesto\s+de\s+formación)
+    |\b(diversidad|inclusión|igualdad\s+de\s+oportunidades|cómo\s+aplicar|envía\s+tu\s+cv)
+    # NUEVOS: encabezados y metadatos
+    |\b(estudios\s+mínimos|educación\s+secundaria|experiencia\s+mínima|conocimientos\s+necesarios|sector|otras\s+actividades)
+    |\b(categoría|nivel|vacantes|inscritos|salario\s+(?:no\s+disponible|bruto|neto)|ubicación\s+del\s+trabajo|jornada|horario)
+    |\b(contrato\s+temporal|remoto|presencial|híbrido|colaboración\s+comercial|marca\s+reconocida)
+    |\b(empleado/a|personas\s+a\s+cargo|descripción\s+completa\s+del\s+empleo)
+    |\b(perfil\s+ideal|buscamos\s+una\s+persona|ideal\s+para\s+comerciales|si\s+te\s+interesa\s+aplica)
+    |\b(nuestro\s+consejo|inscríbete\s+si\s+tienes\s+el\s+perfil)
+    # Nuevos patrones para esta oferta (español)
+    |\b(zona\s+de\s+trabajo|ubicación\s+del\s+trabajo|barcelona\s+ciudad|alrededores|poblaciones\s+cercanas)
+    |\b(captación\s+directa\s+de\s+clientes|puntos\s+de\s+afluencia|detección\s+de\s+personas|test\s+auditivo)
+    |\b(seguimiento\s+básico\s+de\s+los\s+prospectos|reuniones\s+cualificadas|prueba/test)
+    |\b(al\s+menos\s+\d+\s+año|años?\s+de\s+experiencia\s+mínima|experiencia\s+mínima)
+    |\b(qué\s+harás|qué\s+buscamos|perfil\s+ideal|qué\s+ofrecemos)
+    |\b(colaboración\s+comercial\s+con\s+una\s+marca\s+reconocida|facturación\s+estimada)
+    """,
+    re.IGNORECASE | re.VERBOSE
+)
+
 
 def score_sentence(sentence: str, lang: str = "en") -> float:
     """
@@ -141,7 +176,16 @@ def score_sentence(sentence: str, lang: str = "en") -> float:
     if not s or len(s) < 3:
         return 0.0
 
+    # === NUEVO: filtrar frases irrelevantes ===
+    if IRRELEVANT_PHRASES.search(s):
+        return 0.0
+
+    # Si es una línea que parece una skill listada (ej: "Venta", "Gestión comercial") pero es una línea muy corta,
+    # aseguramos que tenga al menos un término técnico. Para evitar "Sector", "Nivel", etc., ya los hemos filtrado arriba.
     if SKILL_LIST_PATTERN.match(s):
+        # Pero si la línea es solo una palabra y no es una habilidad técnica conocida, filtrar también
+        if len(s.split()) == 1 and s.lower() not in TECHNICAL_SIGNALS.findall(s.lower()):
+            return 0.0
         return 1.0
 
     company_penalty = 0.3 if COMPANY_SIGNALS.search(s) else 0.0
