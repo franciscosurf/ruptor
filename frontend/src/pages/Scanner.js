@@ -245,8 +245,8 @@ export default function Scanner() {
                       <div className="text-center"><div className="text-3xl font-bold text-purple-600">{result.detailed_scores?.keyword_exact || 0}%</div><div className="text-xs text-gray-500">Cobertura</div></div>
                     </div>
                     {result.detailed_scores && <DetailedScores scores={result.detailed_scores} />}
-                  </div>
-
+                  </div>                  
+                    
                   {/* Experiencia y Educación */}
                   {(result.experience_match || result.education_match) && (
                     <div className="bg-white/80 backdrop-blur border border-black/5 rounded-3xl p-6 shadow-xl">

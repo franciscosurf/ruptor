@@ -57,8 +57,8 @@ export default function App() {
           z-index: 0;
         }
         .grid-bg {
-          background-image: linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
-                            linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+          background-image: linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px),
+                            linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px);
           background-size: 40px 40px;
         }
         .card {
@@ -77,18 +77,16 @@ export default function App() {
           <div className="hero-glow"></div>
           <div className="max-w-7xl mx-auto px-6 py-28 relative z-10">
             <div className="max-w-4xl">
-              <div className="inline-flex items-center gap-2 bg-black/5 border border-black/5 rounded-full px-4 py-2 mb-8">
+              <div className="inline-flex items-center gap-2 bg-white border border-black/5 rounded-full px-4 py-2 mb-8">
                 <span className="w-2 h-2 rounded-full bg-green-500"></span>
                 <span className="text-sm font-medium">Optimizado para ATS modernos con IA</span>
               </div>
-              <h1 className="text-6xl md:text-8xl font-black tracking-tight leading-none mb-8">
-                Supera el filtro.
-                <span className="gradient-text block">Llega al humano.</span>
+              <h1 className="text-6xl md:text-7xl font-black tracking-tight leading-none mb-8">
+                Supera el filtro ATS
+                <span className="gradient-text block">Consigue el puesto.</span>
               </h1>
               <p className="text-xl md:text-2xl text-black/60 leading-relaxed max-w-3xl mb-12">
-                Tu CV está compitiendo primero contra algoritmos, no personas.
-                <strong className="text-black"> ruptor</strong> optimiza tu candidatura
-                para que atraviese filtros ATS y consiga entrevistas reales.
+                Analiza tu CV contra la oferta y recibe sugerencias en tiempo real para pasar el filtro.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link to="/scanner" className="px-8 py-5 rounded-2xl bg-black text-white text-lg font-semibold hover:scale-105 transition shadow-2xl inline-block">

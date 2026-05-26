@@ -6,7 +6,9 @@ export function DetailedScores({ scores }) {
   const metrics = [
     { key: 'semantic', label: 'Semántico', icon: '🎯', desc: 'Coincidencia conceptual' },
     { key: 'keyword_exact', label: 'Keywords', icon: '🔑', desc: 'Términos exactos' },
-    { key: 'technical_skills', label: 'Skills', icon: '⚙️', desc: 'Habilidades técnicas' }
+    { key: 'technical_skills', label: 'Skills', icon: '⚙️', desc: 'Habilidades técnicas' },
+    { key: 'recruiter_visibility', label: 'Visibilidad', icon: '👁️', desc: 'Atractivo para recruiter' } // nueva
+
   ];
   return (
     <div style={{ marginTop: 24 }}>

@@ -2,6 +2,7 @@ from typing import Dict, Any
 
 from app.core.config import config
 
+
 from fastapi import UploadFile
 
 from app.utils.file_extractor import extract_text
@@ -31,6 +32,8 @@ from app.experience_analyzer import (
 from app.services.education_service import extract_education_level
 from app.services.scoring_service import calculate_confidence_score
 from app.services.text_scoring import extract_culture_phrases  # ← añadir este import
+
+from app.services.recruiter_visibility import calculate_recruiter_visibility
 
 def get_threshold_by_sector(sector: str, mode: str = "balanced") -> float:
     """Devuelve umbral semántico según el sector"""
@@ -128,6 +131,10 @@ async def analyze_cv_logic(
     similarity_scores['keyword_exact'] = keyword_coverage
     similarity_scores['overall'] = round((similarity_scores['semantic'] * 0.5 + keyword_coverage * 0.5), 2)
 
+    # Añadir recruiter_visibility al mismo diccionario
+    recruiter_visibility = calculate_recruiter_visibility(cv_text)
+    similarity_scores['recruiter_visibility'] = recruiter_visibility
+
     confidence = calculate_confidence_score(cv_text, job_text_clean)
 
     # --- 7. Skills técnicas (regex) ---
@@ -138,6 +145,8 @@ async def analyze_cv_logic(
     missing_tech_skills = list(set(extracted_skills_job) - set(extracted_skills_cv))
 
     sector_skills_suggestions = get_relevant_skills_for_sector(job_sector, main_lang, limit=10)
+
+    recruiter_visibility = calculate_recruiter_visibility(cv_text)
 
     # --- 6. Feedback (13 argumentos) ---
     feedback = generate_detailed_feedback(
@@ -167,5 +176,6 @@ async def analyze_cv_logic(
         "extracted_skills_cv": extracted_skills_cv,
         "extracted_skills_job": extracted_skills_job,
         "analysis_mode": mode,
-        "sector_skills_suggestions": sector_skills_suggestions
+        "sector_skills_suggestions": sector_skills_suggestions,
+        "recruiter_visibility": recruiter_visibility
     }
