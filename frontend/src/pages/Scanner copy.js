@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAnalysis } from '../hooks/useAnalysis';
 import { useOptimizer } from '../hooks/useOptimizer';
@@ -15,15 +15,6 @@ import { Header } from '../components/layout/Header';
 import { Card } from '../components/common/Card';
 import { colors } from '../styles/colors';
 
-// Importación de componentes de react-pdf
-import { Document, Page, pdfjs } from 'react-pdf';
-
-// Configuración del Worker usando la URL nativa del bundler
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.min.mjs',
-  import.meta.url,
-).toString();
-
 export default function Scanner() {
   const {
     file, fileName, jobDescription, analysisMode, result, loading, error,
@@ -35,99 +26,26 @@ export default function Scanner() {
 
   const [showModal, setShowModal] = useState(false);
   const [showResults, setShowResults] = useState(false);
-  
-  // Cambiamos la pestaña inicial por defecto a 'recommendations' ya que las métricas ahora son fijas
-  const [activeTab, setActiveTab] = useState('recommendations');
-
-  // Estados nuevos para el control del PDF
-  const [numPages, setNumPages] = useState(null);
-  const [pageNumber, setPageNumber] = useState(1);
-  const [pdfError, setPdfError] = useState(false);
-  const pdfUrlRef = useRef(null);
 
   useEffect(() => {
     if (result) setShowResults(true);
   }, [result]);
-
-  // Liberar la URL del objeto al desmontar el componente para evitar fugas de memoria
-  useEffect(() => {
-    return () => {
-      if (pdfUrlRef.current) {
-        URL.revokeObjectURL(pdfUrlRef.current);
-      }
-    };
-  }, []);
 
   const handleNewAnalysis = () => {
     setResult(null);
     setShowResults(false);
   };
 
-  // Limpieza de estados del PDF al cerrar el modal
-  const closeModal = () => {
-    setShowModal(false);
-    setPageNumber(1);
-    setNumPages(null);
-    setPdfError(false);
-    if (pdfUrlRef.current) {
-      URL.revokeObjectURL(pdfUrlRef.current);
-      pdfUrlRef.current = null;
-    }
-  };
-
-  const goToPrevPage = () => setPageNumber(Math.max(1, pageNumber - 1));
-  const goToNextPage = () => setPageNumber(Math.min(numPages, pageNumber + 1));
+  const closeModal = () => setShowModal(false);
 
   const scrollToSuggestions = () => {
     const el = document.getElementById('suggestions-section');
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
-  // Generar la URL blob del archivo sólo si es un PDF válido
-  const pdfFileUrl = file && file.type === 'application/pdf' && !pdfUrlRef.current
-    ? URL.createObjectURL(file)
-    : pdfUrlRef.current;
-
-  if (file && file.type === 'application/pdf' && !pdfUrlRef.current) {
-    pdfUrlRef.current = pdfFileUrl;
-  }
-
-  // Pestañas dinámicas secundarias (Excluyendo las métricas generales que ahora van fijas arriba)
-  const tabs = [
-    { id: 'recommendations', label: '⚡ Recomendaciones', component: () => (
-      <Recommendations recommendations={result.recommendations} onScrollToSuggestions={scrollToSuggestions} />
-    ) },
-    { id: 'skills', label: '🛠️ Skills', component: () => (
-      <>
-        <div className="mb-4">
-          <div className="text-sm font-medium text-gray-500 mb-2">✅ Tu CV detecta</div>
-          <TagList items={result.extracted_skills_cv} color="#10b981" emptyText="No se detectaron skills específicas" />
-        </div>
-        <div>
-          <div className="text-sm font-medium text-gray-500 mb-2">🎯 La oferta requiere</div>
-          <JobSkillsList cvSkills={result.extracted_skills_cv || []} jobSkills={result.extracted_skills_job || []} />
-        </div>
-      </>
-    ) },
-    { id: 'suggestions', label: '❌ Sugerencias', component: () => (
-      <MissingTermsWithContext items={result.missing_terms_with_context || result.priority_missing_terms?.map(t => ({ term: t })) || []} />
-    ) },
-    { id: 'culture', label: '🌱 Cultura', component: () => (
-      <div>
-        {result.culture_suggestions?.length > 0 ? (
-          <ul className="list-disc pl-5 space-y-2">
-            {result.culture_suggestions.map((item, idx) => <li key={idx} className="text-sm">{item.text}</li>)}
-          </ul>
-        ) : (
-          <p className="text-gray-500">No se detectaron valores culturales relevantes en la oferta.</p>
-        )}
-      </div>
-    ) }
-  ];
-
   return (
     <div className="overflow-x-hidden">
-      {/* Tailwind + estilos personalizados */}
+      {/* Estilos (Tailwind + personalizados) */}
       <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
       <style>{`
         body { font-family: 'Inter', sans-serif; background: #ffffff; color: #0b1020; }
@@ -140,15 +58,12 @@ export default function Scanner() {
         @keyframes scan { 0% { transform: translateY(0); } 50% { transform: translateY(280px); } 100% { transform: translateY(0); } }
         .score-ring { width: 180px; height: 180px; border-radius: 999px; background: conic-gradient(#2563eb 0deg, #7c3aed 290deg, rgba(0,0,0,0.06) 290deg); display: flex; align-items: center; justify-content: center; }
         .score-inner { width: 140px; height: 140px; border-radius: 999px; background: white; display: flex; align-items: center; justify-content: center; flex-direction: column; }
-        
-        /* Ajustes específicos para evitar desborde del canvas del PDF */
-        .pdf-viewer .react-pdf__Document { display: flex; flex-direction: column; align-items: center; }
-        .pdf-viewer .react-pdf__Page canvas { max-width: 100%; height: auto !important; }
       `}</style>
 
-      <Header />
+      {/* HEADER */}
+        <Header />
 
-      {/* HERO */}
+      {/* HERO (con botón que abre el modal) */}
       <section className="relative overflow-hidden grid-bg">
         <div className="hero-glow"></div>
         <div className="max-w-7xl mx-auto px-6 py-28 relative z-10">
@@ -174,7 +89,7 @@ export default function Scanner() {
                 </button>
               </div>
             </div>
-            
+            {/* Previsualización estática del score */}
             <div className="relative">
               <div className="glass rounded-[40px] p-8 shadow-2xl relative overflow-hidden">
                 <div className="scanner-line"></div>
@@ -197,7 +112,7 @@ export default function Scanner() {
         </div>
       </section>
 
-      {/* CÓMO FUNCIONA */}
+      {/* HOW IT WORKS */}
       <section className="py-28">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-20">
@@ -225,7 +140,7 @@ export default function Scanner() {
         </div>
       </section>
 
-      {/* LO QUE MATA TU CV */}
+      {/* PROBLEMS */}
       <section className="py-24 bg-black text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-20">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full bg-purple-600 blur-3xl"></div>
@@ -262,7 +177,7 @@ export default function Scanner() {
         </div>
       </section>
 
-      {/* BANNER CTA */}
+      {/* CTA */}
       <section className="py-28">
         <div className="max-w-5xl mx-auto px-6">
           <div className="rounded-[40px] p-14 bg-gradient-to-br from-purple-600 to-blue-500 text-white text-center shadow-2xl">
@@ -275,6 +190,7 @@ export default function Scanner() {
         </div>
       </section>
 
+      {/* FOOTER */}
       <footer className="border-t border-black/5 py-10">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
           <Link to="/" className="flex items-center gap-3">
@@ -285,104 +201,20 @@ export default function Scanner() {
         </div>
       </footer>
 
-      {/* MODAL A PANTALLA COMPLETA */}
+      {/* MODAL DE ANÁLISIS */}
       {showModal && (
         <div
-          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center"
+          className="fixed inset-0 flex items-center justify-center z-50 p-4"
+          style={{ background: 'linear-gradient(90deg, rgba(124,58,237,0.7), rgba(37,99,235,0.7))', backdropFilter: 'blur(2px)' }}
           onClick={(e) => { if (e.target === e.currentTarget) closeModal(); }}
         >
-          <div className="bg-white w-full h-full flex flex-col shadow-2xl">
-            {/* Cabecera fija */}
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center z-10 flex-shrink-0">
+          <div className="bg-white rounded-3xl w-full max-w-4xl shadow-2xl" style={{ height: '85vh', display: 'flex', flexDirection: 'column' }}>
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center z-10 rounded-t-3xl flex-shrink-0">
               <h2 className="text-xl font-bold">{result ? 'Resultados del análisis' : 'Analiza tu CV'}</h2>
               <button onClick={closeModal} className="text-gray-500 hover:text-gray-700 text-2xl leading-none">×</button>
             </div>
-
-            {/* Cuerpo: dos columnas cuando hay resultado */}
-            {result ? (
-              <div className="flex flex-1 overflow-hidden">
-                {/* COLUMNA IZQUIERDA - Previsualización del CV (PDF o texto raw) */}
-                <div className="w-1/2 border-r border-gray-200 flex flex-col bg-gray-50">
-                  <div className="p-4 border-b border-gray-200 font-semibold flex justify-between items-center bg-white">
-                    <span>📄 Previsualización de tu CV</span>
-                    {file && file.type === 'application/pdf' && numPages && (
-                      <div className="text-sm flex items-center gap-2">
-                        <button onClick={goToPrevPage} className="px-2 py-1 bg-gray-200 rounded text-xs hover:bg-gray-300">◀</button>
-                        <span>Página {pageNumber} de {numPages}</span>
-                        <button onClick={goToNextPage} className="px-2 py-1 bg-gray-200 rounded text-xs hover:bg-gray-300">▶</button>
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex-1 overflow-y-auto p-4 pdf-viewer">
-                    {file && file.type === 'application/pdf' ? (
-                      !pdfError ? (
-                        <Document
-                          file={pdfFileUrl}
-                          onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-                          onLoadError={(err) => {
-                            console.error('Error cargando PDF:', err);
-                            setPdfError(true);
-                          }}
-                        >
-                          <Page 
-                            pageNumber={pageNumber} 
-                            width={450} 
-                            renderTextLayer={false} 
-                            renderAnnotationLayer={false} 
-                          />
-                        </Document>
-                      ) : (
-                        <div className="text-red-500 text-center p-4">
-                          ⚠️ No se pudo cargar la previsualización del PDF. El análisis interno se realizó correctamente.
-                        </div>
-                      )
-                    ) : (
-                      <div className="font-mono text-sm whitespace-pre-wrap bg-white p-4 rounded-xl shadow-sm border border-black/5">
-                        {result.cv_raw_text || "No se pudo extraer texto legible del CV."}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* COLUMNA DERECHA - Estructura fija arriba y Pestañas abajo */}
-                <div className="w-1/2 flex flex-col bg-white">
-                  
-                  {/* SECCIÓN FIJA: Siempre muestra los scores generales arriba */}
-                  <div className="p-6 border-b border-gray-100 bg-gray-50/50 flex-shrink-0">
-                    <ScoreCircle score={result.ats_score} level={result.level} />
-                    <p className="mt-3 text-center text-sm text-gray-600 max-w-md mx-auto">{result.summary}</p>
-                    {result.detailed_scores && (
-                      <div className="mt-4 pt-4 border-t border-gray-200/60">
-                        <DetailedScores scores={result.detailed_scores} />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* MENÚ DE PESTAÑAS (Ubicado abajo de los scores) */}
-                  <div className="flex border-b border-gray-200 bg-white flex-shrink-0">
-                    {tabs.map(tab => (
-                      <button
-                        key={tab.id}
-                        onClick={() => setActiveTab(tab.id)}
-                        className={`flex-1 px-3 py-3 text-sm font-medium transition-all border-b-2 text-center ${
-                          activeTab === tab.id
-                            ? 'border-purple-600 text-purple-600 bg-purple-50/30'
-                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-                        }`}
-                      >
-                        {tab.label}
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* CONTENIDO DE LAS PESTAÑAS (Scroll independiente e inferior) */}
-                  <div className="flex-1 overflow-y-auto p-6 bg-white">
-                    {tabs.find(t => t.id === activeTab)?.component()}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="flex-1 overflow-y-auto p-6">
+            <div className="overflow-y-auto p-6 flex-1">
+              {!result ? (
                 <JobForm
                   fileName={fileName}
                   jobDescription={jobDescription}
@@ -395,8 +227,175 @@ export default function Scanner() {
                   loading={loading}
                   resultExists={!!result}
                 />
-              </div>
-            )}
+              ) : (
+                <div className="space-y-6">
+                  {/* SCORE PRINCIPAL */}
+                  <div className="bg-white/80 backdrop-blur border border-black/5 rounded-3xl p-6 shadow-xl">
+                    <ScoreCircle score={result.ats_score} level={result.level} />
+                    <p className="text-center text-gray-700 text-lg mt-4">{result.summary}</p>
+                    {result.profession_detected && (
+                      <div className="mt-4 text-center">
+                        <span className="text-sm text-gray-500">🎯 Profesión detectada: </span>
+                        <span className="font-semibold">{result.profession_detected.profession?.toUpperCase()}</span>
+                        <span className="text-sm text-gray-500 ml-2">· confianza {result.confidence_score}%</span>
+                      </div>
+                    )}
+                    {/* <div className="flex justify-center gap-8 mt-6 pt-4 border-t border-gray-200">
+                      <div className="text-center"><div className="text-3xl font-bold text-purple-600">{result.detailed_scores?.semantic || 0}%</div><div className="text-xs text-gray-500">Semántico</div></div>
+                      <div className="text-center"><div className="text-3xl font-bold text-purple-600">{result.detailed_scores?.keyword_exact || 0}%</div><div className="text-xs text-gray-500">Cobertura</div></div>
+                    </div> */}
+                    {result.detailed_scores && <DetailedScores scores={result.detailed_scores} />}
+                  </div>                  
+                    
+                  {/* Experiencia y Educación */}
+                  {(result.experience_match || result.education_match) && (
+                    <div className="bg-white/80 backdrop-blur border border-black/5 rounded-3xl p-6 shadow-xl">
+                      <h3 className="text-sm uppercase tracking-wider text-gray-500 mb-4">Experiencia y Educación</h3>
+                      {result.experience_match && (
+                        <div className="mb-4">
+                          <div className="flex justify-between text-sm mb-1"><span>Años de experiencia</span><span className="font-semibold">{result.experience_match.detected} / {result.experience_match.required} años</span></div>
+                          <div className="w-full bg-gray-200 rounded-full h-2"><div className="bg-purple-600 h-2 rounded-full" style={{ width: `${result.experience_match.match}%` }}></div></div>
+                        </div>
+                      )}
+                      {result.education_match && (
+                        <div>
+                          <div className="flex justify-between text-sm mb-1"><span>Nivel educativo</span><span className="font-semibold">{result.education_match.detected_level} / {result.education_match.required_level}</span></div>
+                          <div className="w-full bg-gray-200 rounded-full h-2"><div className="bg-green-500 h-2 rounded-full" style={{ width: `${result.education_match.match}%` }}></div></div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {result.job_title_match
+                  && result.job_title_match.offer_title
+                  && result.job_title_match.best_match
+                  && result.job_title_match.score >= 50  // ← no mostrar si el match es muy bajo o sin datos
+                  && (
+                  <Card title="🏷️ Coincidencia de título">
+                    <div style={{ marginBottom: 20 }}>
+
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
+                        <span style={{ color: colors.textMuted, fontSize: 13 }}>Tu título detectado</span>
+                        <span style={{ fontWeight: 600, fontSize: 13 }}>
+                          {result.job_title_match.best_match || '—'}
+                        </span>
+                      </div>
+
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
+                        <span style={{ color: colors.textMuted, fontSize: 13 }}>Título de la oferta</span>
+                        <span style={{ fontWeight: 600, fontSize: 13 }}>
+                          {result.job_title_match.offer_title || '—'}
+                        </span>
+                      </div>
+
+                      {result.job_title_match.offer_seniority && (
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
+                          <span style={{ color: colors.textMuted, fontSize: 13 }}>Seniority requerido</span>
+                          <span style={{ fontWeight: 600, fontSize: 13, textTransform: 'capitalize' }}>
+                            {result.job_title_match.offer_seniority}
+                            {result.job_title_match.seniority_match === 'exact' && ' ✓'}
+                            {result.job_title_match.seniority_match === 'mismatch' && ' ⚠️'}
+                          </span>
+                        </div>
+                      )}
+
+                      <div style={{ marginTop: 12 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                          <span style={{ color: colors.textMuted, fontSize: 13 }}>Coincidencia semántica</span>
+                          <span style={{ fontWeight: 700, fontSize: 13, color: colors.primary }}>
+                            {result.job_title_match.score}%
+                            <span style={{ fontWeight: 400, color: colors.textMuted, marginLeft: 6 }}>
+                              ({result.job_title_match.label})
+                            </span>
+                          </span>
+                        </div>
+                        <div style={{ background: colors.border, borderRadius: 100, height: 6, overflow: 'hidden' }}>
+                          <div style={{
+                            width: `${result.job_title_match.score}%`,
+                            background: result.job_title_match.score >= 75 ? colors.success
+                                      : result.job_title_match.score >= 50 ? colors.primary
+                                      : colors.warning,
+                            height: '100%',
+                            borderRadius: 100,
+                            transition: 'width 0.3s ease'
+                          }} />
+                        </div>
+                      </div>
+
+                      {result.job_title_match.detail && (
+                        <p style={{ margin: '12px 0 0', fontSize: 12, color: colors.textMuted }}>
+                          {result.job_title_match.detail}
+                        </p>
+                      )}
+
+                    </div>
+                  </Card>
+                )}
+
+                  {/* Recomendaciones */}
+                  {result.recommendations && result.recommendations.length > 0 && (
+                    <Recommendations recommendations={result.recommendations} onScrollToSuggestions={scrollToSuggestions} />
+                  )}
+
+                  {/* Cultura */}
+                  {result.culture_suggestions?.length > 0 && (
+                    <div className="bg-white/80 backdrop-blur border border-black/5 rounded-3xl p-6 shadow-xl">
+                      <h3 className="text-sm uppercase tracking-wider text-gray-500 mb-4">🌱 Valores y cultura de la empresa</h3>
+                      <ul className="list-disc pl-5 space-y-2">{result.culture_suggestions.map((item, idx) => <li key={idx} className="text-sm">{item.text}</li>)}</ul>
+                    </div>
+                  )}
+
+                  {/* Optimizar CV */}
+                  {result.ats_score < 65 && (
+                    <button onClick={handleOptimizeCV} disabled={loadingOptimizer} style={{ width: '100%', padding: '14px 20px', background: loadingOptimizer ? '#9ca3af' : '#f59e0b', color: 'white', border: 'none', borderRadius: '12px', fontWeight: 600, fontSize: 14, cursor: loadingOptimizer ? 'not-allowed' : 'pointer', transition: 'all 0.2s ease' }}>
+                      {loadingOptimizer ? 'Generando optimizaciones...' : '✨ Optimizar Mi CV'}
+                    </button>
+                  )}
+
+                  {/* Habilidades Técnicas */}
+                  {(result.extracted_skills_cv?.length > 0 || result.extracted_skills_job?.length > 0) && (
+                    <div className="bg-white/80 backdrop-blur border border-black/5 rounded-3xl p-6 shadow-xl">
+                      <div className="mb-4"><div className="text-sm font-medium text-gray-500 mb-2">✅ Tu CV detecta</div><TagList items={result.extracted_skills_cv} color="#10b981" emptyText="No se detectaron skills específicas" /></div>
+                      <div><div className="text-sm font-medium text-gray-500 mb-2">🎯 La oferta requiere</div><JobSkillsList cvSkills={result.extracted_skills_cv || []} jobSkills={result.extracted_skills_job || []} /></div>
+                    </div>
+                  )}
+
+                  {/* Skills sugeridas */}
+                  {result.profession_skills_suggestions?.length > 0 && (
+                    <div className="bg-white/80 backdrop-blur border border-black/5 rounded-3xl p-6 shadow-xl">
+                      <h3 className="text-sm uppercase tracking-wider text-gray-500 mb-4">💡 Skills sugeridas para tu perfil</h3>
+                      <TagList items={result.profession_skills_suggestions} color="#f59e0b" />
+                    </div>
+                  )}
+
+                  {/* Sugerencias (faltantes) */}
+                  <div id="suggestions-section">
+                    <div className="bg-white/80 backdrop-blur border border-black/5 rounded-3xl p-6 shadow-xl">
+                      <h3 className="text-sm uppercase tracking-wider text-gray-500 mb-4">❌ SUGERENCIAS</h3>
+                      <MissingTermsWithContext items={result.missing_terms_with_context || result.priority_missing_terms?.map(t => ({ term: t })) || []} />
+                    </div>
+                  </div>
+
+                  {/* Términos que ya tienes */}
+                  <div className="bg-white/80 backdrop-blur border border-black/5 rounded-3xl p-6 shadow-xl">
+                    <h3 className="text-sm uppercase tracking-wider text-gray-500 mb-4">Términos que ya tienes</h3>
+                    <TagList items={result.matched_terms} color="#10b981" emptyText="No se detectaron coincidencias directas." />
+                  </div>
+
+                  {/* Análisis completo (expandible) */}
+                  <details className="bg-white/80 backdrop-blur border border-black/5 rounded-3xl p-6 shadow-xl">
+                    <summary className="cursor-pointer text-purple-600 font-semibold">🔍 Ver análisis completo de palabras clave</summary>
+                    <div className="mt-4 space-y-4">
+                      <div><div className="text-sm font-medium text-gray-500 mb-2">Palabras clave del CV</div><TagList items={result.cv_terms} color="#6b7280" /></div>
+                      <div><div className="text-sm font-medium text-gray-500 mb-2">Palabras clave de la oferta</div><TagList items={result.job_terms} color="#7c3aed" /></div>
+                    </div>
+                  </details>
+
+                  {/* Nuevo análisis */}
+                  <button onClick={handleNewAnalysis} className="w-full py-3 rounded-xl bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition">Nuevo análisis</button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -404,9 +403,10 @@ export default function Scanner() {
       {/* Optimizer Modal */}
       <OptimizerModal show={showOptimizer} data={cvOptimizations} onClose={closeOptimizer} />
 
+      {/* Loading y error */}
       {loading && <LoadingSpinner />}
       {error && (
-        <div className="fixed bottom-4 right-4 bg-red-100 border border-red-300 text-red-700 px-4 py-2 rounded-lg shadow-lg z-50">
+        <div className="fixed bottom-4 right-4 bg-red-100 border border-red-300 text-red-700 px-4 py-2 rounded-lg shadow-lg">
           ⚠️ {error}
         </div>
       )}

@@ -185,6 +185,7 @@ async def analyze_cv_logic(
 
     return {
         **feedback,
+        "cv_raw_text": cv_text,
         "job_title_match":             title_match,
         "company_culture":             [{"text": p, "score": s} for p, s in culture_phrases],
         "missing_terms":               missing_terms[:20],
