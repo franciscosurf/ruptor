@@ -1,7 +1,4 @@
-import re
-
 from typing import List
-from typing import Tuple
 
 from app.core.patterns import TECH_SKILL_PATTERNS
 from app.core.patterns import SOFT_SKILLS_PATTERN

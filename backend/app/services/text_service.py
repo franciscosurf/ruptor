@@ -1,5 +1,3 @@
-import re
-from typing import Dict, Tuple
 from app.core.models import get_nlp
 from app.services.language_service import detect_language
 from app.services.text_scoring import extract_relevant_text as _scoring_extract

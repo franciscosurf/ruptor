@@ -1,7 +1,5 @@
 from app.core.patterns import NOISE_PATTERN
 
-
-
 def calculate_confidence_score(
     cv_text: str,
     job_text: str
@@ -25,4 +23,3 @@ def calculate_confidence_score(
         confidence -= 15
 
     return max(0, min(100, confidence))
-

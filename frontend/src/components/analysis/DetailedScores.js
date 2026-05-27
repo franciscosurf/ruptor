@@ -5,17 +5,20 @@ export function DetailedScores({ scores }) {
   if (!scores) return null;
   const metrics = [
     { key: 'semantic', label: 'Semántico', icon: '🎯', desc: 'Coincidencia conceptual' },
-    { key: 'keyword_exact', label: 'Keywords', icon: '🔑', desc: 'Términos exactos' },
-    { key: 'technical_skills', label: 'Skills', icon: '⚙️', desc: 'Habilidades técnicas' },
-    { key: 'recruiter_visibility', label: 'Visibilidad', icon: '👁️', desc: 'Atractivo para recruiter' } // nueva
-
+    { key: 'keyword_exact', label: 'Keywords Match %', icon: '🔑', desc: 'Keywords de la oferta en tu CV' },
+    //{ key: 'keyword_partial', label: 'Parciales', icon: '🔄', desc: 'Términos similares' },
+    // { key: 'technical_skills', label: 'Skills', icon: '⚙️', desc: 'Habilidades técnicas' }, // ← Eliminado
+    { key: 'recruiter_visibility', label: 'Visibilidad', icon: '👁️', desc: 'Atractivo para reclutador' },
+    { key: 'action_verbs', label: 'Verbos de acción', icon: '⚡', desc: 'Uso de verbos de impacto' },
+    { key: 'quantified_achievements', label: 'Logros cuantificados', icon: '📊', desc: 'Resultados medibles' }
   ];
   return (
     <div style={{ marginTop: 24 }}>
       <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
-        gap: 12
+        display: 'flex',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+        gap: '12px'
       }}>
         {metrics.map(({ key, label, icon, desc }) => (
           scores[key] !== undefined && (
@@ -25,7 +28,8 @@ export function DetailedScores({ scores }) {
               borderRadius: 16,
               textAlign: 'center',
               border: `1px solid ${colors.border}`,
-              transition: 'all 0.2s ease'
+              transition: 'all 0.2s ease',
+              flex: 1
             }}>
               <div style={{ fontSize: 24, marginBottom: 6 }}>{icon}</div>
               <div style={{

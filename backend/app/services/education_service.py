@@ -19,7 +19,6 @@ EDUCATION_LEVELS = {
     "certified": 1,
 }
 
-
 def extract_education_level(text: str) -> Tuple[str, int]:
 
     text_lower = text.lower()
@@ -34,4 +33,3 @@ def extract_education_level(text: str) -> Tuple[str, int]:
             highest_level = level
 
     return highest_level, highest_weight
-

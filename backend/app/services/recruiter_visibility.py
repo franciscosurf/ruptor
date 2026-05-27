@@ -1,5 +1,4 @@
 import re
-from typing import List, Tuple
 
 def calculate_recruiter_visibility(cv_text: str) -> float:
     """

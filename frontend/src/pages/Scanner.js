@@ -12,6 +12,8 @@ import { JobSkillsList } from '../components/analysis/JobSkillsList';
 import { OptimizerModal } from '../components/optimizer/OptimizerModal';
 import { JobForm } from '../components/forms/JobForm';
 import { Header } from '../components/layout/Header';
+import { Card } from '../components/common/Card';
+import { colors } from '../styles/colors';
 
 export default function Scanner() {
   const {
@@ -238,10 +240,10 @@ export default function Scanner() {
                         <span className="text-sm text-gray-500 ml-2">· confianza {result.confidence_score}%</span>
                       </div>
                     )}
-                    <div className="flex justify-center gap-8 mt-6 pt-4 border-t border-gray-200">
+                    {/* <div className="flex justify-center gap-8 mt-6 pt-4 border-t border-gray-200">
                       <div className="text-center"><div className="text-3xl font-bold text-purple-600">{result.detailed_scores?.semantic || 0}%</div><div className="text-xs text-gray-500">Semántico</div></div>
                       <div className="text-center"><div className="text-3xl font-bold text-purple-600">{result.detailed_scores?.keyword_exact || 0}%</div><div className="text-xs text-gray-500">Cobertura</div></div>
-                    </div>
+                    </div> */}
                     {result.detailed_scores && <DetailedScores scores={result.detailed_scores} />}
                   </div>                  
                     
@@ -263,6 +265,72 @@ export default function Scanner() {
                       )}
                     </div>
                   )}
+
+                  {result.job_title_match
+                  && result.job_title_match.offer_title
+                  && result.job_title_match.best_match
+                  && result.job_title_match.score >= 50  // ← no mostrar si el match es muy bajo o sin datos
+                  && (
+                  <Card title="🏷️ Coincidencia de título">
+                    <div style={{ marginBottom: 20 }}>
+
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
+                        <span style={{ color: colors.textMuted, fontSize: 13 }}>Tu título detectado</span>
+                        <span style={{ fontWeight: 600, fontSize: 13 }}>
+                          {result.job_title_match.best_match || '—'}
+                        </span>
+                      </div>
+
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
+                        <span style={{ color: colors.textMuted, fontSize: 13 }}>Título de la oferta</span>
+                        <span style={{ fontWeight: 600, fontSize: 13 }}>
+                          {result.job_title_match.offer_title || '—'}
+                        </span>
+                      </div>
+
+                      {result.job_title_match.offer_seniority && (
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
+                          <span style={{ color: colors.textMuted, fontSize: 13 }}>Seniority requerido</span>
+                          <span style={{ fontWeight: 600, fontSize: 13, textTransform: 'capitalize' }}>
+                            {result.job_title_match.offer_seniority}
+                            {result.job_title_match.seniority_match === 'exact' && ' ✓'}
+                            {result.job_title_match.seniority_match === 'mismatch' && ' ⚠️'}
+                          </span>
+                        </div>
+                      )}
+
+                      <div style={{ marginTop: 12 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                          <span style={{ color: colors.textMuted, fontSize: 13 }}>Coincidencia semántica</span>
+                          <span style={{ fontWeight: 700, fontSize: 13, color: colors.primary }}>
+                            {result.job_title_match.score}%
+                            <span style={{ fontWeight: 400, color: colors.textMuted, marginLeft: 6 }}>
+                              ({result.job_title_match.label})
+                            </span>
+                          </span>
+                        </div>
+                        <div style={{ background: colors.border, borderRadius: 100, height: 6, overflow: 'hidden' }}>
+                          <div style={{
+                            width: `${result.job_title_match.score}%`,
+                            background: result.job_title_match.score >= 75 ? colors.success
+                                      : result.job_title_match.score >= 50 ? colors.primary
+                                      : colors.warning,
+                            height: '100%',
+                            borderRadius: 100,
+                            transition: 'width 0.3s ease'
+                          }} />
+                        </div>
+                      </div>
+
+                      {result.job_title_match.detail && (
+                        <p style={{ margin: '12px 0 0', fontSize: 12, color: colors.textMuted }}>
+                          {result.job_title_match.detail}
+                        </p>
+                      )}
+
+                    </div>
+                  </Card>
+                )}
 
                   {/* Recomendaciones */}
                   {result.recommendations && result.recommendations.length > 0 && (

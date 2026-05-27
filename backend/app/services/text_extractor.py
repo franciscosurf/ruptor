@@ -4,7 +4,6 @@ import docx
 
 from fastapi import UploadFile
 
-
 async def extract_text(file: UploadFile) -> str:
     content = await file.read()
     filename = file.filename.lower()
