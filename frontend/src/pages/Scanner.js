@@ -12,13 +12,14 @@ import { JobSkillsList } from '../components/analysis/JobSkillsList';
 import { OptimizerModal } from '../components/optimizer/OptimizerModal';
 import { JobForm } from '../components/forms/JobForm';
 import { Header } from '../components/layout/Header';
-import { Card } from '../components/common/Card';
-import { colors } from '../styles/colors';
 
-// Importación de componentes de react-pdf
+// Dependencias PDF
 import { Document, Page, pdfjs } from 'react-pdf';
+import { PDFDocument, rgb } from 'pdf-lib';
+import 'react-pdf/dist/Page/TextLayer.css';
+import 'react-pdf/dist/Page/AnnotationLayer.css';
 
-// Configuración del Worker usando la URL nativa del bundler
+// Configuración del Worker de PDF.js
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.mjs',
   import.meta.url,
@@ -31,44 +32,35 @@ export default function Scanner() {
     setResult
   } = useAnalysis();
 
-  const { showOptimizer, cvOptimizations, loadingOptimizer, handleOptimizeCV, closeOptimizer } = useOptimizer(file, jobDescription);
+  const { showOptimizer, cvOptimizations, closeOptimizer } = useOptimizer(file, jobDescription);
 
   const [showModal, setShowModal] = useState(false);
-  const [showResults, setShowResults] = useState(false);
-  
-  // Cambiamos la pestaña inicial por defecto a 'recommendations' ya que las métricas ahora son fijas
   const [activeTab, setActiveTab] = useState('recommendations');
 
-  // Estados nuevos para el control del PDF
+  // Estados del Visor PDF
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [pdfError, setPdfError] = useState(false);
   const pdfUrlRef = useRef(null);
 
-  useEffect(() => {
-    if (result) setShowResults(true);
-  }, [result]);
+  // --- ESTADOS DE EDICIÓN PROFESIONAL (In-place editing) ---
+  const [edits, setEdits] = useState({}); // { spanIndex: { text: "Nuevo", pdfX: 10, pdfY: 20, width: 50, height: 10 } }
+  const [activeEdit, setActiveEdit] = useState(null);
+  const pageRef = useRef(null);
 
-  // Liberar la URL del objeto al desmontar el componente para evitar fugas de memoria
+  // Limpiar memoria
   useEffect(() => {
     return () => {
-      if (pdfUrlRef.current) {
-        URL.revokeObjectURL(pdfUrlRef.current);
-      }
+      if (pdfUrlRef.current) URL.revokeObjectURL(pdfUrlRef.current);
     };
   }, []);
 
-  const handleNewAnalysis = () => {
-    setResult(null);
-    setShowResults(false);
-  };
-
-  // Limpieza de estados del PDF al cerrar el modal
   const closeModal = () => {
     setShowModal(false);
     setPageNumber(1);
     setNumPages(null);
     setPdfError(false);
+    setEdits({});
     if (pdfUrlRef.current) {
       URL.revokeObjectURL(pdfUrlRef.current);
       pdfUrlRef.current = null;
@@ -78,12 +70,6 @@ export default function Scanner() {
   const goToPrevPage = () => setPageNumber(Math.max(1, pageNumber - 1));
   const goToNextPage = () => setPageNumber(Math.min(numPages, pageNumber + 1));
 
-  const scrollToSuggestions = () => {
-    const el = document.getElementById('suggestions-section');
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
-
-  // Generar la URL blob del archivo sólo si es un PDF válido
   const pdfFileUrl = file && file.type === 'application/pdf' && !pdfUrlRef.current
     ? URL.createObjectURL(file)
     : pdfUrlRef.current;
@@ -92,324 +78,354 @@ export default function Scanner() {
     pdfUrlRef.current = pdfFileUrl;
   }
 
-  // Pestañas dinámicas secundarias (Excluyendo las métricas generales que ahora van fijas arriba)
+  // --- LÓGICA DE EDICIÓN EN LA CAPA DE TEXTO ---
+  const handlePageClick = (e) => {
+    const span = e.target.closest('span');
+    if (!span || !span.closest('.react-pdf__Page__textContent')) return;
+
+    const spans = Array.from(pageRef.current.querySelectorAll('.react-pdf__Page__textContent span'));
+    const spanIndex = spans.indexOf(span);
+
+    const pageRect = pageRef.current.getBoundingClientRect();
+    const spanRect = span.getBoundingClientRect();
+    const computedStyle = window.getComputedStyle(span);
+
+    // Guardar también las proporciones para el PDF final (pdf-lib usa puntos, no píxeles HTML)
+    // El ancho de renderizado en React es 450px. Un A4 estándar en PDF mide aprox 595.28 puntos de ancho.
+    const scaleFactor = 595.28 / 450; 
+
+    setActiveEdit({
+      index: spanIndex,
+      initialText: edits[spanIndex] ? edits[spanIndex].text : span.textContent,
+      top: spanRect.top - pageRect.top,
+      left: spanRect.left - pageRect.left,
+      width: spanRect.width,
+      height: spanRect.height,
+      fontSize: computedStyle.fontSize,
+      fontFamily: computedStyle.fontFamily,
+      // Guardamos la coordenada equivalente para pdf-lib (Eje Y invertido se calculará en la descarga)
+      pdfX: (spanRect.left - pageRect.left) * scaleFactor,
+      pdfY: (spanRect.top - pageRect.top) * scaleFactor,
+      pdfWidth: spanRect.width * scaleFactor,
+      pdfHeight: spanRect.height * scaleFactor,
+    });
+  };
+
+  const handleEditBlur = (e) => {
+    if (activeEdit) {
+      const newText = e.target.value;
+      if (newText !== activeEdit.initialText) {
+        setEdits(prev => ({
+          ...prev,
+          [activeEdit.index]: {
+            text: newText,
+            pdfX: activeEdit.pdfX,
+            pdfY: activeEdit.pdfY,
+            pdfWidth: activeEdit.pdfWidth,
+            pdfHeight: activeEdit.pdfHeight
+          }
+        }));
+      }
+      setActiveEdit(null);
+    }
+  };
+
+  const onRenderTextLayerSuccess = () => {
+    if (!pageRef.current) return;
+    const spans = Array.from(pageRef.current.querySelectorAll('.react-pdf__Page__textContent span'));
+    
+    spans.forEach((span, index) => {
+      span.classList.add('editable-pdf-text');
+      
+      if (edits[index]) {
+        span.textContent = edits[index].text;
+        span.style.color = '#7c3aed'; // Resalta visualmente el texto modificado
+        span.style.fontWeight = 'bold';
+      }
+    });
+  };
+
+  // --- EXPORTACIÓN DEL PDF MODIFICADO ---
+  const handleDownloadModifiedPDF = async () => {
+    if (!file) return;
+
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdfDoc = await PDFDocument.load(arrayBuffer);
+      const pages = pdfDoc.getPages();
+      const currentPage = pages[pageNumber - 1]; 
+      const { height } = currentPage.getSize();
+
+      // Aplicar cada edición al archivo binario
+      Object.values(edits).forEach(edit => {
+        // 1. Dibujar rectángulo blanco para borrar el texto antiguo
+        // (En PDF el eje Y empieza abajo, así que restamos la coordenada Y calculada desde arriba)
+        currentPage.drawRectangle({
+          x: edit.pdfX,
+          y: height - edit.pdfY - edit.pdfHeight, 
+          width: edit.pdfWidth + 20, // Margen de seguridad
+          height: edit.pdfHeight + 2,
+          color: rgb(1, 1, 1), 
+        });
+
+        // 2. Escribir el nuevo texto encima
+        currentPage.drawText(edit.text, {
+          x: edit.pdfX,
+          y: height - edit.pdfY - edit.pdfHeight + 2, // Ajuste de línea base
+          size: 11, // Tamaño aproximado (se podría calcular desde el CSS font-size)
+          color: rgb(0.2, 0.2, 0.2), 
+        });
+      });
+
+      const pdfBytes = await pdfDoc.save();
+      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const downloadUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = `CV_Optimizado_${fileName}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(downloadUrl);
+
+    } catch (error) {
+      console.error("Error al generar el PDF:", error);
+      alert("Hubo un error al generar tu PDF optimizado.");
+    }
+  };
+
+  // Pestañas Laterales
   const tabs = [
-    { id: 'recommendations', label: '⚡ Recomendaciones', component: () => (
-      <Recommendations recommendations={result.recommendations} onScrollToSuggestions={scrollToSuggestions} />
-    ) },
+    { id: 'recommendations', label: '⚡ Mejoras', component: () => <Recommendations recommendations={result?.recommendations || []} /> },
     { id: 'skills', label: '🛠️ Skills', component: () => (
       <>
         <div className="mb-4">
           <div className="text-sm font-medium text-gray-500 mb-2">✅ Tu CV detecta</div>
-          <TagList items={result.extracted_skills_cv} color="#10b981" emptyText="No se detectaron skills específicas" />
+          <TagList items={result?.extracted_skills_cv || []} color="#10b981" emptyText="Sin skills" />
         </div>
         <div>
           <div className="text-sm font-medium text-gray-500 mb-2">🎯 La oferta requiere</div>
-          <JobSkillsList cvSkills={result.extracted_skills_cv || []} jobSkills={result.extracted_skills_job || []} />
+          <JobSkillsList cvSkills={result?.extracted_skills_cv || []} jobSkills={result?.extracted_skills_job || []} />
         </div>
       </>
     ) },
-    { id: 'suggestions', label: '❌ Sugerencias', component: () => (
-      <MissingTermsWithContext items={result.missing_terms_with_context || result.priority_missing_terms?.map(t => ({ term: t })) || []} />
-    ) },
-    { id: 'culture', label: '🌱 Cultura', component: () => (
-      <div>
-        {result.culture_suggestions?.length > 0 ? (
-          <ul className="list-disc pl-5 space-y-2">
-            {result.culture_suggestions.map((item, idx) => <li key={idx} className="text-sm">{item.text}</li>)}
-          </ul>
-        ) : (
-          <p className="text-gray-500">No se detectaron valores culturales relevantes en la oferta.</p>
-        )}
-      </div>
-    ) }
+    { id: 'suggestions', label: '❌ Sugerencias', component: () => <MissingTermsWithContext items={result?.missing_terms_with_context || []} /> }
   ];
 
   return (
-    <div className="overflow-x-hidden">
-      {/* Tailwind + estilos personalizados */}
+    <div className="overflow-x-hidden bg-white">
       <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
       <style>{`
-        body { font-family: 'Inter', sans-serif; background: #ffffff; color: #0b1020; }
+        body { font-family: 'Inter', sans-serif; color: #0b1020; }
         .gradient-text { background: linear-gradient(90deg,#7c3aed,#2563eb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .grid-bg { background-image: linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px); background-size: 40px 40px; }
-        .card { background: rgba(255,255,255,0.82); backdrop-filter: blur(10px); border: 1px solid rgba(0,0,0,0.06); }
-        .glass { background: rgba(255,255,255,0.72); backdrop-filter: blur(14px); border: 1px solid rgba(0,0,0,0.06); }
         .hero-glow { position: absolute; width: 700px; height: 700px; border-radius: 999px; background: radial-gradient(circle, rgba(99,102,241,0.18), transparent 70%); top: -300px; right: -250px; }
-        .scanner-line { position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, #7c3aed, #2563eb); box-shadow: 0 0 20px rgba(37,99,235,0.7); animation: scan 3s linear infinite; }
-        @keyframes scan { 0% { transform: translateY(0); } 50% { transform: translateY(280px); } 100% { transform: translateY(0); } }
-        .score-ring { width: 180px; height: 180px; border-radius: 999px; background: conic-gradient(#2563eb 0deg, #7c3aed 290deg, rgba(0,0,0,0.06) 290deg); display: flex; align-items: center; justify-content: center; }
-        .score-inner { width: 140px; height: 140px; border-radius: 999px; background: white; display: flex; align-items: center; justify-content: center; flex-direction: column; }
         
-        /* Ajustes específicos para evitar desborde del canvas del PDF */
-        .pdf-viewer .react-pdf__Document { display: flex; flex-direction: column; align-items: center; }
-        .pdf-viewer .react-pdf__Page canvas { max-width: 100%; height: auto !important; }
+        /* Estilos críticos para el TextLayer Editable */
+        .editable-pdf-text { cursor: text !important; border-radius: 2px; transition: all 0.2s; }
+        .editable-pdf-text:hover { background-color: rgba(124, 58, 237, 0.2) !important; box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.4); }
+        .react-pdf__Page__textContent { z-index: 10 !important; }
+        .react-pdf__Page canvas { border-radius: 4px; }
       `}</style>
 
       <Header />
 
-      {/* HERO */}
+      {/* --- HERO SECTION --- */}
       <section className="relative overflow-hidden grid-bg">
         <div className="hero-glow"></div>
-        <div className="max-w-7xl mx-auto px-6 py-28 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-20 items-center">
-            <div>
-              <div className="inline-flex items-center gap-2 bg-black/5 border border-black/5 rounded-full px-4 py-2 mb-8">
-                <span className="w-2 h-2 rounded-full bg-green-500"></span>
-                <span className="text-sm font-medium">ATS Scanner impulsado por IA</span>
-              </div>
-              <h1 className="text-6xl md:text-7xl font-black tracking-tight leading-none mb-8">
-                Descubre cómo <span className="gradient-text"> te filtra</span> la IA.
-              </h1>
-              <p className="text-xl md:text-2xl text-black/60 leading-relaxed mb-10 max-w-2xl">
-                Tu CV probablemente está siendo rechazado antes de que un humano lo vea.
-                Analiza tu candidatura con ruptor y descubre exactamente cómo te interpreta un ATS moderno.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <button onClick={() => setShowModal(true)} className="px-8 py-5 rounded-2xl bg-black text-white text-lg font-semibold hover:scale-105 transition shadow-2xl">
-                  Subir mi CV
-                </button>
-                <button className="px-8 py-5 rounded-2xl border border-black/10 bg-white text-lg font-semibold hover:bg-black/5 transition">
-                  Ver ejemplo
-                </button>
-              </div>
-            </div>
-            
-            <div className="relative">
-              <div className="glass rounded-[40px] p-8 shadow-2xl relative overflow-hidden">
-                <div className="scanner-line"></div>
-                <div className="flex items-center justify-between mb-8">
-                  <div><p className="text-sm text-black/40 font-semibold uppercase tracking-wider">ATS SCORE</p><h2 className="text-3xl font-black mt-2">CV Analysis</h2></div>
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center text-white text-xl">⚡</div>
-                </div>
-                <div className="flex flex-col items-center mb-10">
-                  <div className="score-ring mb-6"><div className="score-inner"><span className="text-5xl font-black">82</span><span className="text-black/40 text-sm font-semibold">ATS SCORE</span></div></div>
-                  <p className="text-black/60 text-center max-w-sm">Tu CV tiene buena compatibilidad ATS, pero todavía hay mejoras clave para aumentar visibilidad.</p>
-                </div>
-                <div className="space-y-5">
-                  <div className="bg-black/3 rounded-2xl p-5 border border-black/5"><div className="flex items-center justify-between mb-2"><span className="font-semibold">Keywords Match</span><span className="font-bold text-blue-600">91%</span></div><div className="w-full h-2 rounded-full bg-black/5 overflow-hidden"><div className="h-full w-[91%] bg-gradient-to-r from-purple-600 to-blue-500 rounded-full"></div></div></div>
-                  <div className="bg-black/3 rounded-2xl p-5 border border-black/5"><div className="flex items-center justify-between mb-2"><span className="font-semibold">ATS Formatting</span><span className="font-bold text-blue-600">76%</span></div><div className="w-full h-2 rounded-full bg-black/5 overflow-hidden"><div className="h-full w-[76%] bg-gradient-to-r from-purple-600 to-blue-500 rounded-full"></div></div></div>
-                  <div className="bg-black/3 rounded-2xl p-5 border border-black/5"><div className="flex items-center justify-between mb-2"><span className="font-semibold">Recruiter Visibility</span><span className="font-bold text-blue-600">69%</span></div><div className="w-full h-2 rounded-full bg-black/5 overflow-hidden"><div className="h-full w-[69%] bg-gradient-to-r from-purple-600 to-blue-500 rounded-full"></div></div></div>
-                </div>
-              </div>
-            </div>
+        <div className="max-w-7xl mx-auto px-6 py-28 relative z-10 text-center">
+          <div className="inline-flex items-center gap-2 bg-black/5 rounded-full px-4 py-2 mb-8 mx-auto">
+            <span className="w-2 h-2 rounded-full bg-green-500"></span>
+            <span className="text-sm font-medium">Editor In-Place ATS</span>
           </div>
+          <h1 className="text-6xl md:text-7xl font-black tracking-tight leading-none mb-8 max-w-4xl mx-auto">
+            Descubre cómo <span className="gradient-text"> te filtra</span> la IA.
+          </h1>
+          <p className="text-xl md:text-2xl text-black/60 leading-relaxed mb-10 max-w-2xl mx-auto">
+            Tu CV probablemente está siendo rechazado antes de que un humano lo vea. Analiza y edita tu candidatura con ruptor.
+          </p>
+          <button onClick={() => setShowModal(true)} className="px-10 py-5 rounded-2xl bg-black text-white text-lg font-bold hover:scale-105 transition shadow-2xl">
+            Subir mi CV y Analizar
+          </button>
         </div>
       </section>
 
-      {/* CÓMO FUNCIONA */}
-      <section className="py-28">
+      {/* --- CÓMO FUNCIONA --- */}
+      <section className="py-28 bg-gray-50/50">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-20">
             <span className="gradient-text font-bold uppercase tracking-widest text-sm">Cómo funciona</span>
             <h2 className="text-5xl font-black mt-4 mb-6">Simulamos ATS reales</h2>
-            <p className="text-xl text-black/60 max-w-3xl mx-auto">Analizamos tu CV igual que lo haría un sistema automático de selección moderno.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="card rounded-[32px] p-10 shadow-xl">
-              <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center text-white text-2xl mb-8">📄</div>
+            <div className="bg-white rounded-[32px] p-10 shadow-xl border border-gray-100">
               <h3 className="text-2xl font-black mb-4">1. Subes tu CV</h3>
-              <p className="text-black/60 leading-relaxed">PDF o DOCX. Nuestro motor analiza estructura, contenido y compatibilidad ATS.</p>
+              <p className="text-gray-600">Procesamos tu documento PDF nativo y analizamos la estructura.</p>
             </div>
-            <div className="card rounded-[32px] p-10 shadow-xl">
-              <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center text-white text-2xl mb-8">🤖</div>
-              <h3 className="text-2xl font-black mb-4">2. La IA te evalúa</h3>
-              <p className="text-black/60 leading-relaxed">Simulamos filtros automáticos usados por recruiters y plataformas de contratación.</p>
+            <div className="bg-white rounded-[32px] p-10 shadow-xl border border-gray-100">
+              <h3 className="text-2xl font-black mb-4">2. La IA evalúa</h3>
+              <p className="text-gray-600">Simulamos filtros automáticos y extraemos las keywords faltantes.</p>
             </div>
-            <div className="card rounded-[32px] p-10 shadow-xl">
-              <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center text-white text-2xl mb-8">⚡</div>
-              <h3 className="text-2xl font-black mb-4">3. Optimiza y supera</h3>
-              <p className="text-black/60 leading-relaxed">Obtén mejoras concretas para aumentar tu score ATS y llegar al recruiter humano.</p>
+            <div className="bg-white rounded-[32px] p-10 shadow-xl border border-gray-100">
+              <h3 className="text-2xl font-black mb-4">3. Editas in-place</h3>
+              <p className="text-gray-600">Haz clic sobre cualquier palabra de tu CV, edítala y descárgalo.</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* LO QUE MATA TU CV */}
-      <section className="py-24 bg-black text-white relative overflow-hidden">
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full bg-purple-600 blur-3xl"></div>
-        </div>
-        <div className="max-w-6xl mx-auto px-6 relative z-10">
-          <div className="text-center mb-20">
-            <h2 className="text-5xl font-black mb-6">Lo que está matando tu CV</h2>
-            <p className="text-2xl text-white/70 max-w-3xl mx-auto">Los ATS no “piensan”. Filtran por patrones, estructura y keywords.</p>
+      {/* --- FOOTER --- */}
+      <footer className="border-t border-gray-200 py-10 bg-white">
+        <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <span className="font-bold text-lg">⚡ ruptor</span>
           </div>
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="bg-white/5 border border-white/10 rounded-[32px] p-10">
-              <h3 className="text-3xl font-black mb-8 text-red-400">Problemas comunes</h3>
-              <div className="space-y-5 text-white/70">
-                <div>✕ Diseño incompatible ATS</div>
-                <div>✕ Keywords incorrectas</div>
-                <div>✕ Baja densidad semántica</div>
-                <div>✕ Experiencia mal estructurada</div>
-                <div>✕ Skills invisibles para IA</div>
-                <div>✕ PDFs difíciles de parsear</div>
-              </div>
-            </div>
-            <div className="bg-gradient-to-br from-purple-600 to-blue-500 rounded-[32px] p-10">
-              <h3 className="text-3xl font-black mb-8">Lo que hace ruptor</h3>
-              <div className="space-y-5 text-white/90">
-                <div>✓ Optimiza formato ATS</div>
-                <div>✓ Mejora visibilidad IA</div>
-                <div>✓ Reescribe keywords estratégicas</div>
-                <div>✓ Simula filtros automáticos</div>
-                <div>✓ Mejora recruiter matching</div>
-                <div>✓ Maximiza posibilidades reales</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* BANNER CTA */}
-      <section className="py-28">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="rounded-[40px] p-14 bg-gradient-to-br from-purple-600 to-blue-500 text-white text-center shadow-2xl">
-            <h2 className="text-5xl font-black mb-6">Descubre por qué te rechaza la IA.</h2>
-            <p className="text-xl text-white/80 max-w-2xl mx-auto mb-10">Analiza tu CV gratis y entiende cómo te ven realmente los ATS modernos.</p>
-            <button onClick={() => setShowModal(true)} className="px-10 py-5 bg-white text-black rounded-2xl text-lg font-bold hover:scale-105 transition">
-              Escanear mi CV
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <footer className="border-t border-black/5 py-10">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
-          <Link to="/" className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center text-white font-bold">⚡</div>
-            <span className="font-bold text-lg">ruptor</span>
-          </Link>
-          <p className="text-black/40 text-sm">© 2026 ruptor — Supera el filtro. Llega al humano.</p>
+          <p className="text-gray-400 text-sm">© 2026 ruptor — Supera el filtro.</p>
         </div>
       </footer>
 
-      {/* MODAL A PANTALLA COMPLETA */}
+      {/* --- MODAL PRINCIPAL (DASHBOARD SAAS) --- */}
       {showModal && (
-        <div
-          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center"
-          onClick={(e) => { if (e.target === e.currentTarget) closeModal(); }}
-        >
-          <div className="bg-white w-full h-full flex flex-col shadow-2xl">
-            {/* Cabecera fija */}
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center z-10 flex-shrink-0">
-              <h2 className="text-xl font-bold">{result ? 'Resultados del análisis' : 'Analiza tu CV'}</h2>
-              <button onClick={closeModal} className="text-gray-500 hover:text-gray-700 text-2xl leading-none">×</button>
+        <div className="fixed inset-0 z-50 bg-gray-900/90 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-7xl h-[95vh] rounded-3xl flex flex-col shadow-2xl overflow-hidden border border-white/20">
+            
+            {/* Cabecera del Modal */}
+            <div className="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center z-20 shadow-sm">
+              <h2 className="text-xl font-bold text-gray-800">⚡ Editor Inteligente</h2>
+              <div className="flex items-center gap-4">
+                {result && file && (
+                  <button 
+                    onClick={handleDownloadModifiedPDF}
+                    className="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-purple-700 transition shadow flex items-center gap-2"
+                  >
+                    ⬇ Descargar Cambios
+                  </button>
+                )}
+                <button onClick={closeModal} className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition flex items-center justify-center">✕</button>
+              </div>
             </div>
 
-            {/* Cuerpo: dos columnas cuando hay resultado */}
             {result ? (
-              <div className="flex flex-1 overflow-hidden">
-                {/* COLUMNA IZQUIERDA - Previsualización del CV (PDF o texto raw) */}
-                <div className="w-1/2 border-r border-gray-200 flex flex-col bg-gray-50">
-                  <div className="p-4 border-b border-gray-200 font-semibold flex justify-between items-center bg-white">
-                    <span>📄 Previsualización de tu CV</span>
-                    {file && file.type === 'application/pdf' && numPages && (
-                      <div className="text-sm flex items-center gap-2">
-                        <button onClick={goToPrevPage} className="px-2 py-1 bg-gray-200 rounded text-xs hover:bg-gray-300">◀</button>
-                        <span>Página {pageNumber} de {numPages}</span>
-                        <button onClick={goToNextPage} className="px-2 py-1 bg-gray-200 rounded text-xs hover:bg-gray-300">▶</button>
+              <div className="flex flex-1 overflow-hidden bg-gray-100">
+                
+                {/* === COLUMNA IZQUIERDA: VISOR PDF EDITABLE === */}
+                <div className="w-7/12 border-r border-gray-200 flex flex-col relative bg-gray-200/50">
+                  <div className="p-3 border-b border-gray-200 bg-white flex justify-between items-center z-10 shadow-sm">
+                    <span className="text-sm font-semibold text-gray-700 bg-purple-50 text-purple-700 px-3 py-1 rounded-full">
+                      ✨ Haz clic en cualquier texto del CV para editarlo
+                    </span>
+                    {numPages && (
+                      <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-md border border-gray-200">
+                        <button onClick={goToPrevPage} className="px-2 bg-white rounded text-xs hover:bg-gray-50">◀</button>
+                        <span className="text-xs font-medium px-2">{pageNumber} / {numPages}</span>
+                        <button onClick={goToNextPage} className="px-2 bg-white rounded text-xs hover:bg-gray-50">▶</button>
                       </div>
                     )}
                   </div>
-                  <div className="flex-1 overflow-y-auto p-4 pdf-viewer">
-                    {file && file.type === 'application/pdf' ? (
-                      !pdfError ? (
+
+                  <div className="flex-1 overflow-y-auto p-8 flex justify-center relative">
+                    {file && !pdfError ? (
+                      <div 
+                        className="relative shadow-2xl bg-white select-none transition-all" 
+                        ref={pageRef}
+                        onClick={handlePageClick}
+                      >
+                        {/* Renderizado de react-pdf */}
                         <Document
                           file={pdfFileUrl}
                           onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-                          onLoadError={(err) => {
-                            console.error('Error cargando PDF:', err);
-                            setPdfError(true);
-                          }}
+                          onLoadError={() => setPdfError(true)}
                         >
                           <Page 
                             pageNumber={pageNumber} 
                             width={450} 
-                            renderTextLayer={false} 
-                            renderAnnotationLayer={false} 
+                            renderTextLayer={true} 
+                            renderAnnotationLayer={false}
+                            onTextLayerRenderSuccess={onRenderTextLayerSuccess}
                           />
                         </Document>
-                      ) : (
-                        <div className="text-red-500 text-center p-4">
-                          ⚠️ No se pudo cargar la previsualización del PDF. El análisis interno se realizó correctamente.
-                        </div>
-                      )
-                    ) : (
-                      <div className="font-mono text-sm whitespace-pre-wrap bg-white p-4 rounded-xl shadow-sm border border-black/5">
-                        {result.cv_raw_text || "No se pudo extraer texto legible del CV."}
+
+                        {/* Input Flotante para la edición (aparece al hacer clic) */}
+                        {activeEdit && (
+                          <textarea
+                            autoFocus
+                            defaultValue={activeEdit.initialText}
+                            onBlur={handleEditBlur}
+                            onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) e.target.blur(); }}
+                            className="absolute z-50 bg-white border border-purple-500 shadow-lg outline-none resize-none overflow-hidden rounded-sm"
+                            style={{
+                              top: `${activeEdit.top - 2}px`,
+                              left: `${activeEdit.left - 2}px`,
+                              width: `${Math.max(activeEdit.width + 30, 120)}px`, 
+                              height: `${Math.max(activeEdit.height + 10, 24)}px`,
+                              fontSize: activeEdit.fontSize,
+                              fontFamily: activeEdit.fontFamily,
+                              color: '#000',
+                              lineHeight: '1.2',
+                              padding: '2px'
+                            }}
+                          />
+                        )}
                       </div>
+                    ) : (
+                      <div className="text-gray-500 text-sm bg-white p-6 rounded shadow">Error al cargar el PDF.</div>
                     )}
                   </div>
                 </div>
 
-                {/* COLUMNA DERECHA - Estructura fija arriba y Pestañas abajo */}
-                <div className="w-1/2 flex flex-col bg-white">
-                  
-                  {/* SECCIÓN FIJA: Siempre muestra los scores generales arriba */}
-                  <div className="p-6 border-b border-gray-100 bg-gray-50/50 flex-shrink-0">
+                {/* === COLUMNA DERECHA: RESULTADOS IA === */}
+                <div className="w-5/12 flex flex-col bg-white">
+                  <div className="p-6 border-b border-gray-100 bg-gray-50 flex-shrink-0">
                     <ScoreCircle score={result.ats_score} level={result.level} />
-                    <p className="mt-3 text-center text-sm text-gray-600 max-w-md mx-auto">{result.summary}</p>
+                    <p className="mt-4 text-center text-sm font-medium text-gray-600">{result.summary}</p>
                     {result.detailed_scores && (
-                      <div className="mt-4 pt-4 border-t border-gray-200/60">
+                      <div className="mt-5 pt-5 border-t border-gray-200">
                         <DetailedScores scores={result.detailed_scores} />
                       </div>
                     )}
                   </div>
-
-                  {/* MENÚ DE PESTAÑAS (Ubicado abajo de los scores) */}
-                  <div className="flex border-b border-gray-200 bg-white flex-shrink-0">
+                  <div className="flex border-b border-gray-200 bg-white px-2">
                     {tabs.map(tab => (
                       <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`flex-1 px-3 py-3 text-sm font-medium transition-all border-b-2 text-center ${
-                          activeTab === tab.id
-                            ? 'border-purple-600 text-purple-600 bg-purple-50/30'
-                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                        className={`flex-1 py-3 px-2 text-xs font-bold uppercase tracking-wide transition-all border-b-2 text-center ${
+                          activeTab === tab.id ? 'border-purple-600 text-purple-700 bg-purple-50/50 rounded-t-lg' : 'border-transparent text-gray-400 hover:text-gray-600'
                         }`}
                       >
                         {tab.label}
                       </button>
                     ))}
                   </div>
-
-                  {/* CONTENIDO DE LAS PESTAÑAS (Scroll independiente e inferior) */}
                   <div className="flex-1 overflow-y-auto p-6 bg-white">
                     {tabs.find(t => t.id === activeTab)?.component()}
                   </div>
                 </div>
+
               </div>
             ) : (
-              <div className="flex-1 overflow-y-auto p-6">
-                <JobForm
-                  fileName={fileName}
-                  jobDescription={jobDescription}
-                  analysisMode={analysisMode}
-                  onFileChange={handleFileChange}
-                  onJobDescriptionChange={setJobDescription}
-                  onModeChange={setAnalysisMode}
-                  onSubmit={handleSubmit}
-                  onExport={handleExportReport}
-                  loading={loading}
-                  resultExists={!!result}
-                />
+              <div className="flex-1 overflow-y-auto p-8 bg-gray-50 flex items-center justify-center">
+                <div className="w-full max-w-2xl bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
+                  <JobForm
+                    fileName={fileName}
+                    jobDescription={jobDescription}
+                    analysisMode={analysisMode}
+                    onFileChange={handleFileChange}
+                    onJobDescriptionChange={setJobDescription}
+                    onModeChange={setAnalysisMode}
+                    onSubmit={handleSubmit}
+                    onExport={handleExportReport}
+                    loading={loading}
+                    resultExists={!!result}
+                  />
+                </div>
               </div>
             )}
           </div>
         </div>
       )}
-
-      {/* Optimizer Modal */}
       <OptimizerModal show={showOptimizer} data={cvOptimizations} onClose={closeOptimizer} />
-
       {loading && <LoadingSpinner />}
-      {error && (
-        <div className="fixed bottom-4 right-4 bg-red-100 border border-red-300 text-red-700 px-4 py-2 rounded-lg shadow-lg z-50">
-          ⚠️ {error}
-        </div>
-      )}
     </div>
   );
 }
