@@ -31,8 +31,9 @@ export const ScannerModal = ({
   if (!show) return null;
 
   return (
+    /* h-screen para que el modal ocupe toda la pantalla */
     <div className="fixed inset-0 z-50 bg-gray-900/90 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white w-full max-w-7xl h-[95vh] rounded-3xl flex flex-col shadow-2xl overflow-hidden border border-white/20">
+      <div className="h-screen bg-white w-full max-w-8xl h-[95vh] rounded-3xl flex flex-col shadow-2xl overflow-hidden border border-white/20">
         {/* Cabecera */}
         <div className="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center z-20 shadow-sm">
           <h2 className="text-xl font-bold text-gray-800">✏️ Editor Profesional de CV</h2>
@@ -53,17 +54,23 @@ export const ScannerModal = ({
 
         {result ? (
           <div className="flex flex-1 overflow-hidden bg-gray-100">
-            <PdfViewer
-              file={file}
-              pdfUrl={pdfUrl}
-              containerWidth={containerWidth}
-              pageRef={pageRef}
-              onPageClick={onPageClick}
-              activeEdit={activeEdit}
-              onEditBlur={onEditBlur}
-              onRenderSuccess={onRenderSuccess}
-            />
-            <ResultsPanel result={result} />
+            {/* Panel izquierdo: PDF - 50% */}
+            <div className="w-1/2 flex flex-col min-h-0 bg-gray-200/50">
+              <PdfViewer
+                file={file}
+                pdfUrl={pdfUrl}
+                containerWidth={containerWidth}
+                pageRef={pageRef}
+                onPageClick={onPageClick}
+                activeEdit={activeEdit}
+                onEditBlur={onEditBlur}
+                onRenderSuccess={onRenderSuccess}
+              />
+            </div>
+            {/* Panel derecho: Resultados - 50% */}
+            <div className="w-1/2 flex flex-col min-h-0 bg-white">
+              <ResultsPanel result={result} />
+            </div>
           </div>
         ) : (
           <div className="flex-1 overflow-y-auto p-8 bg-gray-50 flex items-center justify-center">

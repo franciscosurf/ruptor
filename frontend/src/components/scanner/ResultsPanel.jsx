@@ -137,13 +137,13 @@ export const ResultsPanel = ({ result }) => {
   ];
 
   return (
-    <div className="w-5/12 flex flex-col bg-white min-h-0">
+    <div className="w-12/12 flex flex-col bg-white min-h-0">
       {/* Bloque del Score */}
       <div className="p-6 border-b border-gray-100 bg-gray-50 flex-shrink-0">
         <ScoreCircle score={result.ats_score} level={result.level} />
         <p className="mt-4 text-center text-sm font-medium text-gray-600">{result.summary}</p>
         {result.detailed_scores && (
-          <div className="mt-5 pt-5 border-t border-gray-100">
+          <div className="mt-2 border-t border-gray-100">
             <DetailedScores scores={result.detailed_scores} />
           </div>
         )}

@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+// src/components/scanner/PdfViewer.jsx
+import React, { useState, useEffect, useRef } from 'react';
 import { Document, Page } from 'react-pdf';
 
 export const PdfViewer = ({
   file,
   pdfUrl,
-  containerWidth,
-  pageRef,
   onPageClick,
   activeEdit,
   onEditBlur,
@@ -14,6 +13,25 @@ export const PdfViewer = ({
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [pdfError, setPdfError] = useState(false);
+  const [availableWidth, setAvailableWidth] = useState(undefined);
+  const wrapperRef = useRef(null);
+
+  // Medir el ancho del contenedor para que el PDF ocupe el 100%
+  useEffect(() => {
+    if (!wrapperRef.current) return;
+
+    const updateWidth = () => {
+      if (wrapperRef.current) {
+        // Restamos un pequeño padding si es necesario (por ejemplo, 16px por los lados)
+        const width = wrapperRef.current.clientWidth - 32; // 16px left+right padding del contenedor
+        setAvailableWidth(width > 0 ? width : undefined);
+      }
+    };
+
+    updateWidth();
+    window.addEventListener('resize', updateWidth);
+    return () => window.removeEventListener('resize', updateWidth);
+  }, []);
 
   const goToPrevPage = () => setPageNumber(Math.max(1, pageNumber - 1));
   const goToNextPage = () => setPageNumber(Math.min(numPages, pageNumber + 1));
@@ -22,11 +40,12 @@ export const PdfViewer = ({
     const span = e.target.closest('span');
     if (!span || !span.closest('.react-pdf__Page__textContent')) return;
 
-    const spans = Array.from(pageRef.current.querySelectorAll('.react-pdf__Page__textContent span'));
+    const spans = Array.from(wrapperRef.current.querySelectorAll('.react-pdf__Page__textContent span'));
     const spanIndex = spans.indexOf(span);
     if (spanIndex === -1) return;
 
-    const pageRect = pageRef.current.getBoundingClientRect();
+    const pageRect = wrapperRef.current.querySelector('.react-pdf__Page')?.getBoundingClientRect();
+    if (!pageRect) return;
     const spanRect = span.getBoundingClientRect();
     const computedStyle = window.getComputedStyle(span);
     const rgbColor = computedStyle.color;
@@ -53,7 +72,7 @@ export const PdfViewer = ({
   }
 
   return (
-    <div className="w-7/12 border-r border-gray-200 flex flex-col relative bg-gray-200/50">
+    <div className="flex-1 flex flex-col relative bg-gray-200/50">
       <div className="p-3 border-b border-gray-200 bg-white flex justify-between items-center z-10 shadow-sm">
         <span className="text-sm font-semibold text-gray-700 bg-purple-50 text-purple-700 px-3 py-1 rounded-full">
           ✨ Haz clic en cualquier texto para editarlo
@@ -66,8 +85,8 @@ export const PdfViewer = ({
           </div>
         )}
       </div>
-      <div className="flex-1 overflow-y-auto p-8 flex justify-center relative">
-        <div className="relative shadow-2xl bg-white select-none transition-all" ref={pageRef} onClick={handleClick}>
+      <div className="flex-1 overflow-y-auto p-8 flex justify-center relative" ref={wrapperRef}>
+        <div className="relative shadow-2xl bg-white select-none transition-all" onClick={handleClick}>
           <Document
             file={pdfUrl}
             onLoadSuccess={({ numPages }) => setNumPages(numPages)}
@@ -75,7 +94,7 @@ export const PdfViewer = ({
           >
             <Page
               pageNumber={pageNumber}
-              width={containerWidth}
+              width={availableWidth}
               renderTextLayer={true}
               renderAnnotationLayer={false}
               onTextLayerRenderSuccess={onRenderSuccess}
