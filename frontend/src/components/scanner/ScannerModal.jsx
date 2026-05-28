@@ -28,20 +28,21 @@ export const ScannerModal = ({
   onExport,
   loading,
 }) => {
-  if (!show) return null;
-
+  
   useEffect(() => {
-    if (show) {
-      document.body.style.overflow = 'hidden';
-      return () => {
-        document.body.style.overflow = '';
-      };
-    }
-    else {
-      // Si se cierra, restauramos (aunque el cleanup ya lo haría al cambiar show)
-      document.body.style.overflow = '';
-    }
+    if (!show) return;
+
+    // Guardamos el estado original exacto antes de modificarlo
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    // Esta función se ejecuta SÍ O SÍ cuando el modal se oculta o se desmonta
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
   }, [show]);
+
+  if (!show) return null;
 
   return (
     /* h-screen para que el modal ocupe toda la pantalla */
