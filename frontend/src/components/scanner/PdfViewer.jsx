@@ -72,7 +72,7 @@ export const PdfViewer = ({
   }
 
   return (
-    <div className="flex-1 flex flex-col relative bg-gray-200/50">
+    <div className="flex-1 flex flex-col relative bg-gray-200/50 overflow-y-auto">
       <div className="p-3 border-b border-gray-200 bg-white flex justify-between items-center z-10 shadow-sm">
         <span className="text-sm font-semibold text-gray-700 bg-purple-50 text-purple-700 px-3 py-1 rounded-full">
           ✨ Haz clic en cualquier texto para editarlo
