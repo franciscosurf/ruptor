@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { PdfViewer } from './PdfViewer';
 import { ResultsPanel } from './ResultsPanel';
 import { JobForm } from '../forms/JobForm';
@@ -29,6 +29,19 @@ export const ScannerModal = ({
   loading,
 }) => {
   if (!show) return null;
+
+  useEffect(() => {
+    if (show) {
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = '';
+      };
+    }
+    else {
+      // Si se cierra, restauramos (aunque el cleanup ya lo haría al cambiar show)
+      document.body.style.overflow = '';
+    }
+  }, [show]);
 
   return (
     /* h-screen para que el modal ocupe toda la pantalla */
