@@ -140,17 +140,23 @@ async def analyze_cv_logic(
     # ── Coverage semántico ────────────────────────────────────────────────────
     if job_phrases:
         keyword_coverage, matched_terms, missing_terms_with_context = semantic_phrase_coverage(
-            cv_terms, job_phrases, job_text, threshold=config.SEMANTIC_THRESHOLD
+            cv_text, job_phrases, job_text, threshold=config.SEMANTIC_THRESHOLD # <-- cv_text aquí
         )
+        #keyword_coverage, matched_terms, missing_terms_with_context = semantic_phrase_coverage(
+        #    cv_terms, job_phrases, job_text, threshold=config.SEMANTIC_THRESHOLD
+        #)
     else:
         keyword_coverage, matched_terms, missing_terms_with_context = 0.0, [], []
 
     missing_terms = [item["term"] for item in missing_terms_with_context]
 
     similarity_scores['keyword_exact']            = round(keyword_exact, 2)
-    similarity_scores['overall']                  = round(
-        similarity_scores['semantic'] * 0.5 + keyword_coverage * 0.5, 2
-    )
+
+    base_overall = similarity_scores['overall']
+    similarity_scores['overall'] = round(base_overall * 0.70 + keyword_coverage * 0.30, 2)
+    #similarity_scores['overall']                  = round(
+    #    similarity_scores['semantic'] * 0.5 + keyword_coverage * 0.5, 2
+    #)
     similarity_scores['action_verbs']             = calculate_action_verbs_score(cv_text)
     similarity_scores['quantified_achievements']  = calculate_quantified_achievements_score(cv_text)
     similarity_scores['recruiter_visibility']     = calculate_recruiter_visibility(cv_text)

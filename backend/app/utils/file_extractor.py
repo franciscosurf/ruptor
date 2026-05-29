@@ -40,6 +40,11 @@ async def extract_text(file: UploadFile) -> str:
         # TXT
         else:
 
+            #content = await file.read()
+            #text = content.decode("utf-8").strip()
+            #print("📄 Texto recibido en backend (primeros 500 chars):", text[:500])
+            #return text
+
             try:
                 return content.decode("utf-8").strip()
 

@@ -1,3 +1,4 @@
+from email.mime import text
 import re
 from typing import List, Tuple
 
@@ -11,15 +12,19 @@ def extract_keywords_advanced(text: str, top_n: int = 60, force_lang: str = None
     
     # 1. Dividir el texto en fragmentos: oraciones (punto y salto de línea)
     # Usamos split con lookbehind positivo: (?<=[.!?;:])\s+  y también split por \n+
-    chunks = re.split(r'(?<=[.!?;:])\s+|\n+', text)
-    chunks = [c.strip() for c in chunks if len(c.strip()) > 20]  # ignorar fragmentos muy cortos
+    # chunks = re.split(r'(?<=[.!?;:])\s+|\n+', text)
+    # chunks = [c.strip() for c in chunks if len(c.strip()) > 20]  # ignorar fragmentos muy cortos
     
-    # Si no hay suficientes fragmentos, usar todo el texto
-    if len(chunks) < 2:
-        chunks = [text[:10000]]
+    # # Si no hay suficientes fragmentos, usar todo el texto
+    # if len(chunks) < 2:
+    #     chunks = [text[:10000]]
     
+    import textwrap
+    clean_text = text[:8000] # Limitar a 8000 caracteres
+    chunks = textwrap.wrap(clean_text, width=1500, break_long_words=False)
+
     all_keywords = []
-    for chunk in chunks[:10]:  # limitar a 10 fragmentos para rendimiento
+    for chunk in chunks:  # [:10] limitar a 10 fragmentos para rendimiento
         # Extraer keywords de cada fragmento por separado
         relevant_text = extract_relevant_text(chunk)
         if not relevant_text.strip() or len(relevant_text) < 50:

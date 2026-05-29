@@ -76,6 +76,196 @@ def calculate_weighted_similarity(
         "technical_skills": round(tech_match * 100, 2)
     }
 
+
+# app/services/similarity_service.py
+
+
+
+# app/services/similarity_service.py
+
+def semantic_phrase_coverage(
+    cv_text: str,  # ← CAMBIADO: Ahora recibe el string completo del CV para segmentar oraciones
+    job_phrases_with_scores: List[Tuple[str, float]],
+    job_text: str,
+    threshold: float = 0.60
+) -> Tuple[float, List[str], List[Dict[str, Any]]]:
+    """
+    Calcula la cobertura semántica comparando las frases clave de la oferta (JD)
+    contra oraciones reales del CV, evitando la pérdida de contexto.
+    """
+    if not cv_text or not job_phrases_with_scores:
+        return 0.0, [], []
+
+    _init_models()
+    emb_model = get_embedding_model()
+
+    # 1. Segmentar el CV en oraciones completas y limpiar fragmentos vacíos o ruidos
+    # Separamos por puntos, signos de puntuación o saltos de línea (\n)
+    cv_sentences = re.split(r'(?<=[.!?;:])\s+|\n+', cv_text)
+    cv_sentences = [s.strip() for s in cv_sentences if len(s.strip()) > 12]
+    
+    # Salvaguarda por si el CV es un bloque de texto plano sin separadores claros
+    if not cv_sentences:
+        cv_sentences = [cv_text.strip()]
+
+    # 2. Procesar y limpiar las frases requeridas por la oferta de empleo
+    seen_phrases = set()
+    deduped_phrases_with_scores = []
+    for phrase, score in job_phrases_with_scores:
+        p_clean = phrase.strip().lower()
+        if p_clean not in seen_phrases and len(p_clean) > 5:
+            seen_phrases.add(p_clean)
+            deduped_phrases_with_scores.append((phrase, score))
+
+    job_phrases = [phrase for phrase, _ in deduped_phrases_with_scores]
+    original_scores = [score for _, score in deduped_phrases_with_scores]
+
+    if not job_phrases:
+        return 0.0, [], []
+
+    try:
+        # Generar embeddings cruzando ORACIONES completas de la oferta vs ORACIONES del CV
+        cv_embs = emb_model.encode(cv_sentences)
+        job_embs = emb_model.encode(job_phrases)
+        sim_matrix = cosine_similarity(job_embs, cv_embs)
+    except Exception as e:
+        print(f"Error generando embeddings en semantic_phrase_coverage: {e}")
+        return 0.0, [], []
+
+    matched = []
+    missing = []
+
+    # 3. Evaluar la similitud de cada frase requerida frente a todo el CV
+    for i, (phrase, orig_score) in enumerate(zip(job_phrases, original_scores)):
+        # Obtener el score de similitud de la oración del CV que más se le parece
+        best_sim = float(sim_matrix[i].max()) if i < len(sim_matrix) and len(cv_sentences) > 0 else 0.0
+        
+        # Encontrar el índice de esa oración para extraer el fragmento exacto como contexto real
+        best_match_idx = sim_matrix[i].argmax() if i < len(sim_matrix) and len(cv_sentences) > 0 else 0
+        cv_context_sentence = cv_sentences[best_match_idx] if cv_sentences else phrase
+
+        term_info = {
+            "term": phrase,
+            "score": round(orig_score, 3),
+            "semantic_score": round(best_sim, 3),
+            # Si supera el umbral, guardamos la frase real del usuario en su CV, si no, la de referencia de la oferta
+            "context": cv_context_sentence if best_sim >= threshold else phrase  
+        }
+
+        if best_sim >= threshold:
+            matched.append(phrase)
+        else:
+            # Solo sugerir si la frase es verdaderamente relevante (score >= 0.4)
+            if orig_score >= 0.4:
+                missing.append(term_info)
+
+    # 4. Cálculo ponderado inteligente de la cobertura (en escala de 0.0 a 100.0)
+    total_possible_score = sum(original_scores)
+    if total_possible_score > 0:
+        matched_indices = [idx for idx, p in enumerate(job_phrases) if p in matched]
+        earned_score = sum(original_scores[idx] for idx in matched_indices)
+        coverage_score = (earned_score / total_possible_score) * 100
+    else:
+        coverage_score = (len(matched) / len(job_phrases) * 100) if job_phrases else 0.0
+
+    # Ordenar por el score de importancia de la oferta (las más críticas primero)
+    missing_sorted = sorted(missing, key=lambda x: x['score'], reverse=True)[:15]
+    print(f"📊 Frases Oferta: {len(job_phrases)} | Matched: {len(matched)} | Missing Sugeridas: {len(missing_sorted)}")
+
+    return round(coverage_score, 2), matched, missing_sorted
+
+
+
+def semantic_phrase_coverageNUEVA(
+    cv_text: str,  # ← CAMBIADO: Ahora recibe el string completo del CV, no la lista de términos
+    job_phrases_with_scores: List[Tuple[str, float]],
+    job_text: str,
+    threshold: float = 0.60
+) -> Tuple[float, List[str], List[Dict[str, Any]]]:
+    """
+    Calcula la cobertura semántica comparando las frases clave de la oferta (JD)
+    contra oraciones reales del CV, evitando la pérdida de contexto de palabras sueltas.
+    """
+    if not cv_text or not job_phrases_with_scores:
+        return 0.0, [], []
+
+    # Inicializar modelos de embeddings compartidos de la app
+    _init_models()
+    emb_model = get_embedding_model()
+
+    # 1. Segmentar el CV en oraciones completas y limpiar fragmentos vacíos o ruidos
+    # Separamos por puntos, signos de puntuación o saltos de línea (\n) propios del editor .txt
+    cv_sentences = re.split(r'(?<=[.!?;:])\s+|\n+', cv_text)
+    cv_sentences = [s.strip() for s in cv_sentences if len(s.strip()) > 12]
+    
+    # Salvaguarda por si el CV es un bloque de texto plano sin separadores claros
+    if not cv_sentences:
+        cv_sentences = [cv_text.strip()]
+
+    # 2. Procesar y limpiar las frases requeridas por la oferta de empleo
+    seen_phrases = set()
+    deduped_phrases_with_scores = []
+    for phrase, score in job_phrases_with_scores:
+        p_clean = phrase.strip().lower()
+        if p_clean not in seen_phrases and len(p_clean) > 5:
+            seen_phrases.add(p_clean)
+            deduped_phrases_with_scores.append((phrase, score))
+
+    job_phrases = [phrase for phrase, _ in deduped_phrases_with_scores]
+    original_scores = [score for _, score in deduped_phrases_with_scores]
+
+    if not job_phrases:
+        return 0.0, [], []
+
+    try:
+        # Generar embeddings cruzando ORACIONES completas de la oferta vs ORACIONES del CV
+        cv_embs = emb_model.encode(cv_sentences)
+        job_embs = emb_model.encode(job_phrases)
+        sim_matrix = cosine_similarity(job_embs, cv_embs)
+    except Exception as e:
+        print(f"Error generando embeddings en semantic_phrase_coverage: {e}")
+        return 0.0, [], []
+
+    matched = []
+    missing = []
+
+    # 3. Evaluar la similitud de cada frase requerida frente a todo el CV
+    for i, (phrase, orig_score) in enumerate(zip(job_phrases, original_scores)):
+        # Obtener el score de similitud de la oración del CV que más se le parece
+        best_sim = float(sim_matrix[i].max()) if i < len(sim_matrix) and len(cv_sentences) > 0 else 0.0
+        
+        # Encontrar el índice de esa oración para extraer el fragmento exacto como contexto real
+        best_match_idx = sim_matrix[i].argmax() if i < len(sim_matrix) and len(cv_sentences) > 0 else 0
+        cv_context_sentence = cv_sentences[best_match_idx] if cv_sentences else phrase
+
+        term_info = {
+            "term": phrase,
+            "score": round(orig_score, 3),
+            "semantic_score": round(best_sim, 3),
+            # Si supera el umbral, guardamos la frase real del usuario en su CV, si no, la de referencia
+            "context": cv_context_sentence if best_sim >= threshold else phrase  
+        }
+
+        if best_sim >= threshold:
+            matched.append(phrase)
+        else:
+            # Solo penalizar/guardar si la frase es verdaderamente relevante en la oferta (score >= 0.4)
+            if orig_score >= 0.4:
+                missing.append(term_info)
+
+    # 4. Cálculo ponderado inteligente de la cobertura (en escala de 0.0 a 1.0)
+    # En lugar de contar ítems, valoramos más si el usuario incluyó las frases más críticas de la JD
+    total_possible_score = sum(original_scores)
+    if total_possible_score > 0:
+        matched_indices = [idx for idx, p in enumerate(job_phrases) if p in matched]
+        earned_score = sum(original_scores[idx] for idx in matched_indices)
+        coverage_score = earned_score / total_possible_score
+    else:
+        coverage_score = len(matched) / len(job_phrases) if job_phrases else 0.0
+
+    return round(coverage_score, 2), matched, missing
+
+
 def semantic_term_coverage(
     cv_terms: List[str],
     job_terms_with_scores: List[Tuple[str, float]],
@@ -189,7 +379,7 @@ def semantic_term_coverage(
     
     return coverage, matched, missing_sorted
 
-def semantic_phrase_coverage(
+def semantic_phrase_coverage33(
     cv_terms: List[str],
     job_phrases_with_scores: List[Tuple[str, float]],
     job_text: str,

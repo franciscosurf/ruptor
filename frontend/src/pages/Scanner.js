@@ -12,12 +12,30 @@ import { OptimizerModal } from '../components/optimizer/OptimizerModal';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { Header } from '../components/layout/Header';  
 
+const cvDataToPlainText = (cvData) => {
+  if (!cvData) return '';
+  const sections = [
+    { title: 'NOMBRE', content: cvData.name },
+    { title: 'CONTACTO', content: cvData.contact },
+    { title: 'PERFIL PROFESIONAL', content: cvData.summary },
+    { title: 'LIDERAZGO Y ACTIVIDADES', content: cvData.leadership },
+    { title: 'EXPERIENCIA', content: cvData.experience },
+    { title: 'EDUCACIÓN', content: cvData.education },
+    { title: 'HABILIDADES E INTERESES', content: cvData.skills },
+  ];
+  return sections
+    .filter(s => s.content && s.content.trim())
+    .map(s => `${s.title}\n${s.content}\n`)
+    .join('\n');
+};
+
 export default function Scanner() {
   const editorRef = useRef(null);
   // Preservamos lógica nativa de análisis de IA
   const {
     file, fileName, jobDescription, analysisMode, result, loading,
-    handleFileChange, setJobDescription, setAnalysisMode, handleSubmit, handleExportReport,
+    handleFileChange, setJobDescription, setAnalysisMode, handleSubmit, 
+    handleExportReport, analyzeWithCvText,
   } = useAnalysis();
 
   // Preservamos lógica nativa del optimizador
@@ -43,6 +61,13 @@ export default function Scanner() {
 
   // Manejador modificado para descargar mediante captura HTML
   const handleDownload = () => exportToPdf(templateRef, fileName);
+
+  // Manejador para reanalizar con el CV editado
+  const handleReanalyze = async (editedCvData) => {
+    if (!editedCvData) return;
+    const cvText = cvDataToPlainText(editedCvData);
+    await analyzeWithCvText(cvText, jobDescription, analysisMode);
+  };
 
   return (
     <div className="overflow-x-hidden bg-white" >
@@ -79,7 +104,8 @@ export default function Scanner() {
         onSubmit={handleSubmit}
         onExport={handleExportReport}
         loading={loading}
-        ref={editorRef}
+        //ref={editorRef}
+        onReanalyze={handleReanalyze} 
       />
 
       <OptimizerModal show={showOptimizer} data={cvOptimizations} onClose={closeOptimizer} />

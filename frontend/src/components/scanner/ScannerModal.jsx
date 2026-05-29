@@ -9,6 +9,7 @@ import { useTemplateExport } from './strategy/useTemplateExport';
 export const ScannerModal = ({
   show, onClose, result, file, fileName, jobDescription, analysisMode,
   onFileChange, onJobDescriptionChange, onModeChange, onSubmit, loading,
+  onReanalyze,
 }) => {
   const templateRef = useRef(null);
   const { cvData, loadPdf, isExtracting, updateSection } = useCvData();
@@ -29,6 +30,12 @@ export const ScannerModal = ({
 
   if (!show) return null;
 
+  const handleReanalyzeClick = () => {
+    if (onReanalyze && cvData) {
+      onReanalyze(cvData);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 bg-gray-900/90 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="h-screen bg-white w-full max-w-8xl h-[95vh] rounded-3xl flex flex-col shadow-2xl overflow-hidden border border-white/20">
@@ -38,12 +45,23 @@ export const ScannerModal = ({
           <h2 className="text-xl font-bold text-gray-800">✏️ Editor de Plantillas Inteligentes CV</h2>
           <div className="flex items-center gap-3">
             {result && cvData && (
-              <button 
-                onClick={() => exportToPdf(cvData, fileName)}
-                className="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-purple-700 transition shadow flex items-center gap-2"
-              >
-                ⬇️ Descargar PDF Maquetado
-              </button>
+              <>
+                {/* 🆕 BOTÓN NUEVO */}
+                <button
+                  onClick={handleReanalyzeClick}
+                  disabled={loading}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 transition shadow flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  🔄 Re-analizar con cambios
+                </button>
+                {/* Botón original de descarga */}
+                <button
+                  onClick={() => exportToPdf(cvData, fileName)}
+                  className="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-purple-700 transition shadow flex items-center gap-2"
+                >
+                  ⬇️ Descargar PDF Maquetado
+                </button>
+              </>
             )}
             <button onClick={onClose} className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition flex items-center justify-center">✕</button>
           </div>
