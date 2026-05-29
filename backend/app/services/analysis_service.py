@@ -1,3 +1,4 @@
+import re
 from typing import Dict, Any
 
 from app.core.config import config
@@ -99,12 +100,46 @@ async def analyze_cv_logic(
     job_text_clean = extract_relevant_text(job_text)
     job_phrases    = extract_relevant_phrases(job_text_clean, min_score=0.4, lang=job_lang)
 
+
+    job_phrases_raw = extract_relevant_phrases(job_text_clean, lang=job_lang)
+
+    # RegEx para cazar y destruir textos de interfaz de LinkedIn, Indeed, Infojobs, etc.
+    BOILERPLATE_REGEX = re.compile(
+        r"(about the job|sobre el empleo|premium|job search|faster with|tiempo estimado|"
+        r"estimado de proceso|semanas|postular|apply|solicitar|guardar|save|share|compartir|"
+        r"report|denunciar|see more|ver más|linkedin|indeed|infojobs|publicado|posted|"
+        r"visitas|solicitantes|proceso de selección|unirse al equipo|estimado de|visualizaciones)", 
+        re.IGNORECASE
+    )
+
+    # Filtrar el ruido antes de deduplicar y exigir un mínimo de longitud
+    job_phrases_filtered = [
+        (phrase, score) for phrase, score in job_phrases_raw 
+        if not BOILERPLATE_REGEX.search(phrase) and len(phrase.strip()) > 20
+    ]
+
     # Deduplicar frases
     unique = {}
-    for phrase, score in job_phrases:
+    for phrase, score in job_phrases_filtered:
         if phrase not in unique or score > unique[phrase]:
             unique[phrase] = score
     job_phrases = sorted(unique.items(), key=lambda x: x[1], reverse=True)[:25]
+
+
+
+    # =========================================================================
+    # 🔥 SALVAGUARDA CRÍTICA: Si las expresiones regulares no extrajeron nada,
+    # dividimos el texto limpio de la oferta por líneas y les asignamos un score base.
+    # ¡Esto asegura que NUNCA vuelva a quedar vacío!
+    # =========================================================================
+    if not job_phrases:
+        raw_lines = [line.strip() for line in job_text_clean.splitlines() if len(line.strip()) > 20]
+        # Si aun así está vacío, usamos el texto completo original separado por puntos
+        if not raw_lines:
+            raw_lines = [s.strip() for s in re.split(r'(?<=[.!?;:])\s+', job_text) if len(s.strip()) > 20]
+        
+        job_phrases = [(line, 0.50) for line in raw_lines[:25]] # Score por defecto de 0.50
+    # =========================================================================
 
     # ── Keywords CV ───────────────────────────────────────────────────────────
     cv_keywords_weighted = extract_keywords_advanced(
