@@ -105,9 +105,18 @@ export function useAnalysis() {
     }
   };
 
+  const resetAnalysis = () => {
+    setFile(null);
+    setFileName('');
+    setJobDescription('');
+    setResult(null);
+    setError(null);
+    setLoading(false);
+  };
+
   return {
     file, fileName, jobDescription, analysisMode, result, loading, error,
     handleFileChange, setJobDescription, setAnalysisMode, handleSubmit, handleExportReport,
-    setResult, analyzeWithCvText
+    setResult, analyzeWithCvText, resetAnalysis
   };
 }

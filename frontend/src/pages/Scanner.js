@@ -35,7 +35,7 @@ export default function Scanner() {
   const {
     file, fileName, jobDescription, analysisMode, result, loading,
     handleFileChange, setJobDescription, setAnalysisMode, handleSubmit, 
-    handleExportReport, analyzeWithCvText,
+    handleExportReport, analyzeWithCvText, resetAnalysis, // <-- Importamos resetAnalysis
   } = useAnalysis();
 
   // Preservamos lógica nativa del optimizador
@@ -69,6 +69,11 @@ export default function Scanner() {
     await analyzeWithCvText(cvText, jobDescription, analysisMode);
   };
 
+  const handleStartAnalysis = () => {
+    resetAnalysis();      // Limpia todo el rastro de un análisis anterior
+    setShowModal(true);   // Abre el modal desde cero
+  };
+
   return (
     <div className="overflow-x-hidden bg-white" >
       <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
@@ -80,7 +85,7 @@ export default function Scanner() {
       `}</style>
       
       <Header />
-      <HeroSection onStart={() => setShowModal(true)} />
+      <HeroSection onStart={handleStartAnalysis} /> {/* <-- Pasamos handleStartAnalysis en vez de setShowModal directo */}
       <HowItWorks />
       <Footer />
 
@@ -109,7 +114,7 @@ export default function Scanner() {
       />
 
       <OptimizerModal show={showOptimizer} data={cvOptimizations} onClose={closeOptimizer} />
-      {loading && <LoadingSpinner />}
+      {/* {loading && <LoadingSpinner />} */} {/* <-- Este loading ya está integrado en el modal, puedes quitarlo de aquí para evitar que oscurezca toda la pantalla */}
     </div>
   );
 }
