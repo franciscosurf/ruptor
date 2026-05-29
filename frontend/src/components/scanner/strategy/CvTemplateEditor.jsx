@@ -38,7 +38,7 @@ export const CvTemplateEditor = ({ cvData, updateSection, templateRef }) => {
       <div 
         ref={templateRef}
         className="bg-white shadow-2xl font-sans text-gray-800 relative select-text leading-relaxed"
-        style={{ width: '210mm', minHeight: 'max-content', padding: '15mm 20mm',height: '100%', }}
+        style={{ width: '210mm',maxWidth:'100%', minHeight: 'max-content', padding: '15mm 20mm',height: '100%', }}
       >
         {/* Encabezado */}
         <div className="border-b-2 border-gray-800 pb-4 mb-6">
