@@ -5,6 +5,7 @@ import { ResultsPanel } from './ResultsPanel';
 import { JobForm } from '../forms/JobForm';
 import { useCvData } from './strategy/useCvData';
 import { useTemplateExport } from './strategy/useTemplateExport';
+import { LoadingSpinner } from '../common/LoadingSpinner';
 
 export const ScannerModal = ({
   show, onClose, result, file, fileName, jobDescription, analysisMode,
@@ -49,17 +50,22 @@ export const ScannerModal = ({
                 {/* 🆕 BOTÓN NUEVO */}
                 <button
                   onClick={handleReanalyzeClick}
-                  disabled={loading}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 transition shadow flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={loading || isExtracting}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border ${
+                    loading || isExtracting
+                      ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                      : 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100 active:scale-95 shadow-sm'
+                  }`}
                 >
-                  🔄 Re-analizar con cambios
+                  {loading ? '⏳ Analizando...' : '🔄 Reanalizar CV'}
                 </button>
                 {/* Botón original de descarga */}
                 <button
-                  onClick={() => exportToPdf(cvData, fileName)}
-                  className="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-purple-700 transition shadow flex items-center gap-2"
+                  onClick={() => exportToPdf(templateRef, fileName)}
+                  disabled={isExtracting}
+                  className="bg-purple-500  px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-sm active:scale-95 disabled:opacity-50"
                 >
-                  ⬇️ Descargar PDF Maquetado
+                  📥 Descargar PDF
                 </button>
               </>
             )}
@@ -80,25 +86,37 @@ export const ScannerModal = ({
               )}
             </div>
             {/* Contenedor Feedback IA */}
-            <div className="w-1/2 flex flex-col min-h-0 bg-white">
-              <ResultsPanel result={result} />
+            <div className="w-1/2 flex flex-col min-h-0 bg-white relative">
+              {loading ? (
+                <div className="flex-1 flex items-center justify-center bg-white/90 backdrop-blur-sm z-10 h-full w-full">
+                  <LoadingSpinner />
+                </div>
+              ) : (
+                <ResultsPanel result={result} />
+              )}
             </div>
           </div>
         ) : (
-          <div className="flex-1 overflow-y-auto p-8 bg-gray-50 flex items-center justify-center">
-            <div className="w-full max-w-2xl bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
-              <JobForm
-                fileName={fileName}
-                jobDescription={jobDescription}
-                analysisMode={analysisMode}
-                onFileChange={onFileChange}
-                onJobDescriptionChange={onJobDescriptionChange}
-                onModeChange={onModeChange}
-                onSubmit={onSubmit}
-                loading={loading}
-                resultExists={!!result}
-              />
-            </div>
+          <div className="flex-1 overflow-y-auto p-8 bg-gray-50 flex items-center justify-center relative">
+            {loading ? (
+              <div className="w-full max-w-2xl bg-white p-12 rounded-2xl shadow-sm border border-gray-200 flex items-center justify-center">
+                <LoadingSpinner />
+              </div>
+            ) : (
+              <div className="w-full max-w-2xl bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
+                <JobForm
+                  fileName={fileName}
+                  jobDescription={jobDescription}
+                  analysisMode={analysisMode}
+                  onFileChange={onFileChange}
+                  onJobDescriptionChange={onJobDescriptionChange}
+                  onModeChange={onModeChange}
+                  onSubmit={onSubmit}
+                  loading={loading}
+                  resultExists={!!result}
+                />
+              </div>
+            )}
           </div>
         )}
       </div>
