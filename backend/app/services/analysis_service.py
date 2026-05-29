@@ -41,10 +41,12 @@ from app.services.text_scoring import extract_relevant_phrases
 from app.services.job_title_matcher import calculate_job_title_match
 from app.core.models import get_embedding_model
 
-from app.services.action_verbs import calculate_action_verbs_score
-from app.services.quantified_achievements import calculate_quantified_achievements_score
+#from app.services.action_verbs import calculate_action_verbs_score
+#from app.services.quantified_achievements import calculate_quantified_achievements_score
 from app.services.similarity_service import semantic_phrase_coverage
 
+from app.services.action_verbs import analyze_action_verbs
+from app.services.quantified_achievements import analyze_quantified_achievements
 
 def get_threshold_by_sector(sector: str, mode: str = "balanced") -> float:
     """Devuelve umbral semántico según el sector"""
@@ -192,8 +194,8 @@ async def analyze_cv_logic(
     #similarity_scores['overall']                  = round(
     #    similarity_scores['semantic'] * 0.5 + keyword_coverage * 0.5, 2
     #)
-    similarity_scores['action_verbs']             = calculate_action_verbs_score(cv_text)
-    similarity_scores['quantified_achievements']  = calculate_quantified_achievements_score(cv_text)
+    #similarity_scores['action_verbs']             = calculate_action_verbs_score(cv_text)
+    #similarity_scores['quantified_achievements']  = calculate_quantified_achievements_score(cv_text)
     similarity_scores['recruiter_visibility']     = calculate_recruiter_visibility(cv_text)
 
     # ── Métricas adicionales ──────────────────────────────────────────────────
@@ -212,6 +214,56 @@ async def analyze_cv_logic(
     print("DEBUG: missing_tech_skills =", missing_tech_skills[:5])
     print("DEBUG: experience_cv / experience_job =", experience_cv, "/", experience_job)
     print("DEBUG: cv_sector vs job_sector =", cv_sector, job_sector)
+
+    
+
+    # ── Análisis de Verbos de Acción ──────────────────────────────────────────
+    action_verbs_score, detected_verbs = analyze_action_verbs(cv_text)
+
+    # Generador dinámico de recomendaciones de texto para Verbos de Acción
+    action_verbs_tips = []
+    if action_verbs_score < 40:
+        action_verbs_tips = [
+            "Tu currículum utiliza un lenguaje excesivamente pasivo o enfocado en tareas rutinarias.",
+            "Reemplaza expresiones débiles como 'Responsable de la gestión de' o 'Encargado de' por verbos de acción contundentes al inicio de tus viñetas (ej: 'Lideré', 'Optimicé', 'Diseñé').",
+            "Intenta que al menos el 35% de las oraciones de tu experiencia profesional arranquen con un verbo de impacto en pasado o infinitivo."
+        ]
+    elif action_verbs_score < 75:
+        action_verbs_tips = [
+            "Buen intento utilizando verbos dinámicos, pero su distribución es muy irregular.",
+            "Hemos detectado términos clave valiosos, pero todavía quedan bloques completos que parecen listas de obligaciones. Añade fuerza usando palabras como 'Automaticé', 'Implementé' o 'Reduje' en tus puestos antiguos."
+        ]
+    else:
+        action_verbs_tips = [
+            "¡Excelente uso del lenguaje! Tu currículum tiene una densidad de verbos activos impecable, lo que demuestra proactividad y liderazgo según los estándares de los ATS modernos."
+        ]
+
+    # ── Análisis de Logros Cuantificables ─────────────────────────────────────
+    quantified_score, quantified_sentences = analyze_quantified_achievements(cv_text)
+
+    # Generador dinámico de recomendaciones de texto para Logros Cuantificables
+    quantified_tips = []
+    if quantified_score == 0:
+        quantified_tips = [
+            "¡Alerta Crítica! No hemos detectado ningún hito o logro respaldado por métricas numéricas, porcentajes o datos financieros.",
+            "Los reclutadores y algoritmos ATS suelen descartar perfiles puramente teóricos. Añade números que respondan a: ¿Cuánto dinero ahorraste? ¿A cuántos usuarios impactaste? ¿En qué porcentaje aceleraste el sistema?",
+            "Ejemplo práctico de cambio: Pasa de 'Desarrollo de API' a 'Desarrollo de API optimizada que redujo el tiempo de respuesta en un 45% para 12,000 usuarios activos'."
+        ]
+    elif quantified_score == 40:
+        quantified_tips = [
+            "Impacto numérico bajo: Solo hemos logrado indexar 1 hito cuantificable legítimo en tu trayectoria.",
+            "Intenta inyectar métricas duras (%, $, volúmenes de clientes, plazos de entrega) en al menos 2 experiencias laborales previas adicionales para demostrar consistencia orientada a resultados."
+        ]
+    elif quantified_score == 75:
+        quantified_tips = [
+            "¡Buen camino! Cuentas con 2 logros cuantificados muy claros y atractivos.",
+            "Para hacer tu perfil verdaderamente imbatible frente a otros candidatos, intenta rescatar una métrica de escala (ej: tamaño de presupuestos manejados o volumen de base de datos) en tu experiencia más reciente."
+        ]
+    else:
+        quantified_tips = [
+            "¡Sobresaliente! Tu trayectoria destaca con un fuerte enfoque en resultados tangibles. Has incorporado métricas en múltiples puntos estratégicos de tu carrera profesional."
+        ]
+
 
     # ── Feedback ──────────────────────────────────────────────────────────────
     feedback = generate_detailed_feedback(
@@ -237,4 +289,15 @@ async def analyze_cv_logic(
         "extracted_skills_job":        extracted_skills_job,
         "analysis_mode":               mode,
         "sector_skills_suggestions":   sector_skills_suggestions,
+        # Guardamos los scores, lo detectado y inyectamos los nuevos arrays de TIPS en texto real
+        "action_verbs_metrics": {
+            "score": action_verbs_score,
+            "detected": detected_verbs,
+            "tips": action_verbs_tips  # ← ¡NUEVO! Frases de sugerencia listas para usar
+        },
+        "quantified_achievements_metrics": {
+            "score": quantified_score,
+            "sentences": quantified_sentences,
+            "tips": quantified_tips  # ← ¡NUEVO! Frases de sugerencia listas para usar
+        }
     }
