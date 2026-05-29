@@ -104,14 +104,14 @@ export function JobForm({
       </div>
 
       <div style={{ marginBottom: 24 }}>
-        <label style={{ display: 'block', fontWeight: 600, marginBottom: 8, color: colors.text, fontSize: 13 }}>
+        {/* <label style={{ display: 'block', fontWeight: 600, marginBottom: 8, color: colors.text, fontSize: 13 }}>
           Modo de análisis
-        </label>
-        <div style={{ display: 'flex', gap: 8 }}>
+        </label> */}
+        <div style={{ display: 'none', gap: 8 }}>
           {[
-            { value: 'strict', label: 'Estricto', desc: 'Máxima precisión' },
-            { value: 'balanced', label: 'Balanceado', desc: 'Recomendado' },
-            { value: 'flexible', label: 'Flexible', desc: 'Más coincidencias' }
+           // { value: 'strict', label: 'Estricto', desc: 'Máxima precisión' },
+            //{ value: 'balanced', label: 'Balanceado', desc: 'Recomendado' },
+           // { value: 'flexible', label: 'Flexible', desc: 'Más coincidencias' }
           ].map(option => (
             <button
               key={option.value}
@@ -144,14 +144,14 @@ export function JobForm({
         }}>
           {loading ? 'Analizando...' : 'Analizar CV'}
         </button>
-        <button onClick={onExport} disabled={!resultExists} style={{
+        {/* <button onClick={onExport} disabled={!resultExists} style={{
           flex: 1, padding: '14px 20px', background: resultExists ? colors.success : colors.borderDark,
           color: resultExists ? 'white' : colors.textMuted,
           border: 'none', borderRadius: 12, fontWeight: 600, fontSize: 14,
           cursor: resultExists ? 'pointer' : 'not-allowed', transition: 'all 0.2s ease'
         }}>
           Exportar
-        </button>
+        </button> */}
       </div>
     </Card>
   );
