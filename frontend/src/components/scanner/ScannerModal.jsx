@@ -39,7 +39,7 @@ export const ScannerModal = ({
           <div className="flex items-center gap-3">
             {result && cvData && (
               <button 
-                onClick={() => exportToPdf(templateRef, fileName)} 
+                onClick={() => exportToPdf(cvData, fileName)}
                 className="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-purple-700 transition shadow flex items-center gap-2"
               >
                 ⬇️ Descargar PDF Maquetado
