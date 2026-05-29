@@ -1,6 +1,6 @@
 // src/components/scanner/ScannerModal.jsx
 import React, { useEffect, useState } from 'react';
-import { CvTemplateEditor } from './strategy/CvTemplateEditor';
+import { CvTemplateEditor } from './CvTemplateEditor';
 import { ResultsPanel } from './ResultsPanel';
 import { JobForm } from '../forms/JobForm';
 import { LoadingSpinner } from './../common/LoadingSpinner';
