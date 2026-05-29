@@ -63,11 +63,20 @@ export default function Scanner() {
   const handleDownload = () => exportToPdf(templateRef, fileName);
 
   // Manejador para reanalizar con el CV editado
-  const handleReanalyze = async (editedCvData) => {
-    if (!editedCvData) return;
-    const cvText = cvDataToPlainText(editedCvData);
-    await analyzeWithCvText(cvText, jobDescription, analysisMode);
-  };
+  const handleReanalyze = async (editedData) => {
+  if (!editedData) return;
+  
+  let cvText = '';
+  if (typeof editedData === 'string') {
+    // Si viene del visor de TXT directo, ya es una cadena de texto
+    cvText = editedData;
+  } else {
+    // Si viene del editor estructurado de PDFs
+    cvText = cvDataToPlainText(editedData);
+  }
+  
+  await analyzeWithCvText(cvText, jobDescription, analysisMode);
+};
 
   const handleStartAnalysis = () => {
     resetAnalysis();      // Limpia todo el rastro de un análisis anterior
