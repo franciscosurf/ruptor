@@ -15,6 +15,9 @@ export const ScannerModal = ({
   // Estado local para editar el archivo de texto plano si aplica
   const [txtContent, setTxtContent] = useState('');
 
+  // NUEVO ESTADO: Controla qué focus está activo ('achievements', 'keywords', o null)
+  const [activeFocus, setActiveFocus] = useState(null);
+
   // Control robusto del tipo de archivo
   const isTextFile = file && (file.type === 'text/plain' || file.name?.toLowerCase().endsWith('.txt'));
 
@@ -109,9 +112,9 @@ export const ScannerModal = ({
 
         {/* CUERPO CENTRAL DEL MODAL */}
         {result ? (
-          <div className="flex flex-1 overflow-hidden bg-gray-100">
+          <div className={`flex flex-1 overflow-hidden bg-gray-100 ${activeFocus ? 'focus-mode-active' : ''}`}>
             
-            {/* Contenedor Izquierda */}
+            {/* Contenedor Izquierda: CV VIEWER */}
             <div className="w-1/2 flex flex-col min-h-0 bg-gray-200/50">
               {isTextFile ? (
                 <textarea
@@ -127,11 +130,17 @@ export const ScannerModal = ({
                 </div>
               ) : (
                 // Pasamos las props del padre al componente interno
-                <CvTemplateEditor cvData={cvData} updateSection={updateSection} templateRef={templateRef} />
+                <CvTemplateEditor 
+                    cvData={cvData} 
+                    updateSection={updateSection} 
+                    templateRef={templateRef} 
+                    activeFocus={activeFocus}
+                    focusAchievements={result?.focus_achievements || []} 
+                  />
               )}
             </div>
 
-            {/* Contenedor Derecha */}
+            {/* Contenedor Derecha: RESULTADOS ATS SCORE */}
             <div className="w-1/2 flex flex-col min-h-0 bg-white border-l border-gray-100">
               {loading ? (
                 <div className="flex-1 flex flex-col items-center justify-center bg-gray-50/50">
@@ -139,7 +148,11 @@ export const ScannerModal = ({
                   <p className="mt-4 text-sm text-gray-500 font-medium animate-pulse">Recalculando métricas ATS...</p>
                 </div>
               ) : (
-                <ResultsPanel result={result} />
+                <ResultsPanel 
+                  result={result} 
+                  activeFocus={activeFocus}
+                  onToggleFocus={(focusType) => setActiveFocus(activeFocus === focusType ? null : focusType)} 
+                />
               )}
             </div>
 

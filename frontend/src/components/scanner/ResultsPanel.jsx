@@ -43,7 +43,7 @@ const PaginationControls = ({ currentPage, totalPages, onPrev, onNext, startIdx,
   );
 };
 
-export const ResultsPanel = ({ result }) => {
+export const ResultsPanel = ({ result, activeFocus, onToggleFocus }) => {
   const [activeTab, setActiveTab] = useState('recommendations');
   const [recommendationsPage, setRecommendationsPage] = useState(0);
   const [suggestionsPage, setSuggestionsPage] = useState(0);
@@ -136,6 +136,65 @@ export const ResultsPanel = ({ result }) => {
       label: '🚀 Impacto',
       component: () => (
         <div className="space-y-6">
+
+          {/* MÓDULO LOGROS CUANTIFICABLES */}
+          <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+            <div className="bg-amber-50 px-4 py-3 border-b border-amber-100 flex justify-between items-center">
+              <h3 className="text-sm font-bold flex items-center gap-2 text-amber-900">
+                <span>📊</span> Logros Cuantificables
+              </h3>
+              <span className="bg-white text-amber-800 font-bold px-2 py-0.5 rounded text-xs border border-amber-200">
+                {result?.quantified_achievements_metrics?.score ?? 0}%
+              </span>
+              {/* Pega esto debajo de la métrica de logros en ResultsPanel */}
+              {result?.focus_achievements && (
+                <button
+                  onClick={() => onToggleFocus('achievements')}
+                  className={`mt-3 px-4 py-2 text-sm font-bold rounded-lg transition-all w-full flex items-center justify-center gap-2 ${
+                    activeFocus === 'achievements'
+                      ? 'bg-yellow-600 text-white hover:bg-yellow-700' //activo
+                      : result?.focus_achievements?.length === 0
+                        ? 'bg-red-50 text-red-700 border border-red-200 hover:bg-red-100' // Estilo de advertencia si está vacío
+                        : 'bg-yellow-600 text-white hover:bg-yellow-700 animate-pulse' // Estilo normal
+                  }`}
+                >
+                  {result?.focus_achievements?.length === 0 
+                    ? (activeFocus === 'achievements' ? '👁️ Cerrar Diagnóstico' : '⚠️ 0 Logros Detectados. Ver por qué.')
+                    : (activeFocus === 'achievements' ? '👁️ Quitar Filtro de Logros' : '🎯 Enfocarse en Logros')
+                  }
+                </button>
+              )}
+            </div>
+
+            <div className="p-4">
+              {/* Recomendaciones de impacto */}
+              <div>
+                <h4 className="font-semibold text-gray-700 text-xs uppercase tracking-wide">Estrategia de Impacto:</h4>
+                <div className="mt-2 space-y-1.5">
+                  {result?.quantified_achievements_metrics?.tips?.map((tip, idx) => (
+                    <p key={idx} className="text-xs text-amber-900 bg-amber-50/50 p-2 rounded-r border-l-2 border-amber-500">
+                      {tip}
+                    </p>
+                  ))}
+                </div>
+              </div>
+
+              {/* Oraciones exactas validadas */}
+              {result?.quantified_achievements_metrics?.sentences?.length > 0 && (
+                <div className="mt-4 pt-3 border-t border-gray-100">
+                  <h4 className="text-xs font-semibold text-blue-700 uppercase tracking-wide mb-2">Métricas duras identificadas:</h4>
+                  <div className="space-y-1.5">
+                    {result.quantified_achievements_metrics.sentences.map((sentence, idx) => (
+                      <p key={idx} className="text-[11px] leading-relaxed bg-gray-50 p-2 rounded border border-gray-200 italic text-gray-700">
+                        "{sentence}"
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* MÓDULO VERBOS DE ACCIÓN */}
           <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
             <div className="bg-blue-50 px-4 py-3 border-b border-blue-100 flex justify-between items-center">
@@ -174,45 +233,8 @@ export const ResultsPanel = ({ result }) => {
             </div>
           </div>
 
-          {/* MÓDULO LOGROS CUANTIFICABLES */}
-          <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-            <div className="bg-amber-50 px-4 py-3 border-b border-amber-100 flex justify-between items-center">
-              <h3 className="text-sm font-bold flex items-center gap-2 text-amber-900">
-                <span>📊</span> Logros Cuantificables
-              </h3>
-              <span className="bg-white text-amber-800 font-bold px-2 py-0.5 rounded text-xs border border-amber-200">
-                {result?.quantified_achievements_metrics?.score ?? 0}%
-              </span>
-            </div>
+          
 
-            <div className="p-4">
-              {/* Recomendaciones de impacto */}
-              <div>
-                <h4 className="font-semibold text-gray-700 text-xs uppercase tracking-wide">Estrategia de Impacto:</h4>
-                <div className="mt-2 space-y-1.5">
-                  {result?.quantified_achievements_metrics?.tips?.map((tip, idx) => (
-                    <p key={idx} className="text-xs text-amber-900 bg-amber-50/50 p-2 rounded-r border-l-2 border-amber-500">
-                      {tip}
-                    </p>
-                  ))}
-                </div>
-              </div>
-
-              {/* Oraciones exactas validadas */}
-              {result?.quantified_achievements_metrics?.sentences?.length > 0 && (
-                <div className="mt-4 pt-3 border-t border-gray-100">
-                  <h4 className="text-xs font-semibold text-blue-700 uppercase tracking-wide mb-2">Métricas duras identificadas:</h4>
-                  <div className="space-y-1.5">
-                    {result.quantified_achievements_metrics.sentences.map((sentence, idx) => (
-                      <p key={idx} className="text-[11px] leading-relaxed bg-gray-50 p-2 rounded border border-gray-200 italic text-gray-700">
-                        "{sentence}"
-                      </p>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
         </div>
       )
     }

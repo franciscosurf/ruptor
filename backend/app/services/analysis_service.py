@@ -48,6 +48,9 @@ from app.services.similarity_service import semantic_phrase_coverage
 from app.services.action_verbs import analyze_action_verbs
 from app.services.quantified_achievements import analyze_quantified_achievements
 
+# Añade esto junto a tus otros imports de app.services...
+from app.services.focus_service import extract_achievement_sentences
+
 def get_threshold_by_sector(sector: str, mode: str = "balanced") -> float:
     """Devuelve umbral semántico según el sector"""
     thresholds = {
@@ -276,6 +279,9 @@ async def analyze_cv_logic(
         culture_phrases, missing_tech_skills
     )
 
+    # NUEVO: Extraemos los logros cuantificados del texto original del CV
+    achievements_list = extract_achievement_sentences(cv_text)
+
     return {
         **feedback,
         "cv_raw_text": cv_text,
@@ -299,5 +305,6 @@ async def analyze_cv_logic(
             "score": quantified_score,
             "sentences": quantified_sentences,
             "tips": quantified_tips  # ← ¡NUEVO! Frases de sugerencia listas para usar
-        }
+        },
+        "focus_achievements":          achievements_list,
     }

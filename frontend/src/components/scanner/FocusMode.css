@@ -1,0 +1,50 @@
+/* FocusMode.css */
+
+/* 1. Transición suave para todos los textos del CV */
+.cv-canvas, 
+.cv-canvas input, 
+.cv-canvas .section-title,
+.cv-canvas .text-gray-700 {
+  transition: color 0.3s ease;
+}
+
+/* 2. Cuando el Focus Mode está ACTIVO, atenuamos TODO el CV */
+.focus-mode-active .cv-canvas {
+  background-color: #f3f4f6 !important; /* Un fondo un poco más oscuro para que resalte el texto */
+}
+
+.focus-mode-active .input-title,
+.focus-mode-active .input-subtitle,
+.focus-mode-active .section-title,
+.focus-mode-active .text-gray-700 {
+  color: #cbd5e1 !important; /* Gris claro (apagamos las luces) */
+  border-color: #e2e8f0 !important;
+}
+
+/* 3. ¡LA MAGIA! Encendemos solo los spans resaltados */
+.focus-mode-active .focus-highlight {
+  color: #0f172a !important; /* Texto negro fuerte */
+  background-color: #fef08a !important; /* Fondo amarillo marcador */
+  font-weight: 600;
+  padding: 2px 4px;
+  border-radius: 4px;
+  box-shadow: 0 0 12px rgba(254, 240, 138, 0.9);
+  position: relative;
+  z-index: 10;
+  transition: all 0.3s ease;
+}
+
+/* Opcional: Un pequeño mensaje flotante para guiar al usuario */
+.focus-mode-active .cv-canvas::before {
+  content: "Modo Enfoque: Visualizando. Haz clic en 'Quitar Focus' para editar.";
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  background: #1e293b;
+  color: white;
+  padding: 4px 10px;
+  font-size: 11px;
+  border-radius: 20px;
+  font-weight: bold;
+  opacity: 0.8;
+}
