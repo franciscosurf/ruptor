@@ -4,6 +4,7 @@ import { CvTemplateEditor } from './CvTemplateEditor';
 import { ResultsPanel } from './ResultsPanel';
 import { JobForm } from '../forms/JobForm';
 import { LoadingSpinner } from './../common/LoadingSpinner';
+import { TxtFocusEditor } from './TxtFocusEditor'; // NUEVO COMPONENTE PARA EDITAR TXT
 
 export const ScannerModal = ({
   show, onClose, result, file, fileName, jobDescription, analysisMode,
@@ -17,6 +18,19 @@ export const ScannerModal = ({
 
   // NUEVO ESTADO: Controla qué focus está activo ('achievements', 'keywords', o null)
   const [activeFocus, setActiveFocus] = useState(null);
+  const [activeFocusText, setActiveFocusText] = useState(null);
+
+
+  let textToHighlight = null;
+
+  if (activeFocus === 'achievements') {
+    // Le pasamos el array de logros que viene en tu JSON
+    textToHighlight = result?.focus_achievements; 
+  } else if (activeFocus === 'otra_cosa') {
+    // Aquí podrías añadir más filtros en el futuro (ej. palabras clave)
+    // textToHighlight = result?.focus_keywords;
+  }
+
 
   // Control robusto del tipo de archivo
   const isTextFile = file && (file.type === 'text/plain' || file.name?.toLowerCase().endsWith('.txt'));
@@ -112,17 +126,17 @@ export const ScannerModal = ({
 
         {/* CUERPO CENTRAL DEL MODAL */}
         {result ? (
+          
           <div className={`flex flex-1 overflow-hidden bg-gray-100 ${activeFocus ? 'focus-mode-active' : ''}`}>
             
             {/* Contenedor Izquierda: CV VIEWER */}
             <div className="w-1/2 flex flex-col min-h-0 bg-gray-200/50">
               {isTextFile ? (
-                <textarea
+                <TxtFocusEditor
                   value={txtContent}
-                  onChange={(e) => setTxtContent(e.target.value)}
-                  className="flex-1 p-8 bg-white overflow-y-auto text-sm font-mono text-gray-700 resize-none focus:outline-none focus:ring-2 focus:ring-purple-400/50 shadow-inner leading-relaxed"
-                  placeholder="Escribe o edita el contenido de tu CV aquí..."
+                  onChange={setTxtContent}
                   disabled={loading}
+                  focusText={textToHighlight} 
                 />
               ) : isExtracting ? (
                 <div className="flex-1 flex items-center justify-center text-gray-500 font-medium">
