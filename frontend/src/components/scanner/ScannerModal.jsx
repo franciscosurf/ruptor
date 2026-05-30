@@ -80,7 +80,7 @@ export const ScannerModal = ({
             <span className="text-2xl">🧠</span>
             <div>
               <h2 className="text-lg font-bold text-gray-800">Optimización de CV con IA</h2>
-              <p className="text-xs text-gray-400">Ajusta tu perfil en tiempo real según la oferta de empleo</p>
+              <p className="text-md text-gray-400">Ajusta tu perfil en tiempo real según la oferta de empleo</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -103,7 +103,7 @@ export const ScannerModal = ({
                 </button>
               </>
             )}
-            <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600">✕</button>
+            <button onClick={onClose} className="py-2 px-3 text-gray-400 hover:text-gray-600 border border-gray-300 rounded-md">✕</button>
           </div>
         </div>
 

@@ -13,11 +13,11 @@ const ITEMS_PER_PAGE_MISSING = 5;  // Sugerencias: 5 por página
 const PaginationControls = ({ currentPage, totalPages, onPrev, onNext, startIdx, endIdx, totalItems }) => {
   if (totalPages <= 1) return null;
   return (
-    <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
+    <div className="flex items-center justify-between mb-6 pt-4 border-t border-gray-100">
       <button
         onClick={onPrev}
         disabled={currentPage === 0}
-        className={`px-3 py-1 rounded-md text-sm font-medium flex items-center gap-1 ${
+        className={`px-3 py-3 rounded-md text-sm font-medium flex items-center gap-1 ${
           currentPage === 0
             ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
             : 'bg-purple-100 text-purple-700 hover:bg-purple-200'
@@ -31,7 +31,7 @@ const PaginationControls = ({ currentPage, totalPages, onPrev, onNext, startIdx,
       <button
         onClick={onNext}
         disabled={currentPage === totalPages - 1}
-        className={`px-3 py-1 rounded-md text-sm font-medium flex items-center gap-1 ${
+        className={`px-3 py-3 rounded-md text-sm font-medium flex items-center gap-1 ${
           currentPage === totalPages - 1
             ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
             : 'bg-purple-100 text-purple-700 hover:bg-purple-200'
@@ -253,7 +253,7 @@ export const ResultsPanel = ({ result }) => {
       </div>
 
       {/* Contenido de la pestaña activa (sin overflow propio, fluye con el scroll del padre) */}
-      <div className="p-6 bg-white flex-1">
+      <div className="p-6 bg-white flex-1 flex flex-col">
         {tabs.find(t => t.id === activeTab)?.component()}
       </div>
     </div>

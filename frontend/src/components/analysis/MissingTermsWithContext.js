@@ -28,7 +28,7 @@ export function MissingTermsWithContext({ items }) {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+    <div data-missing-terms="" style={{ display: 'flex', flex:'1',flexDirection: 'column', gap: 12 }}>
       <p>Revisa y considera añadir las siguientes sugerencias en tu CV.</p>
 
       {items.map((item, idx) => {
