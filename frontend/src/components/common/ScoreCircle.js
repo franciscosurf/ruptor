@@ -3,15 +3,17 @@ import { colors } from '../../styles/colors';
 
 export function ScoreCircle({ score, level }) {
 
-  score = Math.round(score) || 0;
+  score = parseFloat(score) || 0;
+  score = (score || 0).toFixed(1);
+  
 
   const color = score >= 75 ? colors.success 
               : score >= 55 ? colors.primary 
-              : score >= 35 ? colors.warningDark 
+              : score >= 35 ? colors.warning 
               : colors.danger;
   const bgSoft = score >= 75 ? colors.successSoft 
               : score >= 55 ? colors.primarySoft 
-              : score >= 35 ? colors.warningSoft 
+              : score >= 35 ? colors.warning
               : colors.dangerSoft;
 
   return (
@@ -32,7 +34,7 @@ export function ScoreCircle({ score, level }) {
         }}>
           <span style={{
             fontSize: 54, fontWeight: 700,
-            color: colors.warning, fontFamily: "'Inter', system-ui, sans-serif",
+            color: color, fontFamily: "'Inter', system-ui, sans-serif",
             letterSpacing: -1
           }}>
             {score}
@@ -45,7 +47,7 @@ export function ScoreCircle({ score, level }) {
       <div style={{
         marginTop: 16, display: 'inline-block',
         padding: '6px 18px', borderRadius: 100,
-        background: bgSoft, color,
+        background: bgSoft, color:'black',
         fontWeight: 600, fontSize: 12, letterSpacing: 0.3,
       }}>
         {level}
