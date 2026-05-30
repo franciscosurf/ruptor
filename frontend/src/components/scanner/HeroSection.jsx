@@ -20,7 +20,7 @@ export const HeroSection = ({ onStart }) => (
       <p className="text-xl md:text-2xl text-black/60 leading-relaxed mb-10 max-w-2xl mx-auto">
         Edita tu CV directamente en el visor y descárgalo con cambios profesionales. Sin pérdida de formato ni calidad.
       </p>
-      <button onClick={onStart} className="bgPurple px-10 py-5 rounded-2xl text-white text-lg font-bold hover:scale-105 transition shadow-2xl">
+      <button onClick={onStart} className="animate-pulse bgPurple px-10 py-5 rounded-2xl text-white text-lg font-bold hover:scale-105 transition shadow-2xl">
         Subir mi CV y Analizar
       </button>
     </div>

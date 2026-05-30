@@ -60,7 +60,7 @@ export function JobForm({
 
       <div style={{ marginBottom: 24 }}>
         <label style={{ display: 'block', fontWeight: 600, marginBottom: 8, color: colors.text, fontSize: 13 }}>
-          Descripción del puesto
+          Oferta de Trabajo (Pega aquí el texto completo de la oferta de trabajo)
         </label>
         <div style={{ position: 'relative' }}>
           <textarea
