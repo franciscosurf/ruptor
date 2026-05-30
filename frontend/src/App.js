@@ -36,6 +36,9 @@ export default function App() {
     <>
       {/* Tailwind CSS CDN y estilos personalizados */}
       <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+        <style>{` 
+      .bgPurple {background: linear-gradient(90deg,#7c3aed,#2563eb);}
+    `}</style>
       <style>{`
         body {
           font-family: 'Inter', sans-serif;
@@ -89,7 +92,7 @@ export default function App() {
                 Analiza tu CV contra la oferta y recibe sugerencias en tiempo real para pasar el filtro.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link to="/scanner" className="px-8 py-5 rounded-2xl bg-black text-white text-lg font-semibold hover:scale-105 transition shadow-2xl inline-block">
+                <Link to="/scanner" className="px-8 py-5 rounded-2xl bgPurple text-white text-lg font-semibold hover:scale-105 transition shadow-2xl inline-block">
                   Analizar mi CV
                 </Link>
                 <button className="px-8 py-5 rounded-2xl border border-black/10 bg-white text-lg font-semibold hover:bg-black/5 transition">

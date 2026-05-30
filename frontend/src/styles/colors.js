@@ -22,4 +22,5 @@ export const colors = {
   shadowMd: '0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05)',
   shadowLg: '0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05)',
   glow: 'rgba(139, 92, 246, 0.2)',
+  gradientPurple: 'linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%)',
 };
