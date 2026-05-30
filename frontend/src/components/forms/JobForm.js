@@ -141,7 +141,7 @@ export function JobForm({
       <div style={{ marginBottom: '24px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
           <span style={{
-            background: '#8b5cf6',
+            background: jobDescription.length > 0 ? '#10b981' : '#8b5cf6', // Cambia a verde si está lleno
             color: 'white',
             width: '22px',
             height: '22px',
@@ -150,14 +150,22 @@ export function JobForm({
             alignItems: 'center',
             justifyContent: 'center',
             fontSize: '11px',
-            fontWeight: '700'
+            fontWeight: '700',
+            transition: 'background 0.3s ease'
           }}>2</span>
           <label style={{ fontWeight: '600', color: '#1f2937', fontSize: '14px' }}>
             Pega la descripción del puesto
           </label>
         </div>
 
-        <div style={{ position: 'relative', borderRadius: '12px', overflow: 'hidden', border: '1px solid #e5e7eb' }}>
+        <div style={{ 
+          position: 'relative', 
+          borderRadius: '12px', 
+          overflow: 'hidden', 
+          // Borde verde si tiene contenido, gris si está vacío
+          border: `1.5px solid ${jobDescription.length > 0 ? '#10b981' : '#e5e7eb'}`,
+          transition: 'border-color 0.3s ease' 
+        }}>
           <textarea
             value={jobDescription}
             onChange={(e) => {
@@ -166,23 +174,24 @@ export function JobForm({
               }
             }}
             rows={5}
-            placeholder="Pega aquí el texto completo de la oferta de trabajo (requisitos, responsabilidades...)"
+            placeholder="Pega aquí el texto completo de la oferta de trabajo..."
             style={{
               width: '100%',
               padding: '16px',
-              paddingBottom: '44px', // Espacio para el badge inferior derecho
-              background: '#ffffff',
+              paddingBottom: '44px',
+              background: jobDescription.length > 0 ? '#f0fdf4' : '#ffffff', // Fondo sutilmente verde al rellenar
               color: '#374151',
               fontSize: '13.5px',
               lineHeight: '1.5',
               resize: 'none',
               fontFamily: 'inherit',
               border: 'none',
-              outline: 'none'
+              outline: 'none',
+              transition: 'background 0.3s ease'
             }}
           />
           
-          {/* Botón Flotante de Pegar (Arriba a la derecha para no estorbar el texto) */}
+          {/* Botón Flotante de Pegar */}
           <button
             onClick={handlePasteFromClipboard}
             disabled={pasteLoading}
@@ -191,45 +200,32 @@ export function JobForm({
               right: '12px',
               top: '12px',
               padding: '6px 12px',
-              background: '#f5f3ff',
-              border: '1px solid #ddd6fe',
+              background: '#ffffff',
+              border: `1px solid ${jobDescription.length > 0 ? '#10b981' : '#e5e7eb'}`,
               borderRadius: '8px',
               fontSize: '12px',
               fontWeight: '600',
-              color: '#6d28d9',
+              color: jobDescription.length > 0 ? '#059669' : '#6d28d9',
               cursor: pasteLoading ? 'not-allowed' : 'pointer',
-              transition: 'all 0.2s ease',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px'
+              transition: 'all 0.2s ease'
             }}
-            onMouseEnter={(e) => { if(!pasteLoading) e.currentTarget.style.background = '#ede9fe'; }}
-            onMouseLeave={(e) => { if(!pasteLoading) e.currentTarget.style.background = '#f5f3ff'; }}
           >
             {pasteLoading ? 'Pegando...' : '📋 Pegar'}
           </button>
 
-          {/* Contador de caracteres integrado sutilmente */}
+          {/* Contador de caracteres */}
           <div style={{
             position: 'absolute',
             bottom: '12px',
             right: '12px',
             fontSize: '11px',
-            color: '#9ca3af',
-            background: 'rgba(255, 255, 255, 0.9)',
+            color: jobDescription.length > 0 ? '#10b981' : '#9ca3af',
+            background: 'rgba(255, 255, 255, 0.8)',
             padding: '2px 6px',
             borderRadius: '4px'
           }}>
             {jobDescription.length} / 5000
           </div>
-        </div>
-        
-        {/* Pequeño tip de ayuda inferior idéntico al de tu captura */}
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start', background: '#f9fafb', padding: '12px 14px', borderRadius: '8px', marginTop: '12px', border: '1px solid #f3f4f6' }}>
-          <span style={{ fontSize: '14px' }}>💡</span>
-          <p style={{ margin: 0, fontSize: '12px', color: '#6b7280', lineHeight: '1.4' }}>
-            <strong style={{ color: '#4b5563' }}>Consejo:</strong> Copia y pega toda la descripción, incluyendo requisitos, responsabilidades y habilidades deseadas para un análisis óptimo.
-          </p>
         </div>
       </div>
 
