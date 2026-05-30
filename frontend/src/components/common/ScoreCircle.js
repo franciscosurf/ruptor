@@ -2,6 +2,9 @@ import React from 'react';
 import { colors } from '../../styles/colors';
 
 export function ScoreCircle({ score, level }) {
+
+  score = Math.round(score) || 0;
+
   const color = score >= 75 ? colors.success 
               : score >= 55 ? colors.primary 
               : score >= 35 ? colors.warningDark 
@@ -18,7 +21,7 @@ export function ScoreCircle({ score, level }) {
         display: 'inline-flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center',
         width: 160, height: 160, borderRadius: '50%',
-        background: `conic-gradient(${colors.warning} ${score * 3.6}deg, ${colors.borderDark} 0deg)`,
+        background: `conic-gradient(${color} ${score * 3.6}deg, ${colors.borderDark} 0deg)`,
         padding: 6,
       }}>
         <div style={{
@@ -28,13 +31,13 @@ export function ScoreCircle({ score, level }) {
           background: colors.bgCard,
         }}>
           <span style={{
-            fontSize: 44, fontWeight: 700,
+            fontSize: 54, fontWeight: 700,
             color: colors.warning, fontFamily: "'Inter', system-ui, sans-serif",
             letterSpacing: -1
           }}>
             {score}
           </span>
-          <span style={{ fontSize: 10, color: colors.textMuted, letterSpacing: 0.5, marginTop: 4, fontWeight: 500 }}>
+          <span style={{ fontSize: 12, color: colors.textMuted, letterSpacing: 0.5, marginTop: 4, fontWeight: 500 }}>
             ATS SCORE
           </span>
         </div>

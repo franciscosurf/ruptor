@@ -23,7 +23,7 @@ def generate_detailed_feedback(
     elif overall >= 40:
         level, summary = "En proceso de mejora 🛠️", "El ATS tiene dudas sobre tu perfil. Necesitas incluir terminología técnica clave de la oferta para ganar visibilidad."
     elif overall >= 25:
-        level, summary = "Requiere atención ⚠️", "Tu CV actual no está comunicando bien tu valor. Revisa las recomendaciones de 'Skills' y 'Sugerencias' para no ser descartado."
+        level, summary = "Requiere atención ⚠️", "Revisa las recomendaciones de 'Skills' y 'Sugerencias' para no ser descartado. Tu CV actual no está comunicando bien tu valor."
     else:
         level, summary = "Zona de Riesgo 🛑", "Actualmente, este CV no es compatible con la oferta. No pierdas tiempo aplicando ahora; reconstruye tu sección de experiencia primero."
         

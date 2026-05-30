@@ -152,7 +152,7 @@ export const ResultsPanel = ({ result, activeFocus, onToggleFocus }) => {
                   onClick={() => onToggleFocus('achievements')}
                   className={`mt-3 px-4 py-2 text-sm font-bold rounded-lg transition-all w-full flex items-center justify-center gap-2 ${
                     activeFocus === 'achievements'
-                      ? 'bg-yellow-600 text-white hover:bg-yellow-700' //activo
+                      ? 'bg-purple-700 text-white hover:bg-purple-800' //activo
                       : result?.focus_achievements?.length === 0
                         ? 'bg-red-50 text-red-700 border border-red-200 hover:bg-red-100' // Estilo de advertencia si está vacío
                         : 'bg-yellow-600 text-white hover:bg-yellow-700 animate-pulse' // Estilo normal
@@ -166,8 +166,38 @@ export const ResultsPanel = ({ result, activeFocus, onToggleFocus }) => {
               )}
             </div>
 
-            <div className="p-4">
-              {/* Recomendaciones de impacto */}
+            {/* Debajo del botón, dentro de tu card de Impacto */}
+          <div className="mt-4">
+            {activeFocus === 'achievements' && result?.focus_achievements?.length === 0 ? (
+              /* TARJETA DE GAMIFICACIÓN ANIMADA */
+              <div className="bg-purple-700 via-indigo-900 to-indigo-950 text-white rounded-xl p-5 shadow-xl border border-purple-500/30 relative overflow-hidden animate-fade-in">
+                
+                {/* Efecto de luces de fondo */}
+                <div className="absolute -top-10 -right-10 w-24 h-24 bg-purple-500/20 rounded-full blur-xl animate-pulse"></div>
+                
+                <div className="flex items-start gap-3">
+                  <span className="text-3xl animate-bounce mt-1">🚀</span>
+                  <div>
+                    <h4 className="font-extrabold text-white white bg-clip-text bg-gradient-to-r from-amber-300 to-yellow-100 text-base tracking-wide uppercase">
+                      ¡Misión: Desbloquear Impacto!
+                    </h4>
+                    <p className="text-sm text-indigo-100/90 mt-2 leading-relaxed font-normal">
+                      No tienes logros. Los reclutadores <span className="text-amber-300 font-bold">no te ven</span>. 
+                    </p>
+                    
+                    {/* El reto */}
+                    <div className="bg-white/10 rounded-lg p-3 mt-3 border border-white/10 text-xs text-amber-200 font-mono">
+                      <strong>🎯 RETO:</strong> Edita tu experiencia actual e inyecta al menos un dato numérico (ej: <span className="underline">%</span>, <span className="underline">€</span>, o volúmenes de usuarios).
+                    </div>
+                    
+                    <p className="text-xs text-indigo-200/70 mt-3 italic">
+                      ¡Haz la prueba! En cuanto guardes el cambio, la pantalla se iluminará y tu ATS Score subirá de nivel instantáneamente.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* Recomendaciones Estrategia de Impacto Estrategia de impacto por defecto (lo que ya tenías) */
               <div>
                 <h4 className="font-semibold text-gray-700 text-xs uppercase tracking-wide">Estrategia de Impacto:</h4>
                 <div className="mt-2 space-y-1.5">
@@ -178,14 +208,17 @@ export const ResultsPanel = ({ result, activeFocus, onToggleFocus }) => {
                   ))}
                 </div>
               </div>
-
+            )}
+          </div>
+            <div className="p-4">
+              
               {/* Oraciones exactas validadas */}
               {result?.quantified_achievements_metrics?.sentences?.length > 0 && (
                 <div className="mt-4 pt-3 border-t border-gray-100">
                   <h4 className="text-xs font-semibold text-blue-700 uppercase tracking-wide mb-2">Métricas duras identificadas:</h4>
                   <div className="space-y-1.5">
                     {result.quantified_achievements_metrics.sentences.map((sentence, idx) => (
-                      <p key={idx} className="text-[11px] leading-relaxed bg-gray-50 p-2 rounded border border-gray-200 italic text-gray-700">
+                      <p key={idx} className="text-[11px] focus-highlight bg-gray-50 p-2 rounded border border-gray-200 italic text-gray-700">
                         "{sentence}"
                       </p>
                     ))}
