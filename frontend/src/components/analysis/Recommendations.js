@@ -7,7 +7,7 @@ export function Recommendations({ recommendations, onScrollToSuggestions }) {
   if (!recommendations?.length) return null;
   const priorityConfig = {
     Alta: { icon: '⚡', color: colors.danger, bg: colors.dangerSoft },
-    Media: { icon: '📌', color: colors.warning, bg: colors.warningSoft },
+    Media: { icon: '📌', color: colors.warningDark, bg: colors.warningSoft },
     Baja: { icon: '💡', color: colors.primary, bg: colors.primarySoft }
   };
   return (

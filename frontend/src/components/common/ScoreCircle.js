@@ -2,8 +2,14 @@ import React from 'react';
 import { colors } from '../../styles/colors';
 
 export function ScoreCircle({ score, level }) {
-  const color = score >= 75 ? colors.success : score >= 55 ? colors.primary : score >= 35 ? colors.warning : colors.danger;
-  const bgSoft = score >= 75 ? colors.successSoft : score >= 55 ? colors.primarySoft : score >= 35 ? colors.warningSoft : colors.dangerSoft;
+  const color = score >= 75 ? colors.success 
+              : score >= 55 ? colors.primary 
+              : score >= 35 ? colors.warningDark 
+              : colors.danger;
+  const bgSoft = score >= 75 ? colors.successSoft 
+              : score >= 55 ? colors.primarySoft 
+              : score >= 35 ? colors.warningSoft 
+              : colors.dangerSoft;
 
   return (
     <div style={{ textAlign: 'center', marginBottom: 32 }}>
@@ -12,7 +18,7 @@ export function ScoreCircle({ score, level }) {
         display: 'inline-flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center',
         width: 160, height: 160, borderRadius: '50%',
-        background: `conic-gradient(${color} ${score * 3.6}deg, ${colors.borderDark} 0deg)`,
+        background: `conic-gradient(${colors.warning} ${score * 3.6}deg, ${colors.borderDark} 0deg)`,
         padding: 6,
       }}>
         <div style={{
@@ -23,7 +29,7 @@ export function ScoreCircle({ score, level }) {
         }}>
           <span style={{
             fontSize: 44, fontWeight: 700,
-            color, fontFamily: "'Inter', system-ui, sans-serif",
+            color: colors.warning, fontFamily: "'Inter', system-ui, sans-serif",
             letterSpacing: -1
           }}>
             {score}

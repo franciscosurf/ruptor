@@ -13,19 +13,20 @@ def generate_detailed_feedback(
     overall = scores['overall']
     job_sector = job_sector_info.get("sector", "general")
     
+    # Mapeo de niveles con un tono de "Coach"
     if overall >= 85:
-        level, summary = "Excelente", "Tu CV está entre los mejores. Solo detalles finos pueden mejorar."
+        level, summary = "¡Candidato Estrella! ⭐", "Tu CV está optimizado. Tienes altísimas probabilidades de pasar el filtro y llegar a entrevista."
     elif overall >= 70:
-        level, summary = "Sólido", "Gran alineación. Pequeños ajustes te harán destacar aún más."
+        level, summary = "Perfil Sólido 🚀", "Estás muy cerca de la perfección. Unos pequeños ajustes en las palabras clave y tu perfil será irresistible."
     elif overall >= 55:
-        level, summary = "Aceptable", "Buen potencial, pero necesitas más keywords específicas."
+        level, summary = "Potencial Alto 💡", "Tu experiencia encaja, pero el ATS necesita ver términos más específicos. Añade las palabras clave sugeridas abajo para subir tu score."
     elif overall >= 40:
-        level, summary = "Mejorable", "Aceptable, pero los ATS pueden filtrarte por falta de términos clave."
+        level, summary = "En proceso de mejora 🛠️", "El ATS tiene dudas sobre tu perfil. Necesitas incluir terminología técnica clave de la oferta para ganar visibilidad."
     elif overall >= 25:
-        level, summary = "Débil", "Tu CV apenas supera filtros básicos. Revisión profunda necesaria."
+        level, summary = "Requiere atención ⚠️", "Tu CV actual no está comunicando bien tu valor. Revisa las recomendaciones de 'Skills' y 'Sugerencias' para no ser descartado."
     else:
-        level, summary = "Crítico", "El CV no coincide con los requisitos. El ATS no te considera candidato. Reescribe desde cero."
-    
+        level, summary = "Zona de Riesgo 🛑", "Actualmente, este CV no es compatible con la oferta. No pierdas tiempo aplicando ahora; reconstruye tu sección de experiencia primero."
+        
     recommendations = []
     
     # Si los sectores son diferentes, añadir recomendación especial
