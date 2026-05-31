@@ -9,16 +9,8 @@
 }
 
 /* 2. Cuando el Focus Mode está ACTIVO, atenuamos TODO el CV */
-.focus-mode-active .cv-canvas {
+.focus-mode-active .cv-canvas, .focus-mode-active .docx-preview, .focus-mode-active .text-editor, .focus-mode-active .text-editor textarea {
   background-color: #f3f4f6 !important; /* Un fondo un poco más oscuro para que resalte el texto */
-}
-
-.focus-mode-active .input-title,
-.focus-mode-active .input-subtitle,
-.focus-mode-active .section-title,
-.focus-mode-active .text-gray-700 {
-  color: #cbd5e1 !important; /* Gris claro (apagamos las luces) */
-  border-color: #e2e8f0 !important;
 }
 
 /* 3. ¡LA MAGIA! Encendemos solo los spans resaltados */
