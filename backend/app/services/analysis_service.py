@@ -248,25 +248,25 @@ async def analyze_cv_logic(
     quantified_tips = []
     if quantified_score == 0:
         quantified_tips = [
-            "¡Alerta Crítica! No hemos detectado ningún hito o logro respaldado por métricas numéricas, porcentajes o datos financieros.",
-            "Los reclutadores y algoritmos ATS suelen descartar perfiles puramente teóricos. Añade números que respondan a: ¿Cuánto dinero ahorraste? ¿A cuántos usuarios impactaste? ¿En qué porcentaje aceleraste el sistema?",
-            "Ejemplo práctico de cambio: Pasa de 'Desarrollo de API' a 'Desarrollo de API optimizada que redujo el tiempo de respuesta en un 45% para 12,000 usuarios activos'."
+            "Convierte tus tareas en logros medibles: Tu CV se percibe como puramente teórico.",
+            "Para destacar frente a los filtros ATS, transforma tus responsabilidades en resultados cuantificables. Usa la fórmula: Acción + Herramienta + Resultado (%).",
+            "Ejemplo de transformación: Cambia 'Desarrollo de API' por 'Desarrollo de API optimizada (+45% velocidad) para 12,000 usuarios activos'."
         ]
     elif quantified_score == 40:
         quantified_tips = [
-            "Impacto numérico bajo: Solo hemos logrado indexar 1 hito cuantificable legítimo en tu trayectoria.",
-            "Intenta inyectar métricas duras (%, $, volúmenes de clientes, plazos de entrega) en al menos 2 experiencias laborales previas adicionales para demostrar consistencia orientada a resultados."
+            "Impacto inicial detectado: Has incluido un logro cuantificable, pero es insuficiente para destacar.",
+            "Para un perfil estratégico, aplica métricas duras (%, $, volúmenes o plazos) en al menos 2 experiencias adicionales. Demuestra consistencia en tu capacidad para generar resultados."
         ]
     elif quantified_score == 75:
         quantified_tips = [
-            "¡Buen camino! Cuentas con 2 logros cuantificados muy claros y atractivos.",
-            "Para hacer tu perfil verdaderamente imbatible frente a otros candidatos, intenta rescatar una métrica de escala (ej: tamaño de presupuestos manejados o volumen de base de datos) en tu experiencia más reciente."
+            "Progreso excelente: Ya cuentas con 2 logros cuantificados que atraen la atención del reclutador.",
+            "Para alcanzar un perfil imbatible, añade una métrica de escala en tu experiencia más reciente (ej: tamaño de presupuesto gestionado o volumen de transacciones)."
         ]
     else:
         quantified_tips = [
-            "¡Sobresaliente! Tu trayectoria destaca con un fuerte enfoque en resultados tangibles. Has incorporado métricas en múltiples puntos estratégicos de tu carrera profesional."
+            "Perfil de alto impacto: Tu trayectoria destaca por un enfoque profesional en resultados tangibles.",
+            "Has integrado métricas estratégicas en múltiples puntos de tu carrera, lo cual te posiciona muy por encima de la media de candidatos para los sistemas ATS."
         ]
-
 
     # ── Feedback ──────────────────────────────────────────────────────────────
     feedback = generate_detailed_feedback(

@@ -1,10 +1,10 @@
 // src/components/scanner/ScannerModal.jsx
 import React, { useEffect, useState, useRef } from 'react';
 import { CvTemplateEditor } from './CvTemplateEditor';
+import { TxtFocusEditor } from './TxtFocusEditor';
 import { ResultsPanel } from './ResultsPanel';
 import { JobForm } from '../forms/JobForm';
 import { LoadingSpinner } from './../common/LoadingSpinner';
-import { TxtFocusEditor } from './TxtFocusEditor';
 import mammoth from 'mammoth';
 
 // --- NUEVO: Subcomponente Editor Ligero para DOCX ---
@@ -30,7 +30,7 @@ const EditableDocx = ({ initialHtml, onUpdate, focusText }) => {
     handleInput();
   };
 
-  // --- LÓGICA DE RESALTADO EN HTML (Sin romper estilos ni etiquetas) ---
+  // --- Only for EditableDocx LÓGICA DE RESALTADO EN HTML (Sin romper estilos ni etiquetas) ---
   const applyHighlightsToHtml = (html, focusData) => {
     if (!focusData || !html) return html;
 
@@ -141,7 +141,7 @@ const EditableDocx = ({ initialHtml, onUpdate, focusText }) => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-white relative">
+    <div className="flex flex-col h-full bg-white relative editable-docx">
       {/* Barra de herramientas */}
       <div className="flex items-center gap-2 p-2 border-b border-gray-200 bg-gray-50 shrink-0 sticky top-0 z-10">
         <button onClick={() => execCommand('bold')} className="p-1.5 hover:bg-gray-200 rounded font-bold" title="Negrita">B</button>
@@ -181,10 +181,18 @@ export const ScannerModal = ({
   const isDocxFile = file && (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || file.name?.toLowerCase().endsWith('.docx'));
   const isTextFile = file && (file.type === 'text/plain' || file.name?.toLowerCase().endsWith('.txt'));
 
+  const [selectedSentence, setSelectedSentence] = useState(null);
+
   let textToHighlight = null;
   if (activeFocus === 'achievements') {
-    textToHighlight = result?.focus_achievements; 
+    let rawSentences = result?.quantified_achievements_metrics?.sentences || [];
+    // Convierte a string si es objeto
+    textToHighlight = rawSentences.map(s => 
+      typeof s === 'string' ? s : (s.text || s.keyword || '')
+    ).filter(Boolean);
   }
+  console.log('🔍 activeFocus:', activeFocus, 'textToHighlight:', textToHighlight);
+
 
   // --- TXT: leer como texto plano ---
   useEffect(() => {
@@ -293,6 +301,7 @@ export const ScannerModal = ({
           onChange={setTxtContent}
           disabled={loading}
           focusText={textToHighlight}
+          selectedSentence={selectedSentence}
         />
       );
     }
@@ -310,6 +319,7 @@ export const ScannerModal = ({
           <EditableDocx 
             initialHtml={docxHtml} 
             focusText={textToHighlight} // <--- AÑADIMOS EL PROP AQUÍ
+            selectedSentence={selectedSentence} // <--- AÑADIMOS EL PROP AQUÍ
             onUpdate={({ html, text }) => {
               setDocxHtml(html);
               setDocxPlainText(text);
@@ -326,7 +336,8 @@ export const ScannerModal = ({
           updateSection={updateSection}
           templateRef={templateRef}
           activeFocus={activeFocus}
-          focusAchievements={result?.focus_achievements || []}
+          focusAchievements={textToHighlight}
+          selectedSentence={selectedSentence}
         />
       );
     }
@@ -348,6 +359,18 @@ export const ScannerModal = ({
         </div>
       </div>
     );
+  };
+
+  const handleSelectSentence = (sentence) => {
+    setSelectedSentence(sentence);
+    
+    // Hacemos scroll suave hacia el nuevo elemento resaltado una vez React lo dibuje
+    setTimeout(() => {
+      const highlightedElement = document.querySelector('.focus-highlight-single');
+      if (highlightedElement) {
+        highlightedElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 60);
   };
 
   return (
@@ -415,7 +438,11 @@ export const ScannerModal = ({
                 <ResultsPanel
                   result={result}
                   activeFocus={activeFocus}
-                  onToggleFocus={(focusType) => setActiveFocus(activeFocus === focusType ? null : focusType)}
+                  onToggleFocus={(focusType) => {
+                    setActiveFocus(activeFocus === focusType ? null : focusType);
+                    setSelectedSentence(null); // Limpiamos el resaltado individual al cambiar de pestaña
+                  }}
+                  onSelectSentence={handleSelectSentence} // Usa la nueva función basada en estado
                 />
               )}
             </div>

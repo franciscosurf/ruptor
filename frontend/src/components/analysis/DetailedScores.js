@@ -33,7 +33,7 @@ export function DetailedScores({ scores }) {
             scores[key] !== undefined && (
               <div key={key} style={{
                 background: colors.bg, padding: '14px 12px', borderRadius: 16, textAlign: 'center',
-                border: `1px solid ${colors.border}`, transition: 'all 0.2s ease', flex: 1, minWidth: '120px'
+                border: `2px solid #dddddd`, transition: 'all 0.2s ease', flex: 1, minWidth: '120px'
               }}>
                 <div style={{ fontSize: 24, marginBottom: 6 }}>{icon}</div>
                 <div style={{

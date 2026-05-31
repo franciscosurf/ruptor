@@ -67,7 +67,8 @@ export const CvTemplateEditor = ({ cvData, updateSection, templateRef, activeFoc
           mappedParts.push(p);
           if (index < parts.length - 1) {
             mappedParts.push(
-              <span key={`${achievement}-${index}`} className="focus-highlight">
+              // CAMBIO: Se han añadido las clases de Tailwind bg-purple-200/70 text-purple-900, etc.
+              <span key={`${achievement}-${index}`} className="focus-highlight bg-purple-200/70 text-purple-900 rounded-sm font-semibold transition-all">
                 {achievement}
               </span>
             );
@@ -82,7 +83,7 @@ export const CvTemplateEditor = ({ cvData, updateSection, templateRef, activeFoc
 
   return (
     // Agregamos la clase focus-mode-active de forma dinámica al contenedor principal
-    <div className={`flex-1 flex flex-col relative bg-gray-200/50 overflow-y-auto items-center p-8 ${activeFocus ? 'focus-mode-active' : ''}`}>
+    <div className={`flex-1 flex flex-col relative bg-gray-200/50 overflow-y-auto items-center p-8 cv-template-editor ${activeFocus ? 'focus-mode-active' : ''}`}>
       
       {/* Lienzo A4 (Tus estilos inline originales están intactos) */}
       <div 

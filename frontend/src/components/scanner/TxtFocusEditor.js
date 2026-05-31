@@ -60,7 +60,7 @@ export const TxtFocusEditor = ({ value, onChange, disabled, focusText }) => {
   };
 
   return (
-    <div className="relative flex-1 w-full bg-white overflow-hidden shadow-inner">
+    <div className="relative flex-1 w-full bg-white overflow-hidden shadow-inner txt-editor">
       
       {/* CAPA FANTASMA */}
       <div 

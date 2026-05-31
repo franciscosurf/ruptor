@@ -6,6 +6,8 @@ import { DetailedScores } from '../analysis/DetailedScores';
 import { Recommendations } from '../analysis/Recommendations';
 import { MissingTermsWithContext } from '../analysis/MissingTermsWithContext';
 import { JobSkillsList } from '../analysis/JobSkillsList';
+import { Impact } from '../analysis/Impact';
+
 
 const ITEMS_PER_PAGE_REC = 2;      // Mejoras: 2 por página
 const ITEMS_PER_PAGE_MISSING = 5;  // Sugerencias: 5 por página
@@ -43,7 +45,7 @@ const PaginationControls = ({ currentPage, totalPages, onPrev, onNext, startIdx,
   );
 };
 
-export const ResultsPanel = ({ result, activeFocus, onToggleFocus }) => {
+export const ResultsPanel = ({ result, activeFocus, onToggleFocus, onSelectSentence  }) => {
   const [activeTab, setActiveTab] = useState('recommendations');
   const [recommendationsPage, setRecommendationsPage] = useState(0);
   const [suggestionsPage, setSuggestionsPage] = useState(0);
@@ -134,142 +136,7 @@ export const ResultsPanel = ({ result, activeFocus, onToggleFocus }) => {
     {
       id: 'impact',
       label: '🚀 Impacto',
-      component: () => (
-        <div className="space-y-6">
-
-          {/* MÓDULO LOGROS CUANTIFICABLES */}
-          <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-            <div className="bg-amber-50 px-4 py-3 border-b border-amber-100 flex justify-between items-center">
-              <h3 className="text-sm font-bold flex items-center gap-2 text-amber-900">
-                <span>📊</span> Logros Cuantificables
-              </h3>
-              <span className="bg-white text-amber-800 font-bold px-2 py-0.5 rounded text-xs border border-amber-200">
-                {result?.quantified_achievements_metrics?.score ?? 0}%
-              </span>
-              {/* Pega esto debajo de la métrica de logros en ResultsPanel */}
-              {result?.focus_achievements && (
-                <button
-                  onClick={() => onToggleFocus('achievements')}
-                  className={`mt-3 px-4 py-2 text-sm font-bold rounded-lg transition-all w-full flex items-center justify-center gap-2 ${
-                    activeFocus === 'achievements'
-                      ? 'bg-purple-700 text-white hover:bg-purple-800' //activo
-                      : result?.focus_achievements?.length === 0
-                        ? 'bg-red-50 text-red-700 border border-red-200 hover:bg-red-100' // Estilo de advertencia si está vacío
-                        : 'bg-yellow-600 text-white hover:bg-yellow-700 animate-pulse' // Estilo normal
-                  }`}
-                >
-                  {result?.focus_achievements?.length === 0 
-                    ? (activeFocus === 'achievements' ? '👁️ Cerrar Diagnóstico' : '⚠️ 0 Logros Detectados. Ver por qué.')
-                    : (activeFocus === 'achievements' ? '👁️ Quitar Filtro de Logros' : '🎯 Enfocarse en Logros')
-                  }
-                </button>
-              )}
-            </div>
-
-            {/* Debajo del botón, dentro de tu card de Impacto */}
-          <div className="mt-4">
-            {activeFocus === 'achievements' && result?.focus_achievements?.length === 0 ? (
-              /* TARJETA DE GAMIFICACIÓN ANIMADA */
-              <div className="bg-purple-700 via-indigo-900 to-indigo-950 text-white rounded-xl p-5 shadow-xl border border-purple-500/30 relative overflow-hidden animate-fade-in">
-                
-                {/* Efecto de luces de fondo */}
-                <div className="absolute -top-10 -right-10 w-24 h-24 bg-purple-500/20 rounded-full blur-xl animate-pulse"></div>
-                
-                <div className="flex items-start gap-3">
-                  <span className="text-3xl animate-bounce mt-1">🚀</span>
-                  <div>
-                    <h4 className="font-extrabold text-white white bg-clip-text bg-gradient-to-r from-amber-300 to-yellow-100 text-base tracking-wide uppercase">
-                      ¡Misión: Desbloquear Impacto!
-                    </h4>
-                    <p className="text-sm text-indigo-100/90 mt-2 leading-relaxed font-normal">
-                      No tienes logros. Los reclutadores <span className="text-amber-300 font-bold">no te ven</span>. 
-                    </p>
-                    
-                    {/* El reto */}
-                    <div className="bg-white/10 rounded-lg p-3 mt-3 border border-white/10 text-xs text-amber-200 font-mono">
-                      <strong>🎯 RETO:</strong> Edita tu experiencia actual e inyecta al menos un dato numérico (ej: <span className="underline">%</span>, <span className="underline">€</span>, o volúmenes de usuarios).
-                    </div>
-                    
-                    <p className="text-xs text-indigo-200/70 mt-3 italic">
-                      ¡Haz la prueba! En cuanto guardes el cambio, la pantalla se iluminará y tu ATS Score subirá de nivel instantáneamente.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              /* Recomendaciones Estrategia de Impacto Estrategia de impacto por defecto (lo que ya tenías) */
-              <div>
-                <h4 className="font-semibold text-gray-700 text-xs uppercase tracking-wide">Estrategia de Impacto:</h4>
-                <div className="mt-2 space-y-1.5">
-                  {result?.quantified_achievements_metrics?.tips?.map((tip, idx) => (
-                    <p key={idx} className="text-xs text-amber-900 bg-amber-50/50 p-2 rounded-r border-l-2 border-amber-500">
-                      {tip}
-                    </p>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-            <div className="p-4">
-              
-              {/* Oraciones exactas validadas */}
-              {result?.quantified_achievements_metrics?.sentences?.length > 0 && (
-                <div className="mt-4 pt-3 border-t border-gray-100">
-                  <h4 className="text-xs font-semibold text-blue-700 uppercase tracking-wide mb-2">Métricas duras identificadas:</h4>
-                  <div className="space-y-1.5">
-                    {result.quantified_achievements_metrics.sentences.map((sentence, idx) => (
-                      <p key={idx} className="text-[11px] focus-highlight bg-gray-50 p-2 rounded border border-gray-200 italic text-gray-700">
-                        "{sentence}"
-                      </p>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* MÓDULO VERBOS DE ACCIÓN */}
-          <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-            <div className="bg-blue-50 px-4 py-3 border-b border-blue-100 flex justify-between items-center">
-              <h3 className="text-sm font-bold flex items-center gap-2 text-blue-900">
-                <span>⚡</span> Verbos de Acción
-              </h3>
-              <span className="bg-white text-blue-800 font-bold px-2 py-0.5 rounded text-xs border border-blue-200">
-                {result?.action_verbs_metrics?.score ?? 0}%
-              </span>
-            </div>
-            
-            <div className="p-4">
-              {/* Recomendaciones dinámicas enviadas por el Backend */}
-              <div>
-                <h4 className="font-semibold text-gray-700 text-xs uppercase tracking-wide">Consejos del ATS:</h4>
-                <ul className="list-disc pl-4 mt-2 space-y-1 text-sm text-gray-600">
-                  {result?.action_verbs_metrics?.tips?.map((tip, idx) => (
-                    <li key={idx}>{tip}</li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Verbos detectados */}
-              {result?.action_verbs_metrics?.detected?.length > 0 && (
-                <div className="mt-4 pt-3 border-t border-gray-100">
-                  <span className="text-xs font-semibold text-green-700 uppercase tracking-wide">Verbos legítimos detectados:</span>
-                  <div className="flex flex-wrap gap-1.5 mt-2">
-                    {result.action_verbs_metrics.detected.map((verb, idx) => (
-                      <span key={idx} className="bg-green-50 text-green-700 text-[11px] px-2 py-1 rounded font-medium border border-green-200">
-                        {verb}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          
-
-        </div>
-      )
+      component: () => <Impact result={result} activeFocus={activeFocus} onToggleFocus={onToggleFocus} onSelectSentence={onSelectSentence} />
     }
   ];
 
@@ -282,9 +149,35 @@ export const ResultsPanel = ({ result, activeFocus, onToggleFocus }) => {
       {/* Bloque del Score */}
       <div className="p-6 border-b border-gray-100 bg-gray-50 shrink-0">
         <ScoreCircle score={result.ats_score} level={result.level} />
-        <p className="mt-4 text-center text-sm font-medium text-gray-600">{result.summary}</p>
+        <div className="flex items-start gap-3 rounded-xl border border-violet-200 bg-purple-100 p-4">
+          <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-purple-100 text-purple-600">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+
+          <div>
+            
+
+            <p className="mt-1 text-sm text-slate-600">
+              {result.summary}
+            </p>
+          </div>
+        </div>
+
         {result.detailed_scores && (
-          <div className="mt-5 pt-5 border-t border-gray-100">
+          <div className="mt-1 border-t border-gray-100">
             <DetailedScores scores={result.detailed_scores} />
           </div>
         )}
