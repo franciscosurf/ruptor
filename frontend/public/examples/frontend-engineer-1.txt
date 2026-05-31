@@ -1,0 +1,80 @@
+About the job
+Frontend Software Engineer
+
+ 📍 Barcelona | Modelo híbrido
+
+
+En Indra Group, protegemos lo que más importa.
+ Como compañía líder en tecnología y defensa, impulsamos soluciones tecnológicas punteras que refuerzan la seguridad nacional e internacional, participando en programas clave de alta criticidad en el ámbito de la ciberdefensa.
+
+
+💻 ¡Únete a nuestro equipo de Ciberdefensa!
+
+ En nuestro posicionamiento como referente en el sector de defensa, queremos reforzar nuestro equipo con un/a Ingeniero/a Front End  con interés en crecer profesionalmente en proyectos innovadores y de alto impacto tecnológico. Te incorporarás a un entorno de I+D donde trabajarás con tecnologías avanzadas, contribuyendo directamente al desarrollo de soluciones que protegen sistemas e infraestructuras críticas.
+
+
+💡 ¿Qué harás?
+
+
+
+Diseñar, desarrollar y mantener interfaces de usuario complejas en entornos frontend de alta criticidad, garantizando altos estándares de calidad, rendimiento y mantenibilidad.
+Liderar la arquitectura frontend de aplicaciones complejas, participando en el diseño y evolución de librerías de componentes reutilizables basadas en Vue.js.
+Desarrollar soluciones frontend utilizando JavaScript y ECMAScript moderno, aplicando buenas prácticas de HTML5, CSS3, SASS y metodología BEM.
+Integrar las aplicaciones frontend con APIs REST, asegurando una correcta comunicación con sistemas backend y una experiencia de usuario óptima.
+Definir y ejecutar testing unitario avanzado en frontend mediante herramientas como Jest, Karma o Jasmine, contribuyendo activamente a la calidad del producto.
+Ejercer un rol de liderazgo técnico, participando en revisiones de código, mentoría de perfiles más junior y colaboración continua con Product Owners, Scrum Masters y equipos ágiles.
+
+
+
+
+🎯 ¿Qué buscamos en ti?
+
+No te preocupes si no cumples el 100% de lo que buscamos. ¡Anímate, conoce nuestra propuesta y cuéntanos lo que nos puedes aportar! 🚀
+
+
+Experiencia profesional senior en desarrollo Front End, con más de 6 años de experiencia en entornos complejos.
+Dominio avanzado de JavaScript y ECMAScript moderno.
+Al menos 4 años de experiencia demostrable con Vue.js, participando en arquitectura frontend, desarrollo de librerías de componentes y construcción de aplicaciones complejas.
+Conocimiento experto de HTML5, CSS3 y SASS, aplicando metodologías de maquetación como BEM.
+Sólida experiencia en arquitectura frontend, optimización de rendimiento y aplicación de patrones de diseño.
+Dominio avanzado de Git, incluyendo gestión compleja de ramas, revisiones técnicas de código y buenas prácticas de desarrollo colaborativo.
+Experiencia en el desarrollo de interfaces de usuario complejas y en la integración con APIs REST.
+Amplia experiencia en testing unitario frontend, utilizando herramientas como Jest, Karma o Jasmine.
+Experiencia trabajando en metodologías ágiles, con relación fluida con Product Owners y Scrum Masters.
+Capacidad demostrada de liderazgo técnico, mentorización y acompañamiento de equipos.
+Alta autonomía, capacidad resolutiva y habilidades de comunicación, con orientación a la calidad, la seguridad y los principios DevSecOps.
+
+
+Lo que te ofrecemos 
+
+Estabilidad y Futuro 🏢✨: Proyectos a largo plazo en una empresa líder de Defensa con más de 60.000 profesionales, con seguridad financiera.
+Proyectos Innovadores y de Alto Alcance 🚀: Trabajarás con tecnologías de vanguardia, con un impacto tanto a nivel nacional como internacional.
+Ambiente Cercano y Transparente 🤝: Disfrutarás de una comunicación directa y fluida con responsables y compañeros, en un entorno colaborativo y abierto.
+Autonomía y Flexibilidad ⏳: Tendrás libertad para organizar tu trabajo, con una conciliación real y adaptada a tu ritmo. Adaptarlo al modelo de trabajo de la posición, en entorno de fábrica a turnos, no puede haber flexibilidad.
+Plan de carrera adaptado a ti 📈: Diseñado para impulsar tu crecimiento y desarrollo profesional.
+Formación continua 📚: en Open University y Udemy for Business (¡más de 6.000 cursos para especializarte!).
+Descuentos exclusivos para tu bienestar 🎁: Disfruta de ventajas en gimnasios, restaurantes, tiendas, ocio y mucho más al ser empleado de Indra.
+Retribución competitiva 💰 y planes de compensación flexibles 💸📊 a tus necesidades.
+
+
+🕓 ¿Cómo es nuestro proceso de selección
+
+Revisión de tu perfil 🔍: Evaluamos tu experiencia y habilidades para determinar si encajas con lo que buscamos. 
+
+Primera toma de contacto (5-10 min) 📞: Si recibes una llamada de un número desconocido, ¡es nuestro equipo! Será una conversación rápida para conocerte y resolver cualquier duda. 
+Entrevista técnica 🤝: Te reunirás con el equipo, quienes te explicarán el proyecto y las tareas diarias. También exploraremos tus conocimientos técnicos. Además, te realizaremos breves pruebas de competencias psicológicas e inglés (si es necesario). 
+Entrevista con el equipo de atracción de talento🤝: Queremos que nos conozcas mejor como empresa: valores, modelo de carrera, skilss…. para que tanto tu como el equipo de pueda analizar si hay match.
+Oferta y bienvenida 🎉: Si todo va bien, ¡te incorporas a nuestro equipo y comenzamos esta nueva etapa juntos!
+Tiempo Estimado de proceso: 2 semanas.
+
+ 
+ 
+Nuestro compromiso es promover ambientes de trabajo en los que se trate con respeto y dignidad a las personas, procurando el desarrollo profesional de la plantilla y garantizando la igualdad de oportunidades en su selección, formación y promoción ofreciendo un entorno de trabajo libre de cualquier discriminación por motivo de género, edad, discapacidad, orientación sexual, identidad o expresión de género, religión, etnia, estado civil o cualquier otra circunstancia personal o social.
+
+ 
+
+ 
+
+¡INDRA es empresa Top Employer 2026! Incorpórate a una empresa certificada como una de las mejores empresas empleadoras de España, gracias a nuestra gestión integral de RRHH y a las condiciones para nuestros profesionales.
+
+Job search faster with Premium

@@ -1,0 +1,62 @@
+Eres un expert@ en Front-End, te sientes orgullos@ de tu trabajo y estás buscando un nuevo reto que te apasione?
+
+
+
+
+¿Qué te ofrecemos?
+
+Si disfrutas programando, superando retos y aprendiendo todos los días, entonces te ofrecemos pasarlo muy bien!
+Podrás ver el impacto directo de tu trabajo en una de las webs de referencia tanto en España, como en Italia y Portugal. Para los que no lo hayáis vivido ya: no sabéis el cosquilleo que da en la tripa la primera vez que ves algo que has hecho en una plataforma que utilizan millones de personas.
+La vacante es full remote pero disponemos de oficinas en el centro de Madrid y distribuidas en entornos de trabajo colaborativos.
+Vas a aprender. Lo decimos en serio. La plataforma va evolucionando constantemente, y de ahí sacamos mogollón de charlas internas, posts, talleres… que hacen que el conocimiento fluya.
+Patrocinamos eventos, acudimos a ellos y hacemos meetups en la oficina. ¡Es tan importante aprender como enseñar a tus compis!
+Además de tu salario, podrás acogerte a un plan de retribución flexible (tarjeta de transporte, cheques gourmet, seguro médico…) del que te podrás beneficiar desde el primer día.
+Clases de Inglés, italiano y portugués.
+¡También tenemos fisio y clases de yoga… porque para nosotros lo más importante es cuidar de nuestros idealistas!
+Además de trabajar, nos gusta pasarlo bien, por eso que si te unes a nuestras familia, cada mes celebrarás algo…Halloween, San Valentín, Navidad,…¡Te lo vas a pasar muy bien!
+
+
+
+
+Requisitos importantes para trabajar con nosotros.
+
+Typescript
+React 18
+Tests usando vitest y testing library
+Tooling: vite, turbo, pnpm
+CSS3. Tailwind (opcional)
+
+
+
+
+Sería genial si además tienes…
+
+Experiencia 3+ años con storybook y librerías de componentes
+Conocimientos de accesibilidad
+Haber trabajado mano a mano con equipos de usabilidad
+
+
+
+
+¿Qué sabes hacer?
+
+Diseñar y construir componentes y patrones de UI escalables, accesibles y mantenibles con React.
+Capacidad de liderazgo técnico: ayudar a establecer estándares de calidad, revisiones de código, mentorizar y ser referente técnico del equipo.
+Asegurar la calidad y la entrega de código, con uso de buenas prácticas, test automáticos, y documentación clara
+
+
+
+
+Y algo más sobre nosotros…
+
+Desde que iniciamos esta aventura en el año 2000, idealista es mucho más que una compañía.
+Es una cultura, una forma de hacer y entender las cosas que nos diferencia. El respeto, la tolerancia, la integridad y la transparencia forman parte de nuestro ADN.
+Contamos con un equipo de personas que representa a más de 20 nacionalidades distintas, con idiomas diversos, perfiles, culturas y orígenes diferentes. Valoramos la diferencia y aprender de los demás; diferentes creencias y formas de pensar nos enriquecen.
+idealista fomenta la igualdad en todos los ámbitos, realizando acciones de sensibilización y visibilidad del colectivo LGTB+ entre los empleados/as, en la publicidad y en la comunidad en general.
+
+
+Tenemos el compromiso de crear entornos y espacios donde las personas se sientan seguras, protegidas, libres de discriminación y primando la igualdad de oportunidades.
+Asimismo, la promoción de la igualdad de género es otra de las bases de nuestro compromiso con nuestro equipo. Estamos comprometidos con el desarrollo de medidas que fomenten la igualdad y favorezcan la conciliación, maternidad y paternidad.
+
+
+¿Te reconoces? ¡Acepta el reto! :)

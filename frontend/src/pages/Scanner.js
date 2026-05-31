@@ -89,7 +89,11 @@ export default function Scanner() {
       <style>{`
         body { font-family: 'Inter', sans-serif; color: #0b1020; }
         .gradient-text { background: linear-gradient(90deg,#7c3aed,#2563eb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .grid-bg { background-image: linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px); background-size: 40px 40px; }
+        .grid-bg {
+          background-image: linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px),
+                            linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px);
+          background-size: 40px 40px;
+        }
         .hero-glow { position: absolute; width: 700px; height: 700px; border-radius: 999px; background: radial-gradient(circle, rgba(99,102,241,0.18), transparent 70%); top: -300px; right: -250px; }
       `}</style>
       

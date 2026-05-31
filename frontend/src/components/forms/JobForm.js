@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { colors } from '../../styles/colors';
 import { Card } from '../common/Card';
+import { jobOptions } from './jobExamples';
 
 export function JobForm({
   fileName,
@@ -36,6 +37,20 @@ export function JobForm({
     e.stopPropagation();
     onFileChange({ target: { files: null } });
     setFileInputKey(Date.now());
+  };
+
+  const loadExample = async (filePath) => {
+    try {
+      setPasteLoading(true); // Reutilizamos el estado de carga para mostrar un spinner
+      const response = await fetch(filePath);
+      const text = await response.text();
+      onJobDescriptionChange(text);
+    } catch (err) {
+      console.error('Error cargando ejemplo:', err);
+      alert('No se pudo cargar el ejemplo.');
+    } finally {
+      setPasteLoading(false);
+    }
   };
 
   return (
@@ -227,6 +242,76 @@ export function JobForm({
             {jobDescription.length} / 5000
           </div>
         </div>
+
+          {/* PASO 2: OFERTA DE TRABAJO en SELECT */}
+          <div style={{ 
+              marginBottom: '20px', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'space-between',
+              background: '#f8fafc',
+              padding: '12px 16px',
+              borderRadius: '12px',
+              border: '1px solid #e2e8f0'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '18px' }}>⚡</span>
+                <div>
+                  <div style={{ fontSize: '13px', fontWeight: '600', color: '#1e293b' }}>¿Sin inspiración?</div>
+                  <div style={{ fontSize: '11px', color: '#64748b' }}>Prueba con un ejemplo precargado</div>
+                </div>
+              </div>
+
+              <div style={{ position: 'relative' }}>
+                <select 
+                  onChange={(e) => e.target.value && loadExample(e.target.value)}
+                  style={{ 
+                    appearance: 'none',
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #cbd5e1',
+                    borderRadius: '8px',
+                    padding: '8px 36px 8px 14px',
+                    fontSize: '13px',
+                    fontWeight: '500',
+                    color: '#475569',
+                    cursor: 'pointer',
+                    outline: 'none',
+                    boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.borderColor = '#94a3b8';
+                    e.target.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.borderColor = '#cbd5e1';
+                    e.target.style.boxShadow = '0 1px 2px 0 rgba(0, 0, 0, 0.05)';
+                  }}
+                >
+                  <option value="">Selecciona un rol...</option>
+                  {jobOptions.map(opt => (
+                    <option key={opt.file} value={opt.file}>{opt.label}</option>
+                  ))}
+                </select>
+                
+                {/* Flecha elegante */}
+                <div style={{
+                  position: 'absolute',
+                  right: '12px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  pointerEvents: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  color: '#94a3b8'
+                }}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </div>
+              </div>
+            </div>
+
       </div>
 
       {/* PASO 3: ACCIÓN PRINCIPAL */}
