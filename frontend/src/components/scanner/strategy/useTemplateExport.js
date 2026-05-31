@@ -1,133 +1,180 @@
-// src/components/scanner/strategy/useTemplateExport.js
-import jsPDF from 'jspdf';
+// src/components/scanner/strategy/usePdfExport.js
+import { useState, useCallback } from 'react';
+import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+
+/**
+ * Sanitiza el texto para que sea 100% compatible con WinAnsi (Helvetica).
+ * Reemplaza viñetas, comillas especiales, guiones largos, etc.
+ */
+const sanitizeForPdf = (text) => {
+  if (!text) return '';
+  let result = text;
+
+  // 1. Reemplazar viñetas y flechas por guión
+  result = result.replace(/[●•▪▸➢➣➤→▶❯]/g, '- ');
+
+  // 2. Comillas curvas por rectas
+  result = result.replace(/[“”]/g, '"');
+  result = result.replace(/[‘’]/g, "'");
+
+  // 3. Guiones largos por guión normal
+  result = result.replace(/[—–]/g, '-');
+
+  // 4. Símbolos comunes que no aportan valor
+  result = result.replace(/[©®™]/g, '');
+
+  // 5. Convertir acentos y eñes a ASCII (ya que WinAnsi no los soporta)
+  const accentMap = {
+    'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u',
+    'Á': 'A', 'É': 'E', 'Í': 'I', 'Ó': 'O', 'Ú': 'U',
+    'ñ': 'n', 'Ñ': 'N', 'ü': 'u', 'Ü': 'U', 'ç': 'c', 'Ç': 'C'
+  };
+  result = result.replace(/[áéíóúÁÉÍÓÚñÑüÜçÇ]/g, match => accentMap[match] || match);
+
+  // 6. Eliminar cualquier otro carácter no ASCII (rangos no imprimibles o extraños)
+  result = result.replace(/[^\x00-\x7F]/g, (char) => {
+    // Si después de todo sigue habiendo algo raro, lo eliminamos
+    return '';
+  });
+
+  return result;
+};
 
 export const useTemplateExport = () => {
-  const exportToPdf = async (cvData, fileName) => {
+  const [isExporting, setIsExporting] = useState(false);
+
+  const exportToPdf = useCallback(async (cvData, fileName) => {
     if (!cvData) return false;
+    setIsExporting(true);
 
-    const pdf = new jsPDF({
-      unit: 'mm',
-      format: 'a4',
-      orientation: 'portrait',
-    });
+    try {
+      // 1. Crear documento y primera página
+      const pdfDoc = await PDFDocument.create();
+      const pageWidth = 595.28;
+      const pageHeight = 841.89;
+      let currentPage = pdfDoc.addPage([pageWidth, pageHeight]);
 
-    // ── Fuente con soporte completo de caracteres latinos ──────────────────
-    // jsPDF incluye 'courier', 'helvetica', 'times' pero ninguna soporta á/ñ/é
-    // La solución: usar autoTable o cargar una fuente TTF.
-    // Sin librerías extra: usar el encoding 'win-1252' y limpiar caracteres.
-    pdf.setLanguage('es');
+      // 2. Márgenes y fuentes
+      const margin = { x: 50, y: 50 };
+      const contentWidth = pageWidth - margin.x * 2;
+      let y = pageHeight - margin.y;
 
-    const pageW  = 210;
-    const marginX = 18;
-    const marginY = 15;
-    const contentW = pageW - marginX * 2;
-    let y = marginY;
+      const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
+      const fontBold    = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
-    // ── Normalización de caracteres latinos ────────────────────────────────
-    // jsPDF/helvetica no renderiza á é í ó ú ñ ü — los sustituimos por
-    // el equivalente sin tilde solo en el PDF (el editor mantiene los originales)
-    const normalize = (str) => {
-      if (!str) return '';
-      return str
-        .replace(/á/g, 'a').replace(/Á/g, 'A')
-        .replace(/é/g, 'e').replace(/É/g, 'E')
-        .replace(/í/g, 'i').replace(/Í/g, 'I')
-        .replace(/ó/g, 'o').replace(/Ó/g, 'O')
-        .replace(/ú/g, 'u').replace(/Ú/g, 'U')
-        .replace(/ñ/g, 'n').replace(/Ñ/g, 'N')
-        .replace(/ü/g, 'u').replace(/Ü/g, 'U')
-        .replace(/ç/g, 'c').replace(/Ç/g, 'C')
-        .replace(/[^\x00-\x7F]/g, ''); // eliminar cualquier otro no-ASCII
-    };
+      // 3. Función para añadir página
+      const addNewPage = () => {
+        currentPage = pdfDoc.addPage([pageWidth, pageHeight]);
+        y = pageHeight - margin.y;
+      };
 
-    // ── Escritura con soporte real de saltos de línea ──────────────────────
-    const write = (rawText, opts = {}) => {
-      const {
-        size    = 10,
-        style   = 'normal',  // 'normal' | 'bold' | 'italic'
-        color   = [40, 40, 40],
-        lineGap = 1.2,       // multiplicador de interlineado sobre el tamaño
-      } = opts;
-
-      if (!rawText?.trim()) return;
-
-      pdf.setFontSize(size);
-      pdf.setFont('helvetica', style);
-      pdf.setTextColor(...color);
-
-      const lh = size * lineGap * 0.352778; // px → mm (1px = 0.352778mm)
-
-      // CLAVE: dividir primero por \n (saltos reales del textarea)
-      // y después por ancho de columna con splitTextToSize
-      const paragraphs = normalize(rawText).split('\n');
-
-      paragraphs.forEach((para) => {
-        const wrappedLines = pdf.splitTextToSize(para || ' ', contentW);
-        wrappedLines.forEach((line) => {
-          if (y > 282) { pdf.addPage(); y = marginY; }
-          pdf.text(line, marginX, y);
-          y += lh;
+      // 4. Dibujar línea horizontal
+      const drawLine = (yPos, thickness = 0.5, color = rgb(0.6, 0.6, 0.6)) => {
+        currentPage.drawLine({
+          start: { x: margin.x, y: yPos },
+          end: { x: pageWidth - margin.x, y: yPos },
+          thickness,
+          color,
         });
-        // Línea en blanco entre párrafos (si el párrafo original era vacío)
-        if (para.trim() === '') y += lh * 0.3;
-      });
-    };
+      };
 
-    const section = (title) => {
-      y += 4;
-      pdf.setFontSize(7.5);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(20, 20, 20);
-      pdf.text(normalize(title).toUpperCase(), marginX, y);
-      y += 2;
-      pdf.setDrawColor(160, 160, 160);
-      pdf.setLineWidth(0.3);
-      pdf.line(marginX, y, pageW - marginX, y);
-      y += 4;
-    };
+      // 5. Escribir texto con wrap y sanitización
+      const writeText = (rawText, options = {}) => {
+        if (!rawText?.trim()) return;
 
-    // ── Nombre ─────────────────────────────────────────────────────────────
-    write(cvData.name, { size: 20, style: 'bold', color: [10, 10, 10], lineGap: 1.3 });
+        const { size = 10, bold = false, color = rgb(0.15, 0.15, 0.15), lineGap = 1.2 } = options;
+        const font = bold ? fontBold : fontRegular;
+        const lineHeight = size * lineGap;
+        const text = sanitizeForPdf(rawText); // <--- SANITIZACIÓN CRÍTICA
+        const paragraphs = text.split('\n');
 
-    // ── Contacto ───────────────────────────────────────────────────────────
-    write(cvData.contact, { size: 9, color: [100, 100, 100], lineGap: 1.4 });
+        for (const para of paragraphs) {
+          if (para.trim() === '') {
+            y -= lineHeight * 0.5;
+            continue;
+          }
 
-    // Línea divisoria del header
-    y += 2;
-    pdf.setDrawColor(20, 20, 20);
-    pdf.setLineWidth(0.5);
-    pdf.line(marginX, y, pageW - marginX, y);
-    y += 6;
+          // Dividir párrafo en líneas según ancho disponible
+          const words = para.split(' ');
+          let lines = [];
+          let currentLine = '';
 
-    // ── Secciones ──────────────────────────────────────────────────────────
-    if (cvData.summary) {
-      section('Perfil Profesional');
-      write(cvData.summary, { size: 9.5, lineGap: 1.45 });
+          for (const word of words) {
+            const testLine = currentLine ? `${currentLine} ${word}` : word;
+            const testWidth = font.widthOfTextAtSize(testLine, size);
+            if (testWidth < contentWidth) {
+              currentLine = testLine;
+            } else {
+              if (currentLine) lines.push(currentLine);
+              currentLine = word;
+            }
+          }
+          if (currentLine) lines.push(currentLine);
+
+          for (const line of lines) {
+            if (y - lineHeight < margin.y) addNewPage();
+            currentPage.drawText(line, {
+              x: margin.x,
+              y: y - lineHeight,
+              size,
+              font,
+              color,
+            });
+            y -= lineHeight;
+          }
+          y -= lineHeight * 0.3; // espacio entre párrafos
+        }
+      };
+
+      // 6. Título de sección
+      const writeSectionTitle = (title) => {
+        y -= 10;
+        if (y < margin.y + 20) addNewPage();
+        currentPage.drawText(sanitizeForPdf(title).toUpperCase(), {
+          x: margin.x,
+          y: y - 10,
+          size: 9,
+          font: fontBold,
+          color: rgb(0.1, 0.1, 0.1),
+        });
+        y -= 5;
+        //drawLine(y + 3, 0.3);
+        y -= 8;
+      };
+
+      // 7. Componer el CV
+      writeText(cvData.name, { size: 20, bold: true, color: rgb(0, 0, 0), lineGap: 1.3 });
+      writeText(cvData.contact, { size: 9, color: rgb(0.4, 0.4, 0.4), lineGap: 1.4 });
+      y -= 4;
+      //drawLine(y, 0.8, rgb(0.1, 0.1, 0.1));
+      y -= 12;
+
+      if (cvData.summary)    { writeSectionTitle('Perfil Profesional');      writeText(cvData.summary,    { size: 9.5, lineGap: 1.45 }); }
+      if (cvData.leadership) { writeSectionTitle('Liderazgo y Actividades'); writeText(cvData.leadership, { size: 9.5, lineGap: 1.45 }); }
+      if (cvData.experience) { writeSectionTitle('Experiencia');             writeText(cvData.experience, { size: 9.5, lineGap: 1.45 }); }
+      if (cvData.education)  { writeSectionTitle('Educación');               writeText(cvData.education,  { size: 9.5, lineGap: 1.45 }); }
+      if (cvData.skills)     { writeSectionTitle('Habilidades e Intereses'); writeText(cvData.skills,     { size: 9.5, lineGap: 1.45 }); }
+
+      // 8. Guardar y descargar
+      const pdfBytes = await pdfDoc.save();
+      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      const safeFileName = (fileName || 'documento').replace(/[^a-zA-Z0-9_\-]/g, '_');
+      link.download = `CV_Optimizado_${safeFileName}.pdf`;
+      link.click();
+      URL.revokeObjectURL(url);
+
+      return true;
+    } catch (error) {
+      console.error('[usePdfExport] Error generando PDF:', error);
+      alert('No se pudo generar el PDF. Consulta la consola para más detalles.');
+      return false;
+    } finally {
+      setIsExporting(false);
     }
+  }, []);
 
-    if (cvData.leadership) {
-      section('Liderazgo y Actividades');
-      write(cvData.leadership, { size: 9.5, lineGap: 1.45 });
-    }
-
-    if (cvData.experience) {
-      section('Experiencia');
-      write(cvData.experience, { size: 9.5, lineGap: 1.45 });
-    }
-
-    if (cvData.education) {
-      section('Educacion');
-      write(cvData.education, { size: 9.5, lineGap: 1.45 });
-    }
-
-    if (cvData.skills) {
-      section('Habilidades e Intereses');
-      write(cvData.skills, { size: 9.5, lineGap: 1.45 });
-    }
-
-    pdf.save(`CV_Optimizado_${fileName || 'documento'}.pdf`);
-    return true;
-  };
-
-  return { exportToPdf };
+  return { exportToPdf, isExporting };
 };

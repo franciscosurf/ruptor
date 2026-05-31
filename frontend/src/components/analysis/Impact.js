@@ -113,7 +113,10 @@ export const Impact = ({ result, activeFocus, onToggleFocus, onSelectSentence })
               ¿POR QUÉ ES IMPORTANTE?
             </h4>
             <p className="text-sm text-gray-700 mt-1">
-              Los CVs con logros cuantificados reciben <strong className="text-indigo-700">3.5x más entrevistas</strong>.
+              Los CVs con logros reciben <strong className="text-indigo-700">3.5x más entrevistas</strong>.
+            </p>
+            <p className="text-sm text-gray-700 mt-1">
+              Ejemplos:
             </p>
             <div className="grid grid-cols-3 gap-3 mt-4">
               <div className="bg-white rounded-lg p-2 text-center shadow-sm border border-gray-200">

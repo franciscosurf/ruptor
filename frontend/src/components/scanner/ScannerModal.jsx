@@ -6,10 +6,10 @@ import { ResultsPanel } from './ResultsPanel';
 import { JobForm } from '../forms/JobForm';
 import { LoadingSpinner } from './../common/LoadingSpinner';
 import mammoth from 'mammoth';
+import { useTemplateExport } from './strategy/useTemplateExport';
 
-// --- NUEVO: Subcomponente Editor Ligero para DOCX ---
-// Sustituye el componente EditableDocx anterior por este:
 
+// Subcomponente Editor Ligero para DOCX ---
 const EditableDocx = ({ initialHtml, onUpdate, focusText }) => {
   const editorRef = useRef(null);
   // Guardamos el HTML "limpio" (sin las marcas de resaltado) para cuando el usuario guarde o descargue
@@ -169,6 +169,14 @@ export const ScannerModal = ({
   onFileChange, onJobDescriptionChange, onModeChange, onSubmit, loading,
   onReanalyze, cvData, isExtracting, updateSection, templateRef, onDownload
 }) => {
+
+  const { exportToPdf, isExporting } = useTemplateExport();
+  const handleDownloadPdf = async () => {
+    const success = await exportToPdf(cvData, fileName);
+    if (success) console.log('PDF generado correctamente');
+  };
+
+
   // Estados para TXT
   const [txtContent, setTxtContent] = useState('');
   // Estados para DOCX (HTML editable y texto plano)
@@ -407,11 +415,23 @@ export const ScannerModal = ({
                   {loading ? '⏳ Analizando...' : '🔄 Reanalizar CV'}
                 </button>
                 <button
-                  onClick={handleDownloadClick}
-                  disabled={isExtracting || isExtractingDocx}
+                  onClick={() => {
+                    if (isTextFile || isDocxFile) {
+                      handleDownloadClick();
+                    } else {
+                      handleDownloadPdf();
+                    }
+                  }}
+                  disabled={isExtracting || isExtractingDocx || isExporting}
                   className="bg-purple-600 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-50"
                 >
-                  {isTextFile ? '📥 Descargar TXT' : isDocxFile ? '📥 Descargar DOC' : '📥 Descargar PDF'}
+                  {isExporting
+                    ? '⏳ Generando PDF...'
+                    : isTextFile
+                    ? '📥 Descargar TXT'
+                    : isDocxFile
+                    ? '📥 Descargar DOC'
+                    : '📥 Descargar PDF'}
                 </button>
               </>
             )}
