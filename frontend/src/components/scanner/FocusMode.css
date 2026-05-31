@@ -13,6 +13,15 @@
   background-color: #f3f4f6 !important; /* Un fondo un poco más oscuro para que resalte el texto */
 }
 
+.focus-mode-active > div:first-child .input-title,
+.focus-mode-active > div:first-child .input-subtitle,
+.focus-mode-active > div:first-child .section-title,
+.focus-mode-active > div:first-child .text-gray-700,
+.focus-mode-active > div:first-child .docx-preview > *:not(.focus-highlight) {
+  color: #cbd5e1 !important; /* Gris claro (apagamos las luces) */
+  border-color: #e2e8f0 !important;
+}
+
 /* 3. ¡LA MAGIA! Encendemos solo los spans resaltados */
 .focus-mode-active .focus-highlight {
   color: #0f172a !important; /* Texto negro fuerte */

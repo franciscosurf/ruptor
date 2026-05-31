@@ -19,13 +19,38 @@ export const Impact = ({ result, activeFocus, onToggleFocus, onSelectSentence })
   return (
     <div className="space-y-6">
       {/* TÍTULO PRINCIPAL - SIEMPRE VISIBLE */}
-      <div className="border-b border-gray-200 pb-2">
-        <h2 className="text-xl font-extrabold text-gray-900 tracking-tight">
-          IMPACTO: <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-orange-600">DEMUESTRA TU VALOR</span>
-        </h2>
-        <p className="text-sm text-gray-500 mt-1">
-          Convierte tus responsabilidades en logros medibles y utiliza verbos de acción que conecten con el reclutador.
-        </p>
+      <div className="rounded-t-2xl bg-gradient-to-r from-purple-600 to-purple-500 px-6 py-5">
+        <div className="flex items-start">
+
+          <div className="mr-3 flex-shrink-0">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 text-yellow-300"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M13 10V3L4 14h7v7l9-11h-7z"
+              />
+            </svg>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-extrabold uppercase tracking-wide text-white">
+              Impacto: Demuestra tu valor
+            </h3>
+
+            <p className="mt-2 text-sm leading-relaxed text-purple-100">
+              Convierte tus responsabilidades en logros medibles y utiliza
+              verbos de acción que conecten con el reclutador.
+            </p>
+          </div>
+
+        </div>
       </div>
 
       {/* BOTÓN DE ENFOQUE - SIEMPRE VISIBLE (usa sentences) */}
@@ -71,8 +96,8 @@ export const Impact = ({ result, activeFocus, onToggleFocus, onSelectSentence })
       )}
 
       {/* MÓDULO: LOGROS CUANTIFICABLES */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-        <div className="bg-blue-50 px-5 py-3 border-b border-blue-100 flex justify-between items-center">
+      <div className="bg-tab rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div className="bg-tab px-5 py-3 border-b border-blue-100 flex justify-between items-center">
           <h3 className="text-sm font-bold text-amber-900 flex items-center gap-2">
             <span>📊</span> Logros Cuantificables
           </h3>
@@ -108,7 +133,7 @@ export const Impact = ({ result, activeFocus, onToggleFocus, onSelectSentence })
           )}
 
           {/* Bloque "¿POR QUÉ ES IMPORTANTE?" */}
-          <div className="mt-5 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg p-4 border border-indigo-100">
+          <div className="mt-5  rounded-lg p-4 border border-indigo-100 bg-tag">
             <h4 className="text-sm font-bold text-indigo-900 uppercase tracking-wide flex items-center gap-2">
               ¿POR QUÉ ES IMPORTANTE?
             </h4>
@@ -135,7 +160,7 @@ export const Impact = ({ result, activeFocus, onToggleFocus, onSelectSentence })
           </div>
 
           {/* Tips de mejora */}
-          {result?.quantified_achievements_metrics?.tips?.length > 0 && (
+          {/* {result?.quantified_achievements_metrics?.tips?.length > 0 && (
             <div className="mt-4 pt-3 border-t border-gray-100">
               <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">💡 Consejos para añadir logros:</h4>
               <ul className="list-disc pl-4 mt-2 space-y-1 text-xs text-gray-600">
@@ -144,13 +169,13 @@ export const Impact = ({ result, activeFocus, onToggleFocus, onSelectSentence })
                 ))}
               </ul>
             </div>
-          )}
+          )} */}
         </div>
       </div>
 
       {/* MÓDULO: VERBOS DE ACCIÓN */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-        <div className="bg-blue-50 px-5 py-3 border-b border-blue-100 flex justify-between items-center">
+      <div className="bg-tab rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div className="bg-tab px-5 py-3 border-b border-blue-100 flex justify-between items-center">
           <h3 className="text-sm font-bold text-blue-900 flex items-center gap-2">
             <span>⚡</span> Verbos de Acción
           </h3>
