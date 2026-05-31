@@ -15,13 +15,13 @@ export const HeroSection = ({ onStart }) => (
         <span className="text-sm font-medium">Editor In-Place Profesional</span>
       </div>
       <h1 className="text-6xl md:text-7xl font-black tracking-tight leading-none mb-8 max-w-4xl mx-auto">
-        Descubre cómo <span className="gradient-text">te filtra</span> la IA.
+        El <span className="gradient-text">75%</span> de CVs no lo lee nadie
       </h1>
       <p className="text-xl md:text-2xl text-black/60 leading-relaxed mb-10 max-w-2xl mx-auto">
-        Edita tu CV directamente en el visor y descárgalo con cambios profesionales. Sin pérdida de formato ni calidad.
+        El tuyo sí. Analízalo, mejora lo que falla y descárgalo listo para cualquier filtro.
       </p>
       <button onClick={onStart} className="animate-pulse bgPurple px-10 py-5 rounded-2xl text-white text-lg font-bold hover:scale-105 transition shadow-2xl">
-        Subir mi CV y Analizar
+        Analizar mi CV
       </button>
     </div>
   </section>

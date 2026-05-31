@@ -85,11 +85,10 @@ export default function App() {
                 <span className="text-sm font-medium">Optimizado para ATS modernos con IA</span>
               </div>
               <h1 className="text-6xl md:text-7xl font-black tracking-tight leading-none mb-8">
-                Supera el filtro ATS
-                <span className="gradient-text block">Consigue el puesto.</span>
+                <span className="gradient-text">La IA </span>rechaza tu CV antes de que alguien lo lea
               </h1>
               <p className="text-xl md:text-2xl text-black/60 leading-relaxed max-w-3xl mb-12">
-                Analiza tu CV contra la oferta y recibe sugerencias en tiempo real para pasar el filtro.
+                Analízalo contra la oferta y corrígelo en tiempo real.              
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link to="/scanner" className="px-8 py-5 rounded-2xl bgPurple text-white text-lg font-semibold hover:scale-105 transition shadow-2xl inline-block">
