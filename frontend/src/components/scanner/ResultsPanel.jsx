@@ -147,9 +147,11 @@ export const ResultsPanel = ({ result, activeFocus, onToggleFocus, onSelectSente
   return (
     /* Raíz: ahora con overflow-y-auto para scroll vertical en todo el panel */
     <div className="w-full flex flex-col bg-white overflow-y-auto h-full">
-      {/* Bloque del Score */}
       <div className="p-6 border-b border-gray-100 bg-gray-50 shrink-0">
+        {/* Bloque del Score */}
         <ScoreCircle score={result.ats_score} level={result.level} />
+
+        {/* (i) Warning info  */}
         <div className="flex items-start gap-3 rounded-xl border border-violet-200 bg-purple-100 p-4">
           <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-purple-100 text-purple-600">
             <svg
@@ -167,10 +169,7 @@ export const ResultsPanel = ({ result, activeFocus, onToggleFocus, onSelectSente
               />
             </svg>
           </div>
-
           <div>
-            
-
             <p className="mt-1 text-sm text-slate-600">
               {result.summary}
             </p>
