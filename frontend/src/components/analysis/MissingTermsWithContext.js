@@ -117,6 +117,11 @@ export function MissingTermsWithContext({ items }) {
                 >
                   score: {item.score?.toFixed(2) || 'N/A'}
                 </span>
+                {item.potential_points && (
+                  <span className="points-badge" style={{ background: '#eab308', color: 'black', padding: '2px 8px', borderRadius: 20, fontSize: 10 }}>
+                    +{item.potential_points} pts
+                  </span>
+                )}
               </div>
               {expandable && (
                 <span

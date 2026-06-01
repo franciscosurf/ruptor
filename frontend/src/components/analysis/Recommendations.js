@@ -34,6 +34,9 @@ export function Recommendations({ recommendations, onScrollToSuggestions }) {
                   fontWeight: 600
                 }}>
                   {rec.priority}
+                  {rec.potential_points && (
+                    <span className="points-badge">+{rec.potential_points} pts</span>
+                  )}
                 </span>
               </div>
               {rec.examples && rec.examples.length > 0 && (

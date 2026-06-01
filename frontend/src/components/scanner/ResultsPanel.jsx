@@ -72,6 +72,14 @@ export const ResultsPanel = ({ result, activeFocus, onToggleFocus, onSelectSente
 
   const jobSkills = result?.extracted_skills_job || [];
 
+  // En ResultsPanel, calcula totalPotentialPoints con las nuevas claves
+  const totalPotentialPoints = 
+    (result.missing_terms_with_context?.reduce((s, i) => s + (i.potential_points || 0), 0) || 0) +
+    (result.missing_tech_skills_details?.reduce((s, i) => s + i.potential_points, 0) || 0) +
+    (result.recommendations?.reduce((s, i) => s + (i.potential_points || 0), 0) || 0) +
+    (result.action_verbs_metrics?.potential_points || 0) +
+    (result.quantified_achievements_metrics?.potential_points || 0);
+
   const tabs = [
     {
       id: 'recommendations',
@@ -110,6 +118,7 @@ export const ResultsPanel = ({ result, activeFocus, onToggleFocus, onSelectSente
             <JobSkillsList
               cvSkills={result?.extracted_skills_cv || []}
               jobSkills={jobSkills}
+              missingSkillsDetails={result?.missing_tech_skills_with_points || []}
             />
           </div>
         </>
@@ -182,6 +191,12 @@ export const ResultsPanel = ({ result, activeFocus, onToggleFocus, onSelectSente
           </div>
         )}
       </div>
+
+      {totalPotentialPoints > 0 && (
+        <div className="bg-yellow-100 p-3 rounded-lg text-center my-4">
+          🎯 ¡Completa estas mejoras y gana hasta <strong>{totalPotentialPoints} puntos</strong>!
+        </div>
+      )}
 
       {/* Selector de Pestañas */}
       <div className="flex border-b border-gray-200 bg-white px-2 shrink-0">

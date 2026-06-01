@@ -1,23 +1,30 @@
 import React from 'react';
 import { colors } from '../../styles/colors';
-import { handleCopy } from '../../utils/copyUtils'; // Asegúrate de que la ruta sea correcta
+import { copyText } from '../../utils/copyUtils'; // 👈 importamos copyText
 
-export function JobSkillsList({ cvSkills, jobSkills }) {
+export function JobSkillsList({ cvSkills, jobSkills, missingSkillsDetails = [] }) {
   const cvSkillsSet = new Set(cvSkills.map(s => s.toLowerCase().trim()));
+  
+  // Mapa de puntos para skills faltantes
+  const pointsMap = new Map();
+  missingSkillsDetails.forEach(item => {
+    pointsMap.set(item.skill.toLowerCase().trim(), item.potential_points);
+  });
 
+  // Función de copia directa usando copyText
   const handleCopySkill = (skill) => {
-    handleCopy(skill);
+    copyText(skill);
   };
 
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
       {jobSkills.map((skill, idx) => {
         const isOwned = cvSkillsSet.has(skill.toLowerCase().trim());
-        const displayText = skill; // Texto a copiar (sin el checkmark)
+        const points = pointsMap.get(skill.toLowerCase().trim()) || null;
         return (
           <span
             key={idx}
-            onClick={handleCopySkill} // Copia el textContent del span (sin el ✓)
+            onClick={() => handleCopySkill(skill)}
             title={`Copiar "${skill}"`}
             style={{
               padding: '6px 14px',
@@ -45,6 +52,11 @@ export function JobSkillsList({ cvSkills, jobSkills }) {
             }}
           >
             {skill}{isOwned && ' ✓'}
+            {!isOwned && points !== null && (
+              <span style={{ marginLeft: 8, background: '#fde047', padding: '2px 6px', borderRadius: 12, fontSize: 10 }}>
+                +{points} pts
+              </span>
+            )}
           </span>
         );
       })}

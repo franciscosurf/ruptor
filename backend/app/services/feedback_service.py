@@ -109,6 +109,18 @@ def generate_detailed_feedback(
             "score": score
         })
 
+    # =========================================================================
+    # 🎯 ASIGNAR PUNTOS POTENCIALES A CADA RECOMENDACIÓN SEGÚN SU PRIORIDAD
+    # =========================================================================
+    points_map = {
+        "Alta": 5,
+        "Media": 3,
+        "Baja": 1
+    }
+    for rec in recommendations:
+        priority = rec.get("priority", "Media")
+        rec["potential_points"] = points_map.get(priority, 3)
+
     return {
         "ats_score": overall, "level": level, "summary": summary, "detailed_scores": scores,
         "recommendations": recommendations, "priority_missing_terms": missing_terms[:10],

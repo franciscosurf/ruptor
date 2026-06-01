@@ -41,8 +41,6 @@ from app.services.text_scoring import extract_relevant_phrases
 from app.services.job_title_matcher import calculate_job_title_match
 from app.core.models import get_embedding_model
 
-#from app.services.action_verbs import calculate_action_verbs_score
-#from app.services.quantified_achievements import calculate_quantified_achievements_score
 from app.services.similarity_service import semantic_phrase_coverage
 
 from app.services.action_verbs import analyze_action_verbs
@@ -166,6 +164,26 @@ async def analyze_cv_logic(
     job_skills_set = set(extracted_skills_job)
     missing_tech_skills = list(job_skills_set - cv_skills_set)
 
+    # =========================================================================
+    # 🎯 AÑADIR PUNTOS POTENCIALES A CADA SKILL TÉCNICA FALTANTE
+    # =========================================================================
+    missing_tech_skills_details = []
+    # Peso estimado del componente technical_skills (por ejemplo 0.15 = 15%)
+    TECH_WEIGHT = 0.15
+    # Número total de skills requeridas (job_skills_set)
+    total_required = len(job_skills_set)
+    if total_required > 0:
+        for skill in missing_tech_skills:
+            # Importancia de esta skill: puede ser 1 (si es obligatoria) o calcularse por frecuencia
+            importance = 1.0  # o extraer de TF-IDF
+            max_points_for_all_skills = TECH_WEIGHT * 100  # ej: 0.15 * 100 = 15 puntos totales
+            points_per_skill = max_points_for_all_skills / total_required
+            potential = round(points_per_skill * importance)
+            missing_tech_skills_details.append({
+                "skill": skill,
+                "potential_points": max(1, potential)  # mínimo 1
+            })
+
     keyword_exact = (
         len(cv_skills_set & job_skills_set) / len(job_skills_set) * 100
         if job_skills_set else 0.0
@@ -188,6 +206,16 @@ async def analyze_cv_logic(
     else:
         keyword_coverage, matched_terms, missing_terms_with_context = 0.0, [], []
 
+    # =========================================================================
+    # 🎯 AÑADIR PUNTOS POTENCIALES REALISTAS A CADA TÉRMINO FALTANTE
+    # =========================================================================
+    total_missing_terms = len(missing_terms_with_context)
+    if total_missing_terms > 0:
+        max_points_for_keywords = 0.3 * 100  # 30 puntos
+        for item in missing_terms_with_context:
+            points = (max_points_for_keywords / total_missing_terms) * item['score']
+            item['potential_points'] = max(1, round(points))
+
     missing_terms = [item["term"] for item in missing_terms_with_context]
 
     similarity_scores['keyword_exact']            = round(keyword_exact, 2)
@@ -208,18 +236,7 @@ async def analyze_cv_logic(
 
     # ── Cultura: siempre sobre texto ORIGINAL ─────────────────────────────────
     culture_phrases = extract_culture_phrases(job_text, lang=job_lang)
-
-
-    print("="*50)
-    print("DEBUG: keyword_exact =", similarity_scores.get('keyword_exact'))
-    print("DEBUG: technical_skills =", similarity_scores.get('technical_skills'))
-    print("DEBUG: missing_terms =", missing_terms[:5])
-    print("DEBUG: missing_tech_skills =", missing_tech_skills[:5])
-    print("DEBUG: experience_cv / experience_job =", experience_cv, "/", experience_job)
-    print("DEBUG: cv_sector vs job_sector =", cv_sector, job_sector)
-
     
-
     # ── Análisis de Verbos de Acción ──────────────────────────────────────────
     action_verbs_score, detected_verbs = analyze_action_verbs(cv_text)
 
@@ -240,6 +257,13 @@ async def analyze_cv_logic(
         action_verbs_tips = [
             "¡Excelente uso del lenguaje! Tu currículum tiene una densidad de verbos activos impecable, lo que demuestra proactividad y liderazgo según los estándares de los ATS modernos."
         ]
+
+    # Inicializar métricas de verbos de acción
+    action_verbs_metrics = {
+        "score": action_verbs_score,
+        "tips": action_verbs_tips,
+        "potential_points": 8 if action_verbs_score < 40 else 3 if action_verbs_score < 75 else 0
+    }
 
     # ── Análisis de Logros Cuantificables ─────────────────────────────────────
     quantified_score, quantified_sentences = analyze_quantified_achievements(cv_text)
@@ -267,6 +291,33 @@ async def analyze_cv_logic(
             "Perfil de alto impacto: Tu trayectoria destaca por un enfoque profesional en resultados tangibles.",
             "Has integrado métricas estratégicas en múltiples puntos de tu carrera, lo cual te posiciona muy por encima de la media de candidatos para los sistemas ATS."
         ]
+
+    # Inicializar métricas de logros cuantificables
+    quantified_metrics = {
+        "score": quantified_score,
+        "tips": quantified_tips,
+        "potential_points": 15 if quantified_score < 40 else 8 if quantified_score < 75 else 0
+    }
+
+        # =========================================================================
+    # 🎯 PUNTOS POTENCIALES PARA VERBOS DE ACCIÓN
+    # =========================================================================
+    if action_verbs_score < 40:
+        action_verbs_metrics['potential_points'] = 5   # mejora notable
+    elif action_verbs_score < 75:
+        action_verbs_metrics['potential_points'] = 2   # mejora pequeña
+    else:
+        action_verbs_metrics['potential_points'] = 0
+
+    # =========================================================================
+    # 🎯 PUNTOS POTENCIALES PARA LOGROS CUANTIFICABLES
+    # =========================================================================
+    if quantified_score < 40:
+        quantified_metrics['potential_points'] = 8
+    elif quantified_score < 75:
+        quantified_metrics['potential_points'] = 4
+    else:
+        quantified_metrics['potential_points'] = 0
 
     # ── Feedback ──────────────────────────────────────────────────────────────
     feedback = generate_detailed_feedback(
@@ -296,15 +347,18 @@ async def analyze_cv_logic(
         "analysis_mode":               mode,
         "sector_skills_suggestions":   sector_skills_suggestions,
         # Guardamos los scores, lo detectado y inyectamos los nuevos arrays de TIPS en texto real
-        "action_verbs_metrics": {
+        "action_verbs_metrics": action_verbs_metrics,
+        "action_verbs_metrics_with_points": {
             "score": action_verbs_score,
-            "detected": detected_verbs,
-            "tips": action_verbs_tips  # ← ¡NUEVO! Frases de sugerencia listas para usar
+            "potential_points": 8 if action_verbs_score < 40 else 3 if action_verbs_score < 75 else 0,
+            "tips": action_verbs_tips
         },
         "quantified_achievements_metrics": {
             "score": quantified_score,
             "sentences": quantified_sentences,
             "tips": quantified_tips  # ← ¡NUEVO! Frases de sugerencia listas para usar
         },
-        "focus_achievements":          achievements_list,
+        "quantified_metrics": quantified_metrics,
+        "focus_achievements": achievements_list,
+        "missing_tech_skills_with_points": missing_tech_skills_details
     }
