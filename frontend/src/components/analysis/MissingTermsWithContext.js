@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { colors } from '../../styles/colors';
+import { copyText } from '../../utils/copyUtils';
 
 export function MissingTermsWithContext({ items }) {
   const [expandedTerm, setExpandedTerm] = useState(null);
@@ -12,14 +13,27 @@ export function MissingTermsWithContext({ items }) {
     setExpandedTerm(expandedTerm === term ? null : term);
   };
 
-  // Determina si el elemento debe ser expandible
+  // Determina qué texto se debe copiar
+  const getCopyContent = (item) => {
+    const expandable = isExpandable(item);
+    if (!expandable) return item.term;
+    // Si es expandible, obtenemos el contenido que se muestra en el panel
+    const expandContent = getExpandContent(item);
+    return expandContent.content;
+  };
+
+  const handleCopy = async (e, item) => {
+    e.stopPropagation(); // Evita expandir/colapsar
+    const textToCopy = getCopyContent(item);
+    await copyText(textToCopy);
+  };
+
   const isExpandable = (item) => {
     const hasDifferentContext = item.context && item.context !== item.term;
     const isLongTerm = item.term.length > 60;
     return hasDifferentContext || isLongTerm;
   };
 
-  // Obtiene el contenido a mostrar en el panel expandido
   const getExpandContent = (item) => {
     if (item.context && item.context !== item.term) {
       return { type: 'context', content: item.context };
@@ -28,17 +42,26 @@ export function MissingTermsWithContext({ items }) {
   };
 
   return (
-    <div data-missing-terms="" style={{ display: 'flex', flex:'1',flexDirection: 'column', gap: 12 }}>
+    <div data-missing-terms="" style={{ display: 'flex', flex: '1', flexDirection: 'column', gap: 12 }}>
       <p>Revisa y considera añadir las siguientes sugerencias en tu CV.</p>
 
       {items.map((item, idx) => {
         const expandable = isExpandable(item);
         const isExpanded = expandedTerm === item.term;
         const expandContent = getExpandContent(item);
+        const copyContent = getCopyContent(item);
 
         return (
-          <div key={idx} style={{ border: `1px solid ${colors.border}`, borderRadius: 12, overflow: 'hidden', transition: 'all 0.2s ease' }}>
-            {/* Cabecera - solo clickeable si es expandible */}
+          <div
+            key={idx}
+            style={{
+              border: `1px solid ${colors.border}`,
+              borderRadius: 12,
+              overflow: 'hidden',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            {/* Cabecera */}
             <div
               onClick={expandable ? () => toggleTerm(item.term) : undefined}
               style={{
@@ -52,7 +75,10 @@ export function MissingTermsWithContext({ items }) {
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
                 <span style={{ fontSize: 16 }}>⚠️</span>
+                {/* Término clickeable para copiar */}
                 <span
+                  onClick={(e) => handleCopy(e, item)}
+                  title={`Copiar "${copyContent}"`}
                   style={{
                     fontWeight: 600,
                     fontSize: 14,
@@ -63,6 +89,18 @@ export function MissingTermsWithContext({ items }) {
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    textDecoration: 'underline',
+                    textDecorationColor: 'transparent',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.textDecorationColor = colors.danger;
+                    e.currentTarget.style.opacity = '0.8';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.textDecorationColor = 'transparent';
+                    e.currentTarget.style.opacity = '1';
                   }}
                 >
                   {item.term}
@@ -80,7 +118,6 @@ export function MissingTermsWithContext({ items }) {
                   score: {item.score?.toFixed(2) || 'N/A'}
                 </span>
               </div>
-              {/* Flecha solo si es expandible */}
               {expandable && (
                 <span
                   style={{
@@ -89,6 +126,7 @@ export function MissingTermsWithContext({ items }) {
                     transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
                     transition: 'transform 0.2s ease',
                     marginLeft: 8,
+                    flexShrink: 0,
                   }}
                 >
                   ▼
@@ -99,7 +137,15 @@ export function MissingTermsWithContext({ items }) {
             {/* Panel expandido */}
             {expandable && isExpanded && (
               <div style={{ padding: '16px', background: colors.bg, borderTop: `1px solid ${colors.border}` }}>
-                <div style={{ fontSize: 11, color: colors.textMuted, marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                <div
+                  style={{
+                    fontSize: 11,
+                    color: colors.textMuted,
+                    marginBottom: 8,
+                    textTransform: 'uppercase',
+                    letterSpacing: 0.5,
+                  }}
+                >
                   {expandContent.type === 'context' ? '📍 Contexto en la oferta' : '📝 Término completo'}
                 </div>
                 <div

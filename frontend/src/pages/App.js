@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useAnalysis } from './hooks/useAnalysis';
-import { useOptimizer } from './hooks/useOptimizer';
-import { Header } from './components/layout/Header';
+import { useAnalysis } from '../hooks/useAnalysis';
+import { useOptimizer } from '../hooks/useOptimizer';
+import { Header } from '../components/layout/Header';
 import { Link } from 'react-router-dom';
 
 export default function App() {

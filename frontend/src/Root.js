@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import App from './App';
+import App from './pages/App';
 import Pricing from './pages/Pricing';
 import Scanner from './pages/Scanner';
 import Blog from './pages/Blog';

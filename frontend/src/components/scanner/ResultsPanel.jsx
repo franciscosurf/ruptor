@@ -100,7 +100,8 @@ export const ResultsPanel = ({ result, activeFocus, onToggleFocus, onSelectSente
             <div className="text-sm font-medium text-gray-500 mb-2">
               ✅ Tu CV detecta ({result?.extracted_skills_cv?.length || 0})
             </div>
-            <TagList items={result?.extracted_skills_cv || []} color="#10b981" emptyText="Sin skills" />
+            <TagList items={result?.extracted_skills_cv || []} 
+              color="#10b981" emptyText="Sin skills" disableCopy={true} />
           </div>
           <div>
             <div className="text-sm font-medium text-gray-500 mb-2">

@@ -1,0 +1,17 @@
+.border-2-lowpurple {
+    border: 2px solid #7c3bed4f;
+    border-top-left-radius: 18px;
+    border-top-right-radius: 18px;
+}
+
+.tag-item-copy {
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.tag-item-copy:hover {
+  transform: scale(1.05);
+  background-color: #e9d5ff !important; /* morado claro */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
