@@ -194,9 +194,17 @@ export const ResultsPanel = ({ result, activeFocus, onToggleFocus, onSelectSente
       </div>
 
       {totalPotentialPoints > 0 && (
-        <div className="bg-yellow-100 p-3 rounded-lg text-center my-4">
-          🎯 ¡Completa estas mejoras y gana hasta <strong>{totalPotentialPoints} puntos</strong>!
+        <div className="bg-yellow-200 p-5 text-center w-full font-sans">
+          <h2 className="text-lg font-black text-gray-900 tracking-wide uppercase mb-1">
+            Puntos y Misiones de CV
+          </h2>
+          
+          <div className="w-full max-w-md mx-auto bg-gray-100 bg-opacity-75 rounded-full py-1.5 px-4 text-sm text-gray-800">
+            {/* <span className="font-bold text-black">0</span> / */} 
+            <span className="font-bold text-black">{totalPotentialPoints}</span> puntos por ganar
+          </div>
         </div>
+        
       )}
 
       {/* Selector de Pestañas */}
