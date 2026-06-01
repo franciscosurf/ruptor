@@ -154,61 +154,12 @@ async def analyze_cv_logic(
     similarity_scores['recruiter_visibility'] = calculate_recruiter_visibility(cv_text)
 
     # =========================================================================
-    # 🎯 NUEVO CÁLCULO DE PUNTOS POTENCIALES NORMALIZADOS
+    # 🎯 ANÁLISIS PREVIO DE VERBOS Y LOGROS (Orden correcto de ejecución)
     # =========================================================================
-    ats_score = similarity_scores['overall']          # ATS final que se mostrará
-    remaining_points = 100 - ats_score               # Puntos que le faltan para llegar a 100
-
-    # Pesos de cada categoría (ajústalos según la importancia real en tu modelo)
-    weights = {
-        "keywords": 0.50,      # Términos faltantes
-        "skills": 0.25,        # Skills técnicas
-        "action_verbs": 0.10,  # Verbos de acción
-        "quantified": 0.15     # Logros cuantificables
-    }
-
-    # Presupuesto en puntos por categoría
-    budgets = {
-        "keywords": round(remaining_points * weights["keywords"]),
-        "skills": round(remaining_points * weights["skills"]),
-        "action_verbs": round(remaining_points * weights["action_verbs"]),
-        "quantified": round(remaining_points * weights["quantified"]),
-    }
-    total_assigned = sum(budgets.values())
-    if total_assigned != remaining_points:
-        budgets["keywords"] += remaining_points - total_assigned   # Ajuste fino
-
-    # Asignar puntos a cada término faltante (reparto equitativo + ponderación por score)
-    num_terms = len(missing_terms_with_context)
-    if num_terms > 0:
-        for item in missing_terms_with_context:
-            # Ponderación según el score semántico (0..1)
-            score_factor = item.get('score', 0.5)
-            points = round(budgets["keywords"] / num_terms * score_factor)
-            item['potential_points'] = max(1, points)
-    else:
-        # No hay términos faltantes, no se asignan puntos a esta categoría
-        pass
-
-    # Asignar puntos a cada skill faltante (reparto equitativo)
-    num_skills = len(missing_tech_skills)
-    if num_skills > 0:
-        missing_tech_skills_details = []
-        for skill in missing_tech_skills:
-            # Reparto equitativo del presupuesto de skills
-            points = max(1, round(budgets["skills"] / num_skills))
-            missing_tech_skills_details.append({
-                "skill": skill,
-                "potential_points": points
-            })
-    else:
-        missing_tech_skills_details = []
-
-    # Analizar verbos de acción y logros cuantificables (después de tener budgets)
     action_verbs_score, detected_verbs = analyze_action_verbs(cv_text)
     quantified_score, quantified_sentences = analyze_quantified_achievements(cv_text)
 
-    # Generar tips para verbos
+    # Generar tips para verbos (Definidos explícitamente aquí)
     if action_verbs_score < 40:
         action_verbs_tips = [
             "Tu currículum utiliza un lenguaje excesivamente pasivo o enfocado en tareas rutinarias.",
@@ -225,7 +176,7 @@ async def analyze_cv_logic(
             "¡Excelente uso del lenguaje! Tu currículum tiene una densidad de verbos activos impecable, lo que demuestra proactividad y liderazgo según los estándares de los ATS modernos."
         ]
 
-    # Generar tips para logros
+    # Generar tips para logros (Definidos explícitamente aquí)
     if quantified_score == 0:
         quantified_tips = [
             "Convierte tus tareas en logros medibles: Tu CV se percibe como puramente teórico.",
@@ -248,12 +199,92 @@ async def analyze_cv_logic(
             "Has integrado métricas estratégicas en múltiples puntos de tu carrera, lo cual te posiciona muy por encima de la media de candidatos para los sistemas ATS."
         ]
 
-    # Construir métricas unificadas (sin duplicados)
+    # =========================================================================
+    # 🎯 CÁLCULO DE PUNTOS REQUERIDOS (ESTRICTAMENTE ENTEROS)
+    # =========================================================================
+    ats_score = similarity_scores['overall']
+    remaining_points = int(round(100 - ats_score))
+    remaining_points = max(0, min(100, remaining_points))
+
+    # Pesos relativos de cada categoría para la distribución proporcional
+    weights = {
+        "keywords": 30,      
+        "skills": 25,        
+        "action_verbs": 15,  
+        "quantified": 20     
+    }
+    total_weight = sum(weights.values()) # 90
+
+    # 1. Reparto inicial de presupuestos (Parte Entera) y cálculo de residuos
+    budgets = {}
+    budget_remainders = {}
+    
+    for cat, w in weights.items():
+        exact_proportional = remaining_points * (w / total_weight)
+        budgets[cat] = int(exact_proportional)
+        budget_remainders[cat] = exact_proportional - budgets[cat]
+
+    # 2. Distribución de puntos sobrantes por el método del Resto Mayor (Corregido)
+    leftover_points = remaining_points - sum(budgets.values())
+    sorted_categories = sorted(budget_remainders.keys(), key=lambda k: budget_remainders[k], reverse=True)
+    
+    for cat in sorted_categories:
+        if leftover_points > 0:
+            budgets[cat] += 1
+            leftover_points -= 1
+
+    # --- A. Asignación de puntos a Keywords Faltantes (Enteros Exactos) ---
+    num_terms = len(missing_terms_with_context)
+    if num_terms > 0 and budgets["keywords"] > 0:
+        total_score = sum(item.get('score', 0.5) for item in missing_terms_with_context)
+        if total_score == 0: 
+            total_score = num_terms
+
+        term_remainders = {}
+        for idx, item in enumerate(missing_terms_with_context):
+            exact_item_points = budgets["keywords"] * (item.get('score', 0.5) / total_score)
+            item['potential_points'] = int(exact_item_points)
+            term_remainders[idx] = exact_item_points - item['potential_points']
+        
+        leftover_kw = budgets["keywords"] - sum(it['potential_points'] for it in missing_terms_with_context)
+        sorted_term_indices = sorted(term_remainders.keys(), key=lambda i: term_remainders[i], reverse=True)
+        
+        for idx in sorted_term_indices:
+            if leftover_kw > 0:
+                missing_terms_with_context[idx]['potential_points'] += 1
+                leftover_kw -= 1
+    else:
+        for item in missing_terms_with_context:
+            item['potential_points'] = 0
+
+    # --- B. Asignación de puntos a Skills Faltantes (Reparto Equitativo Entero) ---
+    num_skills = len(missing_tech_skills)
+    missing_tech_skills_details = []
+    if num_skills > 0 and budgets["skills"] > 0:
+        base_skill_points = budgets["skills"] // num_skills
+        leftover_skills = budgets["skills"] % num_skills
+        
+        for i, skill in enumerate(missing_tech_skills):
+            pts = base_skill_points + (1 if i < leftover_skills else 0)
+            missing_tech_skills_details.append({
+                "skill": skill,
+                "potential_points": pts
+            })
+    else:
+        for skill in missing_tech_skills:
+            missing_tech_skills_details.append({
+                "skill": skill,
+                "potential_points": 0
+            })
+
+    # =========================================================================
+    # 🎯 CONFIGURACIÓN DE MÉTRICAS Y DICTIONARIOS FINALIZADOS
+    # =========================================================================
     action_verbs_metrics = {
         "score": action_verbs_score,
         "detected": detected_verbs,
         "tips": action_verbs_tips,
-        "potential_points": budgets["action_verbs"]   # Usamos el presupuesto de la categoría
+        "potential_points": budgets["action_verbs"]
     }
 
     quantified_achievements_metrics = {

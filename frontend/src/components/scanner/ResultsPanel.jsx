@@ -73,12 +73,13 @@ export const ResultsPanel = ({ result, activeFocus, onToggleFocus, onSelectSente
   const jobSkills = result?.extracted_skills_job || [];
 
   // En ResultsPanel, calcula totalPotentialPoints con las nuevas claves
-  const totalPotentialPoints = 
-    (result.missing_terms_with_context?.reduce((s, i) => s + (i.potential_points || 0), 0) || 0) +
-    (result.missing_tech_skills_details?.reduce((s, i) => s + i.potential_points, 0) || 0) +
-    (result.recommendations?.reduce((s, i) => s + (i.potential_points || 0), 0) || 0) +
-    (result.action_verbs_metrics?.potential_points || 0) +
-    (result.quantified_achievements_metrics?.potential_points || 0);
+    const totalPotentialPoints  = 
+    (result.missing_terms_with_context?.reduce((s,i)=>s+(i.potential_points||0),0)||0) +
+    (result.missing_tech_skills_with_points?.reduce((s,i)=>s+(i.potential_points||0),0)||0) +
+    (result.action_verbs_metrics?.potential_points||0) +
+    (result.quantified_achievements_metrics?.potential_points||0);
+  console.log('Total puntos potenciales:', totalPotentialPoints);
+  console.log('Remaining points (100 - ats_score):', 100 - result.ats_score);
 
   const tabs = [
     {
