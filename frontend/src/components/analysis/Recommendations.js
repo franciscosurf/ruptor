@@ -35,7 +35,7 @@ export function Recommendations({ recommendations, onScrollToSuggestions }) {
                 }}>
                   {rec.priority}
                   {rec.potential_points && (
-                    <span className="points-badge">+{rec.potential_points} pts</span>
+                    <span className="points-badge">+{rec.potential_points} pts / cada una</span>
                   )}
                 </span>
               </div>
