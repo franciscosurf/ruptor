@@ -77,29 +77,157 @@ export default function App() {
 
         {/* HERO */}
         <section className="relative overflow-hidden grid-bg">
-          <div className="hero-glow"></div>
-          <div className="max-w-7xl mx-auto px-6 py-28 relative z-10">
-            <div className="max-w-4xl">
-              <div className="inline-flex items-center gap-2 bg-white border border-black/5 rounded-full px-4 py-2 mb-8">
-                <span className="w-2 h-2 rounded-full bg-green-500"></span>
-                <span className="text-sm font-medium">Optimizado para ATS modernos con IA</span>
+
+          <div class="max-w-7xl mx-auto px-6 py-28 relative z-10">
+            <div class="grid lg:grid-cols-2 gap-20 items-center">
+
+              {/* <!-- LEFT --> */}
+              <div>
+                <div className="hero-glow"></div>
+                <div className="max-w-7xl mx-auto px-6 py-28 relative z-10">
+                  <div className="max-w-4xl">
+                    <div className="inline-flex items-center gap-2 bg-white border border-black/5 rounded-full px-4 py-2 mb-8">
+                      <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                      <span className="text-sm font-medium">Optimizado para ATS modernos con IA</span>
+                    </div>
+                    <h1 className="text-6xl md:text-7xl font-black tracking-tight leading-none mb-8">
+                      <span className="gradient-text">La IA </span>rechaza tu CV antes de que alguien lo lea
+                    </h1>
+                    <p className="text-xl md:text-2xl text-black/60 leading-relaxed max-w-3xl mb-12">
+                      Analízalo contra la oferta y corrígelo en tiempo real.              
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      <Link to="/scanner" className="px-8 py-5 rounded-2xl bgPurple text-white text-lg font-semibold hover:scale-105 transition shadow-2xl inline-block">
+                        Analizar mi CV
+                      </Link>
+                      <button className="px-8 py-5 rounded-2xl border border-black/10 bg-white text-lg font-semibold hover:bg-black/5 transition">
+                        Ver demo
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <h1 className="text-6xl md:text-7xl font-black tracking-tight leading-none mb-8">
-                <span className="gradient-text">La IA </span>rechaza tu CV antes de que alguien lo lea
-              </h1>
-              <p className="text-xl md:text-2xl text-black/60 leading-relaxed max-w-3xl mb-12">
-                Analízalo contra la oferta y corrígelo en tiempo real.              
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link to="/scanner" className="px-8 py-5 rounded-2xl bgPurple text-white text-lg font-semibold hover:scale-105 transition shadow-2xl inline-block">
-                  Analizar mi CV
-                </Link>
-                <button className="px-8 py-5 rounded-2xl border border-black/10 bg-white text-lg font-semibold hover:bg-black/5 transition">
-                  Ver demo
-                </button>
+              {/* <!-- RIGHT --> */}
+              <div class="relative">
+
+                <div class="glass rounded-[40px] p-8 shadow-2xl relative overflow-hidden">
+
+                  <div class="scanner-line"></div>
+
+                  <div class="flex items-center justify-between mb-8">
+
+                    <div>
+                      <p class="text-sm text-black/40 font-semibold uppercase tracking-wider">
+                        ATS SCORE
+                      </p>
+
+                      <h2 class="text-3xl font-black mt-2">
+                        CV Analysis
+                      </h2>
+                    </div>
+
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center text-white text-xl">
+                      ⚡
+                    </div>
+
+                  </div>
+
+
+                  <div class="flex flex-col items-center mb-10">
+
+                    <div class="score-ring mb-6">
+
+                      <div class="score-inner">
+
+                        <span class="text-5xl font-black">
+                          82
+                        </span>
+
+                        <span class="text-black/40 text-sm font-semibold">
+                          ATS SCORE
+                        </span>
+
+                      </div>
+
+                    </div>
+
+                    <p class="text-black/60 text-center max-w-sm">
+                      Tu CV tiene buena compatibilidad ATS, pero todavía hay mejoras clave para aumentar visibilidad.
+                    </p>
+
+                  </div>
+
+
+
+                  <div class="space-y-5">
+
+                    <div class="bg-black/3 rounded-2xl p-5 border border-black/5">
+
+                      <div class="flex items-center justify-between mb-2">
+                        <span class="font-semibold">
+                          Keywords Match
+                        </span>
+
+                        <span class="font-bold text-blue-600">
+                          91%
+                        </span>
+                      </div>
+
+                      <div class="w-full h-2 rounded-full bg-black/5 overflow-hidden">
+                        <div class="h-full w-[91%] bg-gradient-to-r from-purple-600 to-blue-500 rounded-full"></div>
+                      </div>
+
+                    </div>
+
+
+
+                    <div class="bg-black/3 rounded-2xl p-5 border border-black/5">
+
+                      <div class="flex items-center justify-between mb-2">
+                        <span class="font-semibold">
+                          ATS Formatting
+                        </span>
+
+                        <span class="font-bold text-blue-600">
+                          76%
+                        </span>
+                      </div>
+
+                      <div class="w-full h-2 rounded-full bg-black/5 overflow-hidden">
+                        <div class="h-full w-[76%] bg-gradient-to-r from-purple-600 to-blue-500 rounded-full"></div>
+                      </div>
+
+                    </div>
+
+
+
+                    <div class="bg-black/3 rounded-2xl p-5 border border-black/5">
+
+                      <div class="flex items-center justify-between mb-2">
+                        <span class="font-semibold">
+                          Recruiter Visibility
+                        </span>
+
+                        <span class="font-bold text-blue-600">
+                          69%
+                        </span>
+                      </div>
+
+                      <div class="w-full h-2 rounded-full bg-black/5 overflow-hidden">
+                        <div class="h-full w-[69%] bg-gradient-to-r from-purple-600 to-blue-500 rounded-full"></div>
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
               </div>
+              
             </div>
           </div>
+
         </section>
 
         {/* FEATURES - Cómo funciona */}
