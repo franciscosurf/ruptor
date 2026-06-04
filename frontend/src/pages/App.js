@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useAnalysis } from '../hooks/useAnalysis';
-import { useOptimizer } from '../hooks/useOptimizer';
 import { Header } from '../components/layout/Header';
 import { Link } from 'react-router-dom';
 
@@ -10,8 +9,6 @@ export default function App() {
     handleFileChange, setJobDescription, setAnalysisMode, handleSubmit, handleExportReport,
     setResult
   } = useAnalysis();
-
-  const { showOptimizer, cvOptimizations, loadingOptimizer, handleOptimizeCV, closeOptimizer } = useOptimizer(file, jobDescription);
 
   const [showModal, setShowModal] = useState(false);
   const [showResults, setShowResults] = useState(false);

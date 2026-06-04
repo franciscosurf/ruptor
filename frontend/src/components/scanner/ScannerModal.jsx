@@ -185,7 +185,7 @@ export const ScannerModal = ({
     if (!result) return;
     setReportDownloading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}${ENDPOINTS.DOWNLOAD_PDF}`, {
+      const response = await fetch(`${API_BASE_URL}${ENDPOINTS.DOWNLOAD_PDF_REPORT}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ data: result })

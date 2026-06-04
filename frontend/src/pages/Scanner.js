@@ -1,14 +1,12 @@
 // src/pages/Scanner.js
 import React, { useState, useEffect, useRef } from 'react';
 import { useAnalysis } from '../hooks/useAnalysis';
-import { useOptimizer } from '../hooks/useOptimizer';
 
 // NUEVOS ESTRATEGIA HOOKS (Conversion-First)
 import { useCvData } from '../components/scanner/strategy/useCvData';
 import { useTemplateExport } from '../components/scanner/strategy/useTemplateExport';
 
 import { HeroSection, HowItWorks, Footer, ScannerModal } from '../components/scanner';
-import { OptimizerModal } from '../components/optimizer/OptimizerModal';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { Header } from '../components/layout/Header';  
 
@@ -37,9 +35,6 @@ export default function Scanner() {
     handleFileChange, setJobDescription, setAnalysisMode, handleSubmit, 
     handleExportReport, analyzeWithCvText, resetAnalysis, // <-- Importamos resetAnalysis
   } = useAnalysis();
-
-  // Preservamos lógica nativa del optimizador
-  const { showOptimizer, cvOptimizations, closeOptimizer } = useOptimizer(file, jobDescription);
 
   const [showModal, setShowModal] = useState(false);
   
@@ -125,9 +120,7 @@ export default function Scanner() {
         //ref={editorRef}
         onReanalyze={handleReanalyze} 
       />
-
-      <OptimizerModal show={showOptimizer} data={cvOptimizations} onClose={closeOptimizer} />
-      {/* {loading && <LoadingSpinner />} */} {/* <-- Este loading ya está integrado en el modal, puedes quitarlo de aquí para evitar que oscurezca toda la pantalla */}
+      
     </div>
   );
 }

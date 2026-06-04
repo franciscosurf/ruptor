@@ -68,6 +68,7 @@ export function useAnalysis() {
       a.download = `ats_report_${new Date().toISOString().slice(0,19)}.txt`;
       a.click();
       URL.revokeObjectURL(url);
+      alert("cv exportado exitosamente");
     } catch (err) {
       setError('Error al exportar reporte: ' + err.message);
     }

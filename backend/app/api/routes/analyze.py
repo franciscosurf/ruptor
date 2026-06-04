@@ -26,7 +26,7 @@ async def analyze_cv(
     )
 
 
-@router.post("/api/download-pdf")
+@router.post("/api/download-pdf-report/")
 async def download_analysis_pdf(analisis: AnalisisData):
     """
     Genera un PDF con el informe del análisis ATS a partir de los resultados ya obtenidos.
