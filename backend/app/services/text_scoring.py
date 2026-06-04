@@ -189,56 +189,36 @@ IRRELEVANT_PHRASES = re.compile(
     |\b(tus\s+beneficios)\b
     #|\b(perfil\s+ideal)\b
     |\b(cómo\s+es\s+nuestro\s+proceso)\b
+    # NUEVOS PARA RETAIL Y OFERTAS GENERALES
+    |\b(descuento\s+de\s+empleado|descuento\s+para\s+trabajadores|empleado\s+descuento)
+    |\b(presenta\s+tu\s+solicitud|solicita\s+ahora|inscríbete\s+hoy|únete\s+a\s+nuestro\s+equipo)
+    |\b(fecha\s+de\s+publicación|publicado\s+el|job\s+id|jr-\d+|tipo\s+de\s+contrato)
+    |\b(contrato\s+indefinido|fijo\s+discontinuo|jornada\s+:\s*\d+\s+horas|promedio\s+de\s+horas)
+    |\b(franja\s+horaria|horario\s+de\s+\d+:\d+\s+a\s+\d+:\d+)
+    |\b(posibilidad\s+de\s+apoyo\s+a\s+nuevas\s+aperturas|apoyo\s+a\s+aperturas)
+    |\b(candidatura\s+hasta\s+el\s+\d{1,2}/\d{1,2}/\d{4}|registrar\s+su\s+candidatura)
+    |\b(promueve\s+la\s+igualdad\s+de\s+oportunidades|igualdad\s+de\s+oportunidades\s+en\s+el\s+empleo)
+    |\b(conciliación|descuento\s+de\s+empleado|oportunidades\s+profesionales\s+nacionales)
     """,
     re.IGNORECASE | re.VERBOSE
 )
 
-def score_sentence(sentence: str, lang: str = "en") -> float:
-    s = sentence.strip()
-    if not s or len(s) < 3:
-        return 0.0
-
-    if IRRELEVANT_PHRASES.search(s):
-        return 0.0
-
-    if SKILL_LIST_PATTERN.match(s):
-        if COMPANY_SIGNALS.search(s):
-            return 0.0
-        return 1.0
-
-    tech_hits    = len(TECHNICAL_SIGNALS.findall(s))
-    team_hits    = len(TEAMWORK_SIGNALS.findall(s))
-    culture_hits = len(CULTURE_SIGNALS.findall(s))
-    level_hits   = len(LEVEL_SIGNALS.findall(s))
-
-    total_hits = tech_hits + team_hits + culture_hits + level_hits
-
-    # Sin señales → 0.0 (arregla el bug de español con base fija)
-    if total_hits == 0:
-        return 0.0
-
-    mult = 0.5
-    tech    = min(1.0, tech_hits    * mult)
-    team    = min(1.0, team_hits    * mult)
-    culture = min(1.0, culture_hits * mult)
-    level   = min(1.0, level_hits   * mult)
-
-    weighted = (
-        tech    * DEFAULT_WEIGHTS["technical"] +
-        team    * DEFAULT_WEIGHTS["teamwork"]  +
-        culture * DEFAULT_WEIGHTS["culture"]   +
-        level   * DEFAULT_WEIGHTS["level"]
-    )
-
-    # Base 0.4 solo cuando hay señales → garantiza que 1 señal supere 0.45
-    # 1 tech signal:  0.4 + 0.5×0.35×0.6 = 0.505 ✓
-    # 1 level signal: 0.4 + 0.5×0.20×0.6 = 0.460 ✓
-    score = 0.4 + weighted * 0.6
-
-    if COMPANY_SIGNALS.search(s):
-        score *= 0.4  # penaliza pero no descarta
-
-    return round(min(1.0, max(0.0, score)), 3)
+# Nuevas señales para retail (añadir después de LEVEL_SIGNALS)
+RETAIL_SIGNALS = re.compile(
+    r"""
+    # Inglés
+    \b(customer\s+service|cashier|point\s+of\s+sale|pos|stock\s+management|inventory|merchandising)
+    |\b(fitting\s+room|returns|exchanges|product\s+knowledge|visual\s+merchandising|store\s+maintenance)
+    |\b(help\s+customers\s+find|process\s+payments|handle\s+complaints|recommend\s+products)
+    |\b(team\s+collaboration|fast-paced\s+environment|sales\s+floor|restock\s+shelves)
+    # Español
+    |\b(atención\s+al\s+cliente|caja|tpv|gestión\s+de\s+stock|inventario|merchandising|reposición)
+    |\b(probadores|devoluciones|cambio\s+de\s+producto|conocimiento\s+de\s+producto|escaparates)
+    |\b(ayudar\s+a\s+clientes|procesar\s+pagos|gestionar\s+quejas|recomendar\s+productos)
+    |\b(colaboración\s+en\s+equipo|entorno\s+dinámico|sala\s+de\s+ventas|reponer\s+estanterías)
+    """,
+    re.IGNORECASE | re.VERBOSE
+)
 
 
 """
@@ -299,6 +279,70 @@ NOT_COMPANY_CULTURE = re.compile(
     re.IGNORECASE | re.VERBOSE,
 )
 
+def score_sentence(sentence: str, lang: str = "en") -> float:
+    s = sentence.strip()
+    if not s or len(s) < 3:
+        return 0.0
+
+    if IRRELEVANT_PHRASES.search(s):
+        return 0.0
+
+    if SKILL_LIST_PATTERN.match(s):
+        if COMPANY_SIGNALS.search(s):
+            return 0.0
+        return 1.0
+
+    tech_hits    = len(TECHNICAL_SIGNALS.findall(s))
+    team_hits    = len(TEAMWORK_SIGNALS.findall(s))
+    culture_hits = len(CULTURE_SIGNALS.findall(s))
+    level_hits   = len(LEVEL_SIGNALS.findall(s))
+    retail_hits  = len(RETAIL_SIGNALS.findall(s))   # ← nueva línea
+
+    total_hits = tech_hits + team_hits + culture_hits + level_hits + retail_hits
+
+    # Sin señales → 0.0
+    if total_hits == 0:
+        return 0.0
+
+    mult = 0.5
+    tech    = min(1.0, tech_hits    * mult)
+    team    = min(1.0, team_hits    * mult)
+    culture = min(1.0, culture_hits * mult)
+    level   = min(1.0, level_hits   * mult)
+    retail  = min(1.0, retail_hits  * mult)   # ← definición correcta
+
+    # Pesos: puedes ajustar el de retail según el sector (aquí provisional)
+    # Si quieres que tenga más peso en ofertas de retail, deberías pasar el sector como parámetro.
+    # Por ahora usamos un peso fijo para retail.
+    retail_weight = 0.20   # ajusta según necesidad
+    # Rebalancear los pesos para que sigan sumando 1.0
+    # Pesos originales: technical 0.35, teamwork 0.25, culture 0.20, level 0.20 (total 1.0)
+    # Si añadimos retail, restamos de otros o lo añadimos como quinto factor.
+    # Para mantener suma 1.0, reducimos ligeramente los otros.
+    # Esta es una solución simple: redistribuir proporcionalmente.
+    # O puedes pasar el sector y cambiar la lógica. Aquí usamos pesos fijos:
+    w_tech = 0.30
+    w_team = 0.20
+    w_culture = 0.15
+    w_level = 0.15
+    w_retail = 0.20   # suma = 1.0
+
+    weighted = (
+        tech    * w_tech +
+        team    * w_team +
+        culture * w_culture +
+        level   * w_level +
+        retail  * w_retail
+    )
+
+    # Base 0.4 solo cuando hay señales
+    score = 0.4 + weighted * 0.6
+
+    if COMPANY_SIGNALS.search(s):
+        score *= 0.4
+
+    return round(min(1.0, max(0.0, score)), 3)
+
 
 def extract_culture_phrases(text: str, lang: str = "en") -> List[Tuple[str, float]]:
     """
@@ -351,6 +395,14 @@ def extract_culture_phrases(text: str, lang: str = "en") -> List[Tuple[str, floa
 
         if relevance >= 0.5:
             phrases.append((line, round(min(1.0, relevance), 2)))
+
+            # Al final del bucle, antes de añadir la frase, comprobar:
+        if any(word in line.lower() for word in [
+            "descuento", "salario", "horario", "contrato", "jornada", "beneficio",
+            "discount", "salary", "schedule", "contract", "benefit", "apply", "solicitud"
+        ]):
+            continue # No es cultura, es beneficio o proceso
+
 
     # Ordenar por relevancia, limitar a 5 frases más representativas
     phrases.sort(key=lambda x: -x[1])

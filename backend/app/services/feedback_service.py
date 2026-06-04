@@ -27,79 +27,116 @@ def generate_detailed_feedback(
     else:
         level, summary = "Zona de Riesgo 🛑", "Actualmente, este CV no es compatible con la oferta. No pierdas tiempo aplicando ahora; reconstruye tu sección de experiencia primero."
         
+
+    is_retail = job_sector == "retail" or "primark" in job_text.lower() or "dependiente" in job_text.lower()
+
     recommendations = []
-    
-    # Si los sectores son diferentes, añadir recomendación especial
-    if cv_sector_info.get("sector") != job_sector and cv_sector_info.get("sector") != "general":
-        recommendations.append({
-            "priority": "Alta",
-            "action": f"Transición de sector: {cv_sector_info.get('sector')} → {job_sector}",
-            "examples": [f"Tu CV está orientado a {cv_sector_info.get('sector')}. La oferta requiere {job_sector}."],
-            "impact": "Adapta tu CV al lenguaje y habilidades del nuevo sector"
-        })
-    
-    if scores.get('keyword_exact', 0) < 50:
-        recommendations.append({
-            "priority": "Alta", "action": "Añadir sugerencias clave de la oferta",
-            "examples": missing_terms[:5], "impact": "Aumentará el match con el ATS"
-        })
-    
-    # Recomendación de habilidades técnicas faltantes
-    if scores.get('technical_skills', 0) < 70:
-        # Usar missing_tech_skills si se proporciona, si no, calcular con extract_technical_skills
-        if missing_tech_skills:
-            tech_needed = missing_tech_skills[:8]   # muestra hasta 8
-        else:
-            tech_needed = extract_technical_skills(job_text)[:5]
-        
-        if tech_needed:
+
+    if is_retail:
+        # Recomendaciones específicas para retail
+        if scores.get('keyword_exact', 0) < 50:
             recommendations.append({
                 "priority": "Alta",
-                "action": "Incluir habilidades técnicas específicas",
-                "examples": tech_needed,
-                "impact": "Los ATS buscan skills técnicas exactas"
+                "action": "Añade experiencia en atención al cliente y manejo de tienda",
+                "examples": [
+                    "Atención al cliente en tienda de moda",
+                    "Manejo de caja TPV y procesamiento de pagos",
+                    "Reposición y control de inventario",
+                    "Apertura/cierre de tienda y gestión de probadores"
+                ],
+                "impact": "El puesto de Retail Assistant requiere estas habilidades clave"
             })
-    
-    if sector_comparison and sector_comparison.get("missing_skills"):
-        recommendations.append({
-            "priority": "Alta", "action": f"Habilidades específicas del sector {job_sector}",
-            "examples": sector_comparison.get("missing_skills", [])[:5],
-            "impact": "Estas skills son estándar en el sector de la oferta"
-        })
-    
-    if experience_job > 0 and experience_cv < experience_job:
-        recommendations.append({
-            "priority": "Alta", "action": "Aumentar experiencia relevante",
-            "examples": [f"La oferta pide {experience_job} años, tu CV muestra {experience_cv} años"],
-            "impact": "Destaca proyectos y logros equivalentes"
-        })
         
-    if not recommendations and overall < 75:
-        fallback_examples = (missing_tech_skills or missing_terms or [])[:5]
-        recommendations.append({
-            "priority": "Media",
-            "action": "Mejorar la alineación general con la oferta",
-            "examples": fallback_examples,
-            "impact": "Tu CV necesita más keywords específicas para destacar en este ATS"
-        })
+        # Si faltan skills de retail (calculadas aparte)
+        if missing_tech_skills:
+            recommendations.append({
+                "priority": "Alta",
+                "action": "Incluye estas habilidades de retail en tu CV",
+                "examples": missing_tech_skills[:5],
+                "impact": "Los ATS de retail buscan estos términos específicos"
+            })
+        
+        # Recomendación sobre idiomas (Primark valora idiomas)
+        if scores.get('languages', 100) < 50:  # asumiendo que tienes un score de idiomas
+            recommendations.append({
+                "priority": "Media",
+                "action": "Destaca tu nivel de idiomas (especialmente catalán e inglés)",
+                "examples": ["Catalán: nivel conversacional", "Inglés: atención a clientes internacionales"],
+                "impact": "Primark busca candidatos con idiomas para dar mejor servicio"
+            })
+    else:
+    
+        # Si los sectores son diferentes, añadir recomendación especial
+        if cv_sector_info.get("sector") != job_sector and cv_sector_info.get("sector") != "general":
+            recommendations.append({
+                "priority": "Alta",
+                "action": f"Transición de sector: {cv_sector_info.get('sector')} → {job_sector}",
+                "examples": [f"Tu CV está orientado a {cv_sector_info.get('sector')}. La oferta requiere {job_sector}."],
+                "impact": "Adapta tu CV al lenguaje y habilidades del nuevo sector"
+            })
+        
+        if scores.get('keyword_exact', 0) < 50:
+            recommendations.append({
+                "priority": "Alta", "action": "Añadir sugerencias clave de la oferta",
+                "examples": missing_terms[:5], "impact": "Aumentará el match con el ATS"
+            })
+        
+        # Recomendación de habilidades técnicas faltantes
+        if scores.get('technical_skills', 0) < 70:
+            # Usar missing_tech_skills si se proporciona, si no, calcular con extract_technical_skills
+            if missing_tech_skills:
+                tech_needed = missing_tech_skills[:8]   # muestra hasta 8
+            else:
+                tech_needed = extract_technical_skills(job_text)[:5]
+            
+            if tech_needed:
+                recommendations.append({
+                    "priority": "Alta",
+                    "action": "Incluir habilidades técnicas específicas",
+                    "examples": tech_needed,
+                    "impact": "Los ATS buscan skills técnicas exactas"
+                })
+        
+        if sector_comparison and sector_comparison.get("missing_skills"):
+            recommendations.append({
+                "priority": "Alta", "action": f"Habilidades específicas del sector {job_sector}",
+                "examples": sector_comparison.get("missing_skills", [])[:5],
+                "impact": "Estas skills son estándar en el sector de la oferta"
+            })
+        
+        if experience_job > 0 and experience_cv < experience_job:
+            recommendations.append({
+                "priority": "Alta", "action": "Aumentar experiencia relevante",
+                "examples": [f"La oferta pide {experience_job} años, tu CV muestra {experience_cv} años"],
+                "impact": "Destaca proyectos y logros equivalentes"
+            })
+            
+        if not recommendations and overall < 75:
+            fallback_examples = (missing_tech_skills or missing_terms or [])[:5]
+            recommendations.append({
+                "priority": "Media",
+                "action": "Mejorar la alineación general con la oferta",
+                "examples": fallback_examples,
+                "impact": "Tu CV necesita más keywords específicas para destacar en este ATS"
+            })
 
-    # Añadir siempre si action_verbs es bajo
-    if scores.get('action_verbs', 100) < 40:
-        recommendations.append({
-            "priority": "Media",
-            "action": "Usar más verbos de impacto en tu CV",
-            "examples": ["desarrollé", "lideré", "implementé", "optimicé", "reduje", "aumenté"],
-            "impact": "Los verbos de acción mejoran el score ATS y llaman la atención del recruiter"
-        })
+        # Añadir siempre si action_verbs es bajo
+        if scores.get('action_verbs', 100) < 40:
+            recommendations.append({
+                "priority": "Media",
+                "action": "Usar más verbos de impacto en tu CV",
+                "examples": ["desarrollé", "lideré", "implementé", "optimicé", "reduje", "aumenté"],
+                "impact": "Los verbos de acción mejoran el score ATS y llaman la atención del recruiter"
+            })
 
-    # Añadir siempre si quantified_achievements es bajo
-    if scores.get('quantified_achievements', 100) < 30:
-        recommendations.append({
-            "priority": "Media",
-            "action": "Añadir logros cuantificables con números",
-            "examples": ["↑30% de rendimiento", "10k usuarios", "reducción de 2s en carga", "equipo de 5 personas"],
-            "impact": "Los logros con datos concretos aumentan la credibilidad y el score ATS"
-        })
+        # Añadir siempre si quantified_achievements es bajo
+        if scores.get('quantified_achievements', 100) < 30:
+            recommendations.append({
+                "priority": "Media",
+                "action": "Añadir logros cuantificables con números",
+                "examples": ["↑30% de rendimiento", "10k usuarios", "reducción de 2s en carga", "equipo de 5 personas"],
+                "impact": "Los logros con datos concretos aumentan la credibilidad y el score ATS"
+            })
     
     # Procesar frases de cultura
     culture_suggestions = []
