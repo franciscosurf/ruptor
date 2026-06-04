@@ -1,0 +1,42 @@
+{
+  "sector": "logistica",
+  "version": "1.0",
+  "skills": {
+    "es": [
+      "planificación de transporte", "gestión de almacén", "inventario",
+      "cadena de suministro", "aprovisionamiento", "compras",
+      "distribución", "rutas óptimas", "flota de vehículos",
+      "sistemas de gestión de almacenes", "wms", "tms",
+      "manejo de montacargas", "preparación de pedidos", "embalaje",
+      "etiquetado", "control de calidad logístico", "incoterms",
+      "aduanas", "comercio internacional"
+    ],
+    "en": [
+      "transport planning", "warehouse management", "inventory",
+      "supply chain", "procurement", "purchasing",
+      "distribution", "route optimization", "fleet management",
+      "warehouse management systems", "wms", "tms",
+      "forklift operation", "order picking", "packaging",
+      "labeling", "logistic quality control", "incoterms",
+      "customs", "international trade"
+    ]
+  },
+  "stopwords": {
+    "es": [
+      "logística", "almacén", "transporte", "distribución", "cadena",
+      "aprovisionamiento", "inventario", "stocks"
+    ],
+    "en": [
+      "logistics", "warehouse", "transport", "distribution", "chain",
+      "procurement", "inventory", "stocks"
+    ]
+  },
+  "tools": {
+    "es": ["sap ewm", "oracle wms", "manhattan", "jda", "prestashop", "shopify"],
+    "en": ["sap ewm", "oracle wms", "manhattan", "jda", "prestashop", "shopify"]
+  },
+  "responsibilities": {
+    "es": ["planificar", "coordinar", "controlar stock", "gestionar rutas", "negociar"],
+    "en": ["plan", "coordinate", "control stock", "manage routes", "negotiate"]
+  }
+}

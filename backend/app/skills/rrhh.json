@@ -1,0 +1,40 @@
+{
+  "sector": "rrhh",
+  "version": "1.0",
+  "skills": {
+    "es": [
+      "reclutamiento", "selección de personal", "entrevistas",
+      "onboarding", "formación", "desarrollo organizacional",
+      "evaluación del desempeño", "clima laboral", "relaciones laborales",
+      "nóminas", "seguros sociales", "contratación", "despido",
+      "conciliación", "igualdad", "diversidad", "rrhh estratégico",
+      "people analytics", "empleo", "marcas empleadoras"
+    ],
+    "en": [
+      "recruitment", "staff selection", "interviewing",
+      "onboarding", "training", "organizational development",
+      "performance appraisal", "work environment", "labor relations",
+      "payroll", "social security", "contracting", "termination",
+      "work-life balance", "equality", "diversity", "strategic hr",
+      "people analytics", "recruitment marketing", "employer branding"
+    ]
+  },
+  "stopwords": {
+    "es": [
+      "rrhh", "recursos humanos", "personal", "empleado", "talento",
+      "reclutamiento", "selección", "formación"
+    ],
+    "en": [
+      "hr", "human resources", "staff", "employee", "talent",
+      "recruitment", "selection", "training"
+    ]
+  },
+  "tools": {
+    "es": ["sap hr", "oracle hcm", "workday", "linkedin talent", "bamboo hr", "people soft"],
+    "en": ["sap hr", "oracle hcm", "workday", "linkedin talent", "bamboo hr", "people soft"]
+  },
+  "responsibilities": {
+    "es": ["seleccionar", "formar", "evaluar", "contratar", "asesorar"],
+    "en": ["recruit", "train", "appraise", "hire", "advise"]
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "sector": "ingenieria",
+  "version": "1.0",
+  "skills": {
+    "es": [
+      "diseño asistido por ordenador", "autocad", "solidworks", "catia",
+      "cálculo estructural", "simulación", "matlab", "ansys",
+      "gestión de proyectos", "lean manufacturing", "six sigma",
+      "calidad total", "normativa iso", "seguridad industrial",
+      "mecánica de fluidos", "termodinámica", "resistencia materiales",
+      "electrotecnia", "electrónica", "automatización", "plc", "robótica",
+      "civil", "topografía", "geotecnia", "hidráulica"
+    ],
+    "en": [
+      "computer-aided design", "autocad", "solidworks", "catia",
+      "structural analysis", "simulation", "matlab", "ansys",
+      "project management", "lean manufacturing", "six sigma",
+      "quality management", "iso standards", "industrial safety",
+      "fluid mechanics", "thermodynamics", "strength of materials",
+      "electrical engineering", "electronics", "automation", "plc", "robotics",
+      "civil engineering", "surveying", "geotechnics", "hydraulics"
+    ]
+  },
+  "stopwords": {
+    "es": [
+      "ingeniero", "ingeniería", "cálculo", "diseño", "proyecto",
+      "construcción", "mantenimiento"
+    ],
+    "en": [
+      "engineer", "engineering", "calculation", "design", "project",
+      "construction", "maintenance"
+    ]
+  },
+  "tools": {
+    "es": ["autocad", "solidworks", "matlab", "ansys", "revit", "civil 3d", "primavera"],
+    "en": ["autocad", "solidworks", "matlab", "ansys", "revit", "civil 3d", "primavera"]
+  },
+  "responsibilities": {
+    "es": ["diseñar", "calcular", "simular", "supervisar", "optimizar"],
+    "en": ["design", "calculate", "simulate", "supervise", "optimize"]
+  }
+}

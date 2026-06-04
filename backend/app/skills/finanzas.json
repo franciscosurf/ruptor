@@ -1,0 +1,40 @@
+{
+  "sector": "finanzas",
+  "version": "1.0",
+  "skills": {
+    "es": [
+      "análisis financiero", "contabilidad general", "auditoría", "impuestos",
+      "tesorería", "gestión de riesgos", "valoración de empresas",
+      "planificación financiera", "presupuestos", "control de gestión",
+      "costes", "reporting financiero", "normativa ifrs", "fintech",
+      "inversión", "financiación", "derivados", "mercados financieros",
+      "cumplimiento financiero", "prevención blanqueo", "capitales"
+    ],
+    "en": [
+      "financial analysis", "general accounting", "audit", "tax",
+      "treasury", "risk management", "business valuation",
+      "financial planning", "budgeting", "management control",
+      "costing", "financial reporting", "ifrs", "fintech",
+      "investment", "financing", "derivatives", "financial markets",
+      "financial compliance", "anti-money laundering"
+    ]
+  },
+  "stopwords": {
+    "es": [
+      "finanzas", "contabilidad", "auditoría", "banco", "seguro",
+      "impuesto", "inversión", "riesgo"
+    ],
+    "en": [
+      "finance", "accounting", "audit", "bank", "insurance",
+      "tax", "investment", "risk"
+    ]
+  },
+  "tools": {
+    "es": ["excel", "sap fi", "oracle hyperion", "power bi", "tableau", "quickbooks"],
+    "en": ["excel", "sap fi", "oracle hyperion", "power bi", "tableau", "quickbooks"]
+  },
+  "responsibilities": {
+    "es": ["analizar", "contabilizar", "auditar", "presupuestar", "reportar"],
+    "en": ["analyze", "account", "audit", "budget", "report"]
+  }
+}

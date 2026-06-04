@@ -1,0 +1,40 @@
+{
+  "sector": "diseno",
+  "version": "1.0",
+  "skills": {
+    "es": [
+      "diseño gráfico", "identidad corporativa", "diseño editorial",
+      "maquetación", "ilustración", "retoque fotográfico", "animación",
+      "modelado 3d", "renderizado", "diseño web", "interfaz de usuario",
+      "experiencia de usuario", "prototipado", "diseño responsivo",
+      "diseño de producto", "diseño industrial", "sketching",
+      "composición visual", "teoría del color", "tipografía"
+    ],
+    "en": [
+      "graphic design", "brand identity", "editorial design",
+      "layout", "illustration", "photo retouching", "animation",
+      "3d modeling", "rendering", "web design", "user interface",
+      "user experience", "prototyping", "responsive design",
+      "product design", "industrial design", "sketching",
+      "visual composition", "color theory", "typography"
+    ]
+  },
+  "stopwords": {
+    "es": [
+      "diseñador", "diseño", "gráfico", "creativo", "visual",
+      "maquetador", "ilustrador"
+    ],
+    "en": [
+      "designer", "design", "graphic", "creative", "visual",
+      "layout artist", "illustrator"
+    ]
+  },
+  "tools": {
+    "es": ["photoshop", "illustrator", "indesign", "figma", "sketch", "adobe xd", "blender", "cinema 4d"],
+    "en": ["photoshop", "illustrator", "indesign", "figma", "sketch", "adobe xd", "blender", "cinema 4d"]
+  },
+  "responsibilities": {
+    "es": ["diseñar", "ilustrar", "maquetar", "prototipar", "revisar"],
+    "en": ["design", "illustrate", "layout", "prototype", "review"]
+  }
+}

@@ -14,7 +14,7 @@ SKILLS_DIR = Path(__file__).parent
 # Cache de sectores cargados
 _sectors_cache: Dict[str, Dict[str, Any]] = {}
 
-# Patrones para detectar sector
+# Patrones para detectar sector (ampliado con retail)
 SECTOR_PATTERNS = {
     "tecnologia": re.compile(
         r'\b(python|java|javascript|react|angular|vue|docker|kubernetes|aws|azure|'
@@ -94,6 +94,13 @@ SECTOR_PATTERNS = {
         r'customer service|customer support|call center|help desk)\b', 
         re.IGNORECASE
     ),
+    # NUEVO: Retail para detectar ofertas como dependienta, Primark, etc.
+    "dependienta": re.compile(
+        r'\b(primark|zara|mango|dependiente|dependienta|retail|store\s+assistant|'
+        r'tienda|atención\s+al\s+cliente|ventas\s+al\s+público|caja|reposición|'
+        r'reponer|probadores|devoluciones|escaparates|stock|inventario)\b', 
+        re.IGNORECASE
+    ),
 }
 
 
@@ -126,13 +133,31 @@ def load_skill_sector(sector: str) -> Dict[str, Any]:
 
 
 def get_skill_sector(sector: str, language: str = "en") -> Set[str]:
+    """Devuelve el conjunto de habilidades (skills) del sector."""
+    data = load_skill_sector(sector)
+    skills_dict = data.get("skills", {})
+    return set(skills_dict.get(language, []))
+
+def get_tools_for_sector(sector: str, language: str = "en") -> Set[str]:
+    """Devuelve el conjunto de herramientas (tools) del sector."""
+    data = load_skill_sector(sector)
+    tools_dict = data.get("tools", {})
+    return set(tools_dict.get(language, []))
+
+def get_responsibilities_for_sector(sector: str, language: str = "en") -> Set[str]:
+    """Devuelve el conjunto de responsabilidades/verbos del sector."""
+    data = load_skill_sector(sector)
+    resp_dict = data.get("responsibilities", {})
+    return set(resp_dict.get(language, []))
+
+def get_stopwords_for_sector(sector: str, language: str = "en") -> Set[str]:
     """
-    Devuelve el conjunto de habilidades para un sector e idioma.
+    Devuelve stopwords específicas del sector (palabras genéricas que no deben ser skills).
+    Si el JSON no tiene la clave 'stopwords', devuelve conjunto vacío.
     """
     data = load_skill_sector(sector)
-    skills = data.get("skills", {}).get(language, [])
-    return set(skills)
-
+    stopwords_dict = data.get("stopwords", {})
+    return set(stopwords_dict.get(language, []))
 
 def detect_sector_from_text(text: str) -> Dict[str, Any]:
     """
@@ -142,13 +167,17 @@ def detect_sector_from_text(text: str) -> Dict[str, Any]:
     text_lower = text.lower()
     scores = {}
     
-    if re.search(r'\b(primark|zara|mango|dependiente|retail|store\s+assistant|tienda|atención\s+al\s+cliente|ventas\s+al\s+público|caja|reposición)\b', text_lower):
-        return {"sector": "retail", "confidence": 0.85}
-
+    # Detección rápida para retail (por si el patrón general no lo capta bien)
+    if re.search(r'\b(primark|zara|mango|dependiente|dependienta|retail|store\s+assistant|tienda)\b', text_lower):
+        return {"sector": "dependienta", "confidence": 85, "all_scores": {"dependienta": 85}}
+    
+    # Recorrer todos los patrones definidos en SECTOR_PATTERNS (incluye retail ahora)
     for sector, pattern in SECTOR_PATTERNS.items():
         matches = pattern.findall(text_lower)
-        score = len(matches) * 2
-        scores[sector] = score
+        if matches:
+            # Puntuación simple: número de matches * 2
+            score = len(matches) * 2
+            scores[sector] = score
     
     if scores:
         best_sector = max(scores, key=scores.get)
@@ -165,13 +194,18 @@ def detect_sector_from_text(text: str) -> Dict[str, Any]:
 
 def get_all_sectors() -> List[str]:
     """
-    Devuelve la lista de todos los sectores disponibles.
+    Devuelve la lista de todos los sectores disponibles (basado en los archivos JSON).
     """
     sectors = []
     for file in SKILLS_DIR.glob("*.json"):
         if file.stem != "general":
             sectors.append(file.stem)
-    return sectors
+    # Aseguramos que 'retail' esté incluido si existe el JSON
+    # También podemos incluir los sectores definidos en SECTOR_PATTERNS
+    for sector in SECTOR_PATTERNS.keys():
+        if sector not in sectors and sector != "general":
+            sectors.append(sector)
+    return list(set(sectors))
 
 
 def get_relevant_skills_for_sector(sector: str, language: str = "en", limit: int = 20) -> List[str]:

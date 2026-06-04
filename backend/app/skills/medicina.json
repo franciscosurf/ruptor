@@ -1,0 +1,42 @@
+{
+  "sector": "medicina",
+  "version": "1.0",
+  "skills": {
+    "es": [
+      "diagnóstico clínico", "historia clínica", "exploración física",
+      "prescripción farmacológica", "cirugía menor", "urgencias",
+      "cuidados intensivos", "pediatría", "ginecología", "traumatología",
+      "cardiología", "neumología", "neurología", "psiquiatría",
+      "radiología", "laboratorio clínico", "toma de muestras",
+      "vacunación", "curas", "movilización de pacientes",
+      "registro enfermero", "soporte vital", "ecografía"
+    ],
+    "en": [
+      "clinical diagnosis", "medical history", "physical examination",
+      "pharmacological prescription", "minor surgery", "emergency",
+      "intensive care", "pediatrics", "gynecology", "traumatology",
+      "cardiology", "pulmonology", "neurology", "psychiatry",
+      "radiology", "clinical lab", "sampling",
+      "vaccination", "wound care", "patient mobilization",
+      "nursing record", "life support", "ultrasound"
+    ]
+  },
+  "stopwords": {
+    "es": [
+      "médico", "doctor", "enfermero", "paciente", "hospital", "clínica",
+      "tratamiento", "diagnóstico", "salud", "asistencia"
+    ],
+    "en": [
+      "doctor", "physician", "nurse", "patient", "hospital", "clinic",
+      "treatment", "diagnosis", "health", "care"
+    ]
+  },
+  "tools": {
+    "es": ["sistema de historia clínica", "electrocardiógrafo", "desfibrilador", "ventilador"],
+    "en": ["ehr system", "ecg machine", "defibrillator", "ventilator"]
+  },
+  "responsibilities": {
+    "es": ["diagnosticar", "prescribir", "tratar", "monitorear", "derivar"],
+    "en": ["diagnose", "prescribe", "treat", "monitor", "refer"]
+  }
+}

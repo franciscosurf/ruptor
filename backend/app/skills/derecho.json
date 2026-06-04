@@ -1,0 +1,40 @@
+{
+  "sector": "derecho",
+  "version": "1.0",
+  "skills": {
+    "es": [
+      "derecho civil", "derecho penal", "derecho mercantil", "derecho laboral",
+      "derecho fiscal", "derecho administrativo", "litigación", "mediación",
+      "arbitraje", "contratación", "redacción legal", "dictámenes",
+      "recursos", "procedimiento judicial", "gestión de expedientes",
+      "búsqueda jurisprudencial", "cumplimiento normativo", "due diligence",
+      "propiedad intelectual", "derecho digital", "extranjería"
+    ],
+    "en": [
+      "civil law", "criminal law", "commercial law", "labor law",
+      "tax law", "administrative law", "litigation", "mediation",
+      "arbitration", "contracting", "legal drafting", "legal opinions",
+      "appeals", "judicial procedure", "case file management",
+      "case law search", "compliance", "due diligence",
+      "intellectual property", "digital law", "immigration law"
+    ]
+  },
+  "stopwords": {
+    "es": [
+      "abogado", "jurídico", "legal", "ley", "juez", "tribunal",
+      "contrato", "demanda", "sentencia", "litigio"
+    ],
+    "en": [
+      "lawyer", "attorney", "legal", "law", "judge", "court",
+      "contract", "lawsuit", "judgment", "litigation"
+    ]
+  },
+  "tools": {
+    "es": ["lexnet", "cendoj", "vlex", "westlaw", "clínicas jurídicas"],
+    "en": ["westlaw", "lexisnexis", "pacer", "case management software"]
+  },
+  "responsibilities": {
+    "es": ["asesorar", "representar", "redactar", "negociar", "litigar"],
+    "en": ["advise", "represent", "draft", "negotiate", "litigate"]
+  }
+}

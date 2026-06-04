@@ -1,0 +1,40 @@
+{
+  "sector": "atencion_cliente",
+  "version": "1.0",
+  "skills": {
+    "es": [
+      "atención al cliente", "servicio de atención al cliente", "call center",
+      "resolución de incidencias", "gestión de quejas", "fidelización",
+      "venta consultiva", "postventa", "soporte técnico básico",
+      "gestión de pedidos", "logística inversa", "devoluciones",
+      "customer experience", "encuestas de satisfacción", "métricas crm",
+      "escucha activa", "empatía", "negociación", "persuasión"
+    ],
+    "en": [
+      "customer service", "customer support", "call center",
+      "issue resolution", "complaint handling", "loyalty",
+      "consultative selling", "after-sales", "basic technical support",
+      "order management", "reverse logistics", "returns",
+      "customer experience", "satisfaction surveys", "crm metrics",
+      "active listening", "empathy", "negotiation", "persuasion"
+    ]
+  },
+  "stopwords": {
+    "es": [
+      "atención", "cliente", "servicio", "soporte", "llamadas",
+      "quejas", "incidencias", "satisfacción"
+    ],
+    "en": [
+      "service", "customer", "support", "calls",
+      "complaints", "issues", "satisfaction"
+    ]
+  },
+  "tools": {
+    "es": ["crm", "zendesk", "freshdesk", "salesforce", "hubspot", "telefonía ip"],
+    "en": ["crm", "zendesk", "freshdesk", "salesforce", "hubspot", "voip"]
+  },
+  "responsibilities": {
+    "es": ["atender", "resolver", "informar", "vender", "seguir caso"],
+    "en": ["serve", "resolve", "inform", "sell", "follow up"]
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "sector": "educacion",
+  "version": "1.0",
+  "skills": {
+    "es": [
+      "planificación didáctica", "evaluación del aprendizaje", "tutoría",
+      "metodologías activas", "gamificación", "aprendizaje cooperativo",
+      "tecnología educativa", "plataformas lms", "contenido digital",
+      "educación inclusiva", "atención a la diversidad", "orientación educativa",
+      "formación del profesorado", "coordinación académica", "desarrollo curricular",
+      "investigación educativa", "psicopedagogía", "educación emocional"
+    ],
+    "en": [
+      "lesson planning", "learning assessment", "tutoring",
+      "active methodologies", "gamification", "cooperative learning",
+      "educational technology", "lms platforms", "digital content",
+      "inclusive education", "diversity attention", "educational guidance",
+      "teacher training", "academic coordination", "curriculum development",
+      "educational research", "educational psychology", "emotional education"
+    ]
+  },
+  "stopwords": {
+    "es": [
+      "profesor", "docente", "maestro", "educador", "enseñanza",
+      "alumno", "estudiante", "universidad", "academia"
+    ],
+    "en": [
+      "teacher", "professor", "educator", "instructor", "teaching",
+      "student", "pupil", "university", "academy"
+    ]
+  },
+  "tools": {
+    "es": ["moodle", "classroom", "teams", "zoom", "jitsi", "genially", "canva"],
+    "en": ["moodle", "google classroom", "teams", "zoom", "canvas", "blackboard"]
+  },
+  "responsibilities": {
+    "es": ["enseñar", "evaluar", "tutorizar", "planificar", "coordinar"],
+    "en": ["teach", "assess", "tutor", "plan", "coordinate"]
+  }
+}
