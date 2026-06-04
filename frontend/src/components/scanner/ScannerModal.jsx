@@ -1,5 +1,6 @@
 // src/components/scanner/ScannerModal.jsx
 import React, { useEffect, useState, useRef } from 'react';
+import { API_BASE_URL, ENDPOINTS } from '../../constants/endpoints';
 import { CvTemplateEditor } from './CvTemplateEditor';
 import { TxtFocusEditor } from './TxtFocusEditor';
 import { ResultsPanel } from './ResultsPanel';
@@ -171,11 +172,44 @@ export const ScannerModal = ({
 }) => {
 
   const { exportToPdf, isExporting } = useTemplateExport();
+  const [reportDownloading, setReportDownloading] = useState(false); // 🆕 estado para el informe PDF
+
+
   const handleDownloadPdf = async () => {
     const success = await exportToPdf(cvData, fileName);
     if (success) console.log('PDF generado correctamente');
   };
 
+   // 🆕 Función para descargar el informe de análisis ATS
+  const handleDownloadReport = async () => {
+    if (!result) return;
+    setReportDownloading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}${ENDPOINTS.DOWNLOAD_PDF}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ data: result })
+    });
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Error al generar el informe');
+      }
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'informe_ats.pdf';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error descargando el informe:', error);
+      alert('No se pudo generar el informe. Inténtalo de nuevo.');
+    } finally {
+      setReportDownloading(false);
+    }
+  };
 
   // Estados para TXT
   const [txtContent, setTxtContent] = useState('');
@@ -413,6 +447,14 @@ export const ScannerModal = ({
                   className="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 transition-all disabled:opacity-50"
                 >
                   {loading ? '⏳ Analizando...' : '🔄 Reanalizar CV'}
+                </button>
+                {/* 🆕 BOTÓN PARA DESCARGAR INFORME PDF */}
+                <button
+                  onClick={handleDownloadReport}
+                  disabled={loading || isExtracting || isExtractingDocx || reportDownloading}
+                  className="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition-all disabled:opacity-50"
+                >
+                  {reportDownloading ? '⏳ Generando...' : '📄 Descargar Informe'}
                 </button>
                 <button
                   onClick={() => {

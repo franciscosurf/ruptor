@@ -4,4 +4,5 @@ export const ENDPOINTS = {
   ANALYZE_TEXT: '/analyze-text/',
   OPTIMIZE_CV: '/optimize-cv/',
   EXPORT_REPORT: '/export-report/',
+  DOWNLOAD_PDF: '/api/download-pdf',   // ← nuevo
 };

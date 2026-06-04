@@ -11,3 +11,4 @@ python-docx
 langdetect
 keybert
 numpy
+reportlab

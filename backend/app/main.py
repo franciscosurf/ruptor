@@ -21,4 +21,5 @@ app.add_middleware(
 app.include_router(analyze_router)
 app.include_router(optimize_router)
 app.include_router(health_router)
+app.include_router(analyze_router, prefix="/api", tags=["analyze"])
 
