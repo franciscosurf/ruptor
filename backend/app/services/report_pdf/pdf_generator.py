@@ -112,7 +112,17 @@ def generar_informe_pdf(analisis: Dict[str, Any]) -> bytes:
     if verbs:
         story.append(Paragraph("Verbos de Acción", subtitulo_style))
         story.append(Paragraph(f"Puntuación: {verbs.get('score', 0)}/100", normal_style))
-        story.append(Paragraph(f"Verbos detectados: {', '.join(verbs.get('detected', [])[:5])}", normal_style))
+        detected = verbs.get('detected', [])
+        if detected:
+            story.append(Paragraph(f"<b>Verbos detectados en tu CV:</b> {', '.join(detected[:8])}", normal_style))
+        else:
+            story.append(Paragraph("<b>No se detectaron verbos de acción relevantes.</b>", normal_style))
+        # Ejemplos de verbos sugeridos si la puntuación es baja
+        if verbs.get('score', 0) < 50:
+            story.append(Paragraph("<b>Ejemplos de verbos de alto impacto que puedes incluir:</b>", normal_style))
+            ejemplos_verbos = ["lideré", "optimicé", "implementé", "diseñé", "coordiné", "automaticé", "reduje", "aumenté"]
+            for v in ejemplos_verbos[:5]:
+                story.append(Paragraph(f"• {v}", bullet_style))
         tips = verbs.get('tips', [])
         if tips:
             story.append(Paragraph("<b>Consejo:</b> " + tips[0], normal_style))
@@ -124,9 +134,20 @@ def generar_informe_pdf(analisis: Dict[str, Any]) -> bytes:
         story.append(Paragraph(f"Puntuación: {quantified.get('score', 0)}/100", normal_style))
         sentences = quantified.get('sentences', [])
         if sentences:
-            story.append(Paragraph("<b>Frases destacadas:</b>", normal_style))
+            story.append(Paragraph("<b>Ejemplos de logros cuantificados en tu CV:</b>", normal_style))
             for sent in sentences[:3]:
-                story.append(Paragraph(f"• {sent[:100]}...", bullet_style))
+                story.append(Paragraph(f"• {sent}", bullet_style))
+        else:
+            story.append(Paragraph("<b>No se encontraron logros con métricas numéricas.</b>", normal_style))
+            story.append(Paragraph("<b>Ejemplos de cómo cuantificar tus logros:</b>", normal_style))
+            ejemplos_logros = [
+                "Aumenté las ventas en un 25% en 6 meses",
+                "Reduje el tiempo de respuesta en un 40%",
+                "Gestioné un equipo de 10 personas",
+                "Incrementé la satisfacción del cliente en 15 puntos"
+            ]
+            for ex in ejemplos_logros:
+                story.append(Paragraph(f"• {ex}", bullet_style))
         tips = quantified.get('tips', [])
         if tips:
             story.append(Paragraph("<b>Consejo:</b> " + tips[0], normal_style))

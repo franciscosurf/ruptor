@@ -142,6 +142,9 @@ def detect_sector_from_text(text: str) -> Dict[str, Any]:
     text_lower = text.lower()
     scores = {}
     
+    if re.search(r'\b(primark|zara|mango|dependiente|retail|store\s+assistant|tienda|atención\s+al\s+cliente|ventas\s+al\s+público|caja|reposición)\b', text_lower):
+        return {"sector": "retail", "confidence": 0.85}
+
     for sector, pattern in SECTOR_PATTERNS.items():
         matches = pattern.findall(text_lower)
         score = len(matches) * 2

@@ -1,0 +1,8 @@
+Para añadir una ruta:
+
+backend\app\main.py
+frontend\src\constants\endpoints.js
+
+backend\app\api\routes\analyze.py
+
+import { API_BASE_URL, ENDPOINTS } from '../../constants/endpoints';

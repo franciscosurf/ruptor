@@ -19,17 +19,35 @@ EDUCATION_LEVELS = {
     "certified": 1,
 }
 
-def extract_education_level(text: str) -> Tuple[str, int]:
+import re
 
+def extract_education_level(text: str) -> tuple:
+    """
+    Detecta el nivel educativo requerido en la oferta o presente en el CV.
+    Retorna (nivel, puntuación_normalizada) donde nivel puede ser:
+    'ninguno', 'secundaria', 'grado', 'master', 'doctorado'
+    """
     text_lower = text.lower()
-
-    highest_level = "ninguno"
-    highest_weight = 0
-
-    for level, weight in EDUCATION_LEVELS.items():
-
-        if level in text_lower and weight > highest_weight:
-            highest_weight = weight
-            highest_level = level
-
-    return highest_level, highest_weight
+    
+    # Patrón mejorado: solo detecta "grado" si va seguido de palabras académicas
+    # o si está en una frase que claramente habla de requisitos educativos
+    education_patterns = {
+        'doctorado': r'\b(doctorado|ph\.?d|doctoral)\b',
+        'master': r'\b(máster|master|maestría|postgrado)\b',
+        'grado': r'\b(grado\s+(?:en|universitario|académico|de\s+licenciatura)|titulación\s+de\s+grado|educación\s+mínima:\s*grado)\b',
+        'secundaria': r'\b(educación\s+secundaria|bachillerato|high\s+school|eso)\b'
+    }
+    # Para el caso de "grado" suelto pero en contexto de requisitos:
+    # También buscamos líneas que contengan "requisitos:" y luego "grado"
+    lines = text.split('\n')
+    for line in lines:
+        if 'requisito' in line.lower() or 'educación' in line.lower() or 'formación' in line.lower():
+            if re.search(r'\bgrado\b', line.lower()):
+                return ('grado', 3)  # nivel 3 de 4
+    
+    for level, pattern in education_patterns.items():
+        if re.search(pattern, text_lower):
+            # Asignar puntuación: secundaria=2, grado=3, master=4, doctorado=5
+            score = {'secundaria':2, 'grado':3, 'master':4, 'doctorado':5}.get(level, 0)
+            return (level, score)
+    return ('ninguno', 0)
