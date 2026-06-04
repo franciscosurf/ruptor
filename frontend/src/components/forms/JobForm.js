@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { colors } from '../../styles/colors';
 import { Card } from '../common/Card';
-import { jobOptions } from './jobExamples';
 
 export function JobForm({
   fileName,
@@ -14,6 +13,8 @@ export function JobForm({
   const [pasteLoading, setPasteLoading] = useState(false);
   const [fileInputKey, setFileInputKey] = useState(Date.now());
   const [isDragOver, setIsDragOver] = useState(false);
+  const [exampleOptions, setExampleOptions] = useState([]);
+  const [loadingExamples, setLoadingExamples] = useState(true);
 
   const handlePasteFromClipboard = async () => {
     try {
@@ -39,10 +40,24 @@ export function JobForm({
     setFileInputKey(Date.now());
   };
 
+  useEffect(() => {
+    fetch('/examples/index.json')
+      .then(res => res.json())
+      .then(data => {
+        setExampleOptions(data);
+        setLoadingExamples(false);
+      })
+      .catch(err => {
+        console.error('Error cargando ejemplos:', err);
+        setLoadingExamples(false);
+      });
+  }, []);
+
+  // Función para cargar el contenido de un archivo de ejemplo
   const loadExample = async (filePath) => {
     try {
-      setPasteLoading(true); // Reutilizamos el estado de carga para mostrar un spinner
-      const response = await fetch(filePath);
+      setPasteLoading(true);
+      const response = await fetch(`/examples/${filePath}`);
       const text = await response.text();
       onJobDescriptionChange(text);
     } catch (err) {
@@ -289,9 +304,13 @@ export function JobForm({
                   }}
                 >
                   <option value="">Selecciona un rol...</option>
-                  {jobOptions.map(opt => (
-                    <option key={opt.file} value={opt.file}>{opt.label}</option>
-                  ))}
+                    {!loadingExamples ? (
+                      exampleOptions.map(opt => (
+                        <option key={opt.file} value={opt.file}>{opt.label}</option>
+                      ))
+                    ) : (
+                      <option disabled>Cargando ejemplos...</option>
+                    )}
                 </select>
                 
                 {/* Flecha elegante */}

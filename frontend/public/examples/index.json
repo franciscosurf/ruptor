@@ -1,0 +1,26 @@
+[
+  {
+    "label": "Comercial 1",
+    "file": "comercial-1.txt"
+  },
+  {
+    "label": "Frontend Engineer 1",
+    "file": "frontend-engineer-1.txt"
+  },
+  {
+    "label": "Frontend Engineer 1 En",
+    "file": "frontend-engineer-1-en.txt"
+  },
+  {
+    "label": "Frontend Engineer 2",
+    "file": "frontend-engineer-2.txt"
+  },
+  {
+    "label": "Mozo Almacen 1",
+    "file": "mozo-almacen-1.txt"
+  },
+  {
+    "label": "Primark Dependienta",
+    "file": "primark-dependienta.txt"
+  }
+]
