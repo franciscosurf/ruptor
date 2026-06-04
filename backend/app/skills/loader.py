@@ -94,7 +94,6 @@ SECTOR_PATTERNS = {
         r'customer service|customer support|call center|help desk)\b', 
         re.IGNORECASE
     ),
-    # NUEVO: Retail para detectar ofertas como dependienta, Primark, etc.
     "dependienta": re.compile(
         r'\b(primark|zara|mango|dependiente|dependienta|retail|store\s+assistant|'
         r'tienda|atención\s+al\s+cliente|ventas\s+al\s+público|caja|reposición|'
