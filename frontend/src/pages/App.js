@@ -1,33 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { useAnalysis } from '../hooks/useAnalysis';
+import React from 'react';
 import { Header } from '../components/layout/Header';
 import { Link } from 'react-router-dom';
 
 export default function App() {
-  const {
-    file, fileName, jobDescription, analysisMode, result, loading, error,
-    handleFileChange, setJobDescription, setAnalysisMode, handleSubmit, handleExportReport,
-    setResult
-  } = useAnalysis();
-
-  const [showModal, setShowModal] = useState(false);
-  const [showResults, setShowResults] = useState(false);
-
-  useEffect(() => {
-    if (result) setShowResults(true);
-  }, [result]);
-
-  const handleNewAnalysis = () => {
-    setResult(null);
-    setShowResults(false);
-  };
-
-  const closeModal = () => setShowModal(false);
-
-  const scrollToSuggestions = () => {
-    const el = document.getElementById('suggestions-section');
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
 
   return (
     <>
@@ -297,13 +272,7 @@ export default function App() {
           </div>
         </footer>
 
-        {/* Loading y error */}
-        {loading && <LoadingSpinner />}
-        {error && (
-          <div className="fixed bottom-4 right-4 bg-red-100 border border-red-300 text-red-700 px-4 py-2 rounded-lg shadow-lg">
-            ⚠️ {error}
-          </div>
-        )}
+        
       </div>
     </>
   );
