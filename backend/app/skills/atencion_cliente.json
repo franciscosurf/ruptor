@@ -19,6 +19,24 @@
       "active listening", "empathy", "negotiation", "persuasion"
     ]
   },
+  "skill_context": {
+    "es": {
+      "devoluciones": "gestión de devoluciones y logística inversa",
+      "quejas": "resolución de quejas y reclamaciones",
+      "incidencias": "resolución de incidencias técnicas",
+      "fidelización": "estrategias de fidelización de clientes",
+      "postventa": "seguimiento postventa y satisfacción",
+      "soporte": "soporte técnico básico al cliente"
+    },
+    "en": {
+      "returns": "handling returns and reverse logistics",
+      "complaints": "complaint and claim resolution",
+      "issues": "technical issue resolution",
+      "loyalty": "customer loyalty strategies",
+      "after-sales": "after-sales follow-up and satisfaction",
+      "support": "basic technical customer support"
+    }
+  },
   "stopwords": {
     "es": [
       "atención", "cliente", "servicio", "soporte", "llamadas",

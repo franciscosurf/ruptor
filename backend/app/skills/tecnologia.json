@@ -37,6 +37,24 @@
       "vitest", "testing library", "vite", "turbo", "pnpm", "storybook"
     ]
   },
+  "skill_context": {
+    "es": {
+      "desarrollar": "desarrollo de software y codificación",
+      "implementar": "implementación de sistemas y despliegues",
+      "arquitecturar": "arquitectura de soluciones cloud",
+      "mantener": "mantenimiento y evolución de aplicaciones",
+      "desplegar": "despliegue continuo (CI/CD)",
+      "testear": "pruebas unitarias e integración"
+    },
+    "en": {
+      "develop": "software development and coding",
+      "implement": "system implementation and deployments",
+      "architect": "cloud solution architecture",
+      "maintain": "application maintenance and evolution",
+      "deploy": "continuous deployment (CI/CD)",
+      "test": "unit and integration testing"
+    }
+  },
   "tools": {
     "en": ["vscode", "intellij", "pycharm", "eclipse", "postman", "insomnia", "docker desktop", "kubectl"],
     "es": ["vscode", "intellij", "pycharm", "eclipse", "postman", "insomnia", "docker desktop", "kubectl"]

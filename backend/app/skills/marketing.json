@@ -31,6 +31,24 @@
       "gestión de comunidades", "marketing de influencers", "marketing de afiliación"
     ]
   },
+  "skill_context": {
+    "es": {
+      "seo": "optimización en motores de búsqueda (SEO)",
+      "sem": "marketing en buscadores (SEM / Google Ads)",
+      "contenidos": "marketing de contenidos y copywriting",
+      "redes": "gestión de redes sociales y community management",
+      "analítica": "analítica web y medición de KPIs",
+      "email": "email marketing y automatización de campañas"
+    },
+    "en": {
+      "seo": "search engine optimization",
+      "sem": "search engine marketing (Google Ads)",
+      "content": "content marketing and copywriting",
+      "social": "social media management and community",
+      "analytics": "web analytics and KPI measurement",
+      "email": "email marketing and campaign automation"
+    }
+  },
   "tools": {
     "en": ["canva", "adobe creative suite", "figma", "semrush", "ahrefs", "moz", "screaming frog", "hotjar", "crazy egg"],
     "es": ["canva", "adobe creative suite", "figma", "semrush", "ahrefs", "moz", "screaming frog", "hotjar", "crazy egg"]

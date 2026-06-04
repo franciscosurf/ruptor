@@ -21,6 +21,24 @@
       "customs", "international trade"
     ]
   },
+  "skill_context": {
+    "es": {
+      "inventario": "control de inventario y stock",
+      "almacén": "gestión de almacén y layout",
+      "transporte": "planificación de transporte y rutas",
+      "compras": "aprovisionamiento y compras estratégicas",
+      "aduanas": "gestión aduanera y comercio exterior",
+      "wms": "sistemas de gestión de almacenes (WMS)"
+    },
+    "en": {
+      "inventory": "inventory and stock control",
+      "warehouse": "warehouse management and layout",
+      "transport": "transport planning and route optimization",
+      "procurement": "strategic procurement and purchasing",
+      "customs": "customs clearance and international trade",
+      "wms": "warehouse management systems (WMS)"
+    }
+  },
   "stopwords": {
     "es": [
       "logística", "almacén", "transporte", "distribución", "cadena",

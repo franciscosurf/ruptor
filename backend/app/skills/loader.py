@@ -248,3 +248,11 @@ def compare_skills_between_sectors(
         "match_percentage": round(len(common) / len(job_skills) * 100, 2) if job_skills else 0,
         "extra_skills": list(extra)[:10]
     }
+
+def get_skill_context(sector: str, language: str = "en") -> Dict[str, str]:
+    """
+    Devuelve el mapeo de habilidades genéricas -> frases contextuales.
+    """
+    data = load_skill_sector(sector)
+    context_dict = data.get("skill_context", {}).get(language, {})
+    return context_dict

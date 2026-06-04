@@ -19,6 +19,24 @@
       "financial compliance", "anti-money laundering"
     ]
   },
+  "skill_context": {
+    "es": {
+      "análisis": "análisis financiero y de estados contables",
+      "presupuestos": "elaboración y seguimiento presupuestario",
+      "costes": "análisis de costes y control de gestión",
+      "riesgos": "gestión de riesgos financieros",
+      "inversión": "evaluación de inversiones y rentabilidad",
+      "reporting": "reporting financiero bajo IFRS"
+    },
+    "en": {
+      "analysis": "financial analysis and statement review",
+      "budgeting": "budget preparation and monitoring",
+      "costing": "cost analysis and management control",
+      "risk": "financial risk management",
+      "investment": "investment appraisal and ROI analysis",
+      "reporting": "financial reporting under IFRS"
+    }
+  },
   "stopwords": {
     "es": [
       "finanzas", "contabilidad", "auditoría", "banco", "seguro",

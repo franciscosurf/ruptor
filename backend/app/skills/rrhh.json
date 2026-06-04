@@ -19,6 +19,24 @@
       "people analytics", "recruitment marketing", "employer branding"
     ]
   },
+  "skill_context": {
+    "es": {
+      "reclutamiento": "reclutamiento y selección por competencias",
+      "entrevistas": "entrevistas conductuales y técnicas",
+      "onboarding": "programas de onboarding e integración",
+      "formación": "detección de necesidades formativas",
+      "evaluación": "evaluación del desempeño y 360°",
+      "clima": "medición de clima laboral y encuestas"
+    },
+    "en": {
+      "recruitment": "competency-based recruitment",
+      "interviews": "behavioral and technical interviewing",
+      "onboarding": "onboarding and integration programs",
+      "training": "training needs analysis",
+      "appraisal": "performance appraisal and 360° feedback",
+      "climate": "work climate measurement and surveys"
+    }
+  },
   "stopwords": {
     "es": [
       "rrhh", "recursos humanos", "personal", "empleado", "talento",

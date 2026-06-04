@@ -27,6 +27,26 @@
       "gestión de oficina", "gestión de instalaciones", "gestión de suministros"
     ]
   },
+  "skill_context": {
+    "es": {
+      "archivo": "gestión documental y archivo",
+      "facturación": "procesamiento de facturación electrónica",
+      "compras": "gestión de compras y aprovisionamiento",
+      "inventario": "control de inventario y stock",
+      "logística": "coordinación logística y cadena de suministro",
+      "atención al cliente": "atención al cliente y resolución de incidencias",
+      "reportes": "elaboración de reportes y dashboards"
+    },
+    "en": {
+      "filing": "document management and filing",
+      "invoicing": "electronic invoicing processing",
+      "procurement": "procurement and purchasing management",
+      "inventory": "inventory and stock control",
+      "logistics": "logistics coordination and supply chain",
+      "customer service": "customer service and issue resolution",
+      "reporting": "report creation and dashboards"
+    }
+  },
   "tools": {
     "en": ["microsoft office", "google workspace", "oracle ebs", "sap fico", "quickbooks", "slack"],
     "es": ["microsoft office", "google workspace", "oracle ebs", "sap fico", "quickbooks", "slack"]

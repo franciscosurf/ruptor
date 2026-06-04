@@ -29,6 +29,24 @@
       "sdr", "bdr", "ejecutivo de cuentas", "desarrollo de ventas", "desarrollo de negocio"
     ]
   },
+  "skill_context": {
+    "es": {
+      "negociación": "técnicas de negociación y cierre",
+      "prospección": "prospección y calificación de leads",
+      "cierre": "cierre de ventas y gestión de objeciones",
+      "upselling": "venta adicional y cross-selling",
+      "cuentas": "gestión de cuentas clave (key accounts)",
+      "pipeline": "gestión del pipeline y forecast"
+    },
+    "en": {
+      "negotiation": "negotiation and closing techniques",
+      "prospecting": "lead prospecting and qualification",
+      "closing": "sales closing and objection handling",
+      "upselling": "upselling and cross-selling",
+      "accounts": "key account management",
+      "pipeline": "pipeline management and forecasting"
+    }
+  },
   "tools": {
     "en": ["salesforce", "hubspot", "linkedin sales navigator", "zoom info", "apollo", "lusha", "calendly", "outreach", "salesloft"],
     "es": ["salesforce", "hubspot", "linkedin sales navigator", "zoom info", "apollo", "lusha", "calendly", "outreach", "salesloft"]

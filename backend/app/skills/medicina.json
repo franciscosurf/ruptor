@@ -21,6 +21,24 @@
       "nursing record", "life support", "ultrasound"
     ]
   },
+  "skill_context": {
+    "es": {
+      "diagnóstico": "diagnóstico clínico diferencial",
+      "historia": "elaboración de historia clínica",
+      "prescripción": "prescripción farmacológica segura",
+      "urgencias": "atención en urgencias y emergencias",
+      "cuidados": "cuidados intensivos y monitorización",
+      "soporte": "soporte vital básico y avanzado"
+    },
+    "en": {
+      "diagnosis": "differential clinical diagnosis",
+      "history": "medical history taking",
+      "prescription": "safe pharmacological prescription",
+      "emergency": "emergency and acute care",
+      "intensive": "intensive care and monitoring",
+      "life support": "basic and advanced life support"
+    }
+  },
   "stopwords": {
     "es": [
       "médico", "doctor", "enfermero", "paciente", "hospital", "clínica",

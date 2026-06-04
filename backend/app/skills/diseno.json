@@ -19,6 +19,24 @@
       "visual composition", "color theory", "typography"
     ]
   },
+  "skill_context": {
+    "es": {
+      "maquetación": "maquetación editorial y retícula",
+      "ilustración": "ilustración digital y vectorial",
+      "prototipado": "prototipado de interfaces (UX/UI)",
+      "renderizado": "renderizado 3D y visualización",
+      "animación": "animación y motion graphics",
+      "retoque": "retoque fotográfico profesional"
+    },
+    "en": {
+      "layout": "editorial layout and grid design",
+      "illustration": "digital and vector illustration",
+      "prototyping": "UI/UX prototyping",
+      "rendering": "3D rendering and visualization",
+      "animation": "animation and motion graphics",
+      "retouching": "professional photo retouching"
+    }
+  },
   "stopwords": {
     "es": [
       "diseñador", "diseño", "gráfico", "creativo", "visual",

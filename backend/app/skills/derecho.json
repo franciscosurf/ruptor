@@ -19,6 +19,24 @@
       "intellectual property", "digital law", "immigration law"
     ]
   },
+  "skill_context": {
+    "es": {
+      "contratos": "redacción y revisión de contratos",
+      "demandas": "gestión de demandas y litigios",
+      "recursos": "interposición de recursos judiciales",
+      "expedientes": "gestión de expedientes judiciales",
+      "cumplimiento": "cumplimiento normativo y compliance",
+      "due diligence": "procesos de due diligence legal"
+    },
+    "en": {
+      "contracts": "drafting and reviewing contracts",
+      "lawsuits": "lawsuit and litigation management",
+      "appeals": "filing judicial appeals",
+      "case files": "judicial case file management",
+      "compliance": "regulatory compliance",
+      "due diligence": "legal due diligence processes"
+    }
+  },
   "stopwords": {
     "es": [
       "abogado", "jurídico", "legal", "ley", "juez", "tribunal",

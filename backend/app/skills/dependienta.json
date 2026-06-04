@@ -19,6 +19,24 @@
       "fast-paced environment", "sales floor", "restock shelves"
     ]
   },
+  "skill_context": {
+    "es": {
+      "devoluciones": "gestión de devoluciones",
+      "tallas": "consultas sobre tallas",
+      "estilos": "consultas sobre estilos",
+      "compras": "procesar compras",
+      "caja": "manejo de caja TPV",
+      "reposición": "reposición de estanterías"
+    },
+    "en": {
+      "returns": "handling returns",
+      "sizes": "sizing consultations",
+      "styles": "style advice",
+      "purchases": "processing purchases",
+      "cash": "cash register operation",
+      "restocking": "shelf restocking"
+    }
+  },
   "stopwords": {
     "es": [
       "compras", "ventas", "producto", "cliente", "tienda", "precio",

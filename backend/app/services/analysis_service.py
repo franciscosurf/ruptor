@@ -121,7 +121,8 @@ async def analyze_cv_logic(
 
     # Skills técnicas
     extracted_skills_cv  = extract_technical_skills(cv_text, sector=job_sector)
-    extracted_skills_job = extract_technical_skills(job_text_clean)
+    #extracted_skills_job = extract_technical_skills(job_text_clean)
+    extracted_skills_job = extract_technical_skills(job_text_clean, sector=job_sector)
 
     cv_skills_set  = set(extracted_skills_cv)
     job_skills_set = set(extracted_skills_job)

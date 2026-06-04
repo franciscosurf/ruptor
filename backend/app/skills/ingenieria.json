@@ -21,6 +21,24 @@
       "civil engineering", "surveying", "geotechnics", "hydraulics"
     ]
   },
+  "skill_context": {
+    "es": {
+      "diseño": "diseño asistido por ordenador (CAD)",
+      "cálculo": "cálculo estructural y simulación",
+      "simulación": "simulación numérica (FEM/CFD)",
+      "automatización": "automatización industrial y PLC",
+      "calidad": "gestión de calidad y normativa ISO",
+      "seguridad": "seguridad industrial y prevención"
+    },
+    "en": {
+      "design": "computer-aided design (CAD)",
+      "analysis": "structural analysis and simulation",
+      "simulation": "numerical simulation (FEM/CFD)",
+      "automation": "industrial automation and PLC",
+      "quality": "quality management and ISO standards",
+      "safety": "industrial safety and prevention"
+    }
+  },
   "stopwords": {
     "es": [
       "ingeniero", "ingeniería", "cálculo", "diseño", "proyecto",

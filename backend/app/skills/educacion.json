@@ -19,6 +19,24 @@
       "educational research", "educational psychology", "emotional education"
     ]
   },
+  "skill_context": {
+    "es": {
+      "planificación": "planificación didáctica y curricular",
+      "evaluación": "evaluación del aprendizaje y rúbricas",
+      "tutoría": "tutoría y acompañamiento académico",
+      "gamificación": "gamificación y aprendizaje lúdico",
+      "tecnología educativa": "integración de TIC en el aula",
+      "inclusiva": "educación inclusiva y atención a la diversidad"
+    },
+    "en": {
+      "planning": "didactic and curriculum planning",
+      "assessment": "learning assessment and rubrics",
+      "tutoring": "academic tutoring and mentoring",
+      "gamification": "gamification and playful learning",
+      "edtech": "ICT integration in the classroom",
+      "inclusive": "inclusive education and diversity support"
+    }
+  },
   "stopwords": {
     "es": [
       "profesor", "docente", "maestro", "educador", "enseñanza",
