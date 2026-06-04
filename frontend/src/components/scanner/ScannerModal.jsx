@@ -198,7 +198,19 @@ export const ScannerModal = ({
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'informe_ats.pdf';
+
+      // --- NUEVO NOMBRE DINÁMICO ---
+      // Obtener nombre base del CV (sin extensión)
+      let baseName = fileName ? fileName.replace(/\.[^/.]+$/, '') : 'informe';
+      // Reemplazar espacios y caracteres especiales
+      baseName = baseName.replace(/[^a-zA-Z0-9áéíóúüñÁÉÍÓÚÜÑ]/g, '_');
+      // Añadir fecha y hora
+      const now = new Date();
+      const dateStr = now.toISOString().slice(0,19).replace(/[-:]/g, '').replace('T', '_');
+      const finalName = `informe_ATS_${baseName}_${dateStr}.pdf`;
+      a.download = finalName;   // ← aquí se asigna el nombre
+      // -------------------------
+
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
