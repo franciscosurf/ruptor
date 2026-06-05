@@ -1,5 +1,5 @@
 // src/components/scanner/ScannerModal.jsx
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { API_BASE_URL, ENDPOINTS } from '../../constants/endpoints';
 import { CvTemplateEditor } from './CvTemplateEditor';
 import { TxtFocusEditor } from './TxtFocusEditor';
@@ -236,6 +236,65 @@ export const ScannerModal = ({
   const isTextFile = file && (file.type === 'text/plain' || file.name?.toLowerCase().endsWith('.txt'));
 
   const [selectedSentence, setSelectedSentence] = useState(null);
+
+
+  // ========================
+  // DEBOUNCE PARA REANÁLISIS AUTOMÁTICO
+  // ========================
+  const lastReanalyzedTextRef = useRef(null);
+
+  // 1. OBTENER TEXTO (Convierte el objeto en un solo string para poder compararlo)
+  const getCurrentCVText = useCallback(() => {
+    if (isTextFile) return txtContent;
+    if (isDocxFile) return docxPlainText;
+    if (cvData) {
+      return typeof cvData === 'object' ? Object.values(cvData).join('\n') : cvData;
+    }
+    return null;
+  }, [isTextFile, txtContent, isDocxFile, docxPlainText, cvData]);
+
+  // 2. ESTABLECER LA LÍNEA BASE INICIAL (Solo se ejecuta al abrir el CV por primera vez)
+  useEffect(() => {
+    if (show && result && !lastReanalyzedTextRef.current) {
+      lastReanalyzedTextRef.current = getCurrentCVText();
+    }
+    if (!show) {
+      lastReanalyzedTextRef.current = null; // Limpiar cuando se cierra el modal
+    }
+  }, [show, result, getCurrentCVText]);
+
+  // 3. MOTOR DE AUTOGUARDADO (El Debounce Real)
+  // 3. MOTOR DE AUTOGUARDADO (El Debounce Real)
+  useEffect(() => {
+    // CAMBIO CRÍTICO: Añadido !result para que el autoguardado NUNCA 
+    // se active si el usuario está en el formulario principal.
+    if (!show || !result || loading) return;
+
+    const currentText = getCurrentCVText();
+    if (!currentText) return;
+
+    // Si el texto es idéntico al último que analizamos, no hacemos nada
+    if (currentText === lastReanalyzedTextRef.current) return;
+
+    // Si hubo cambios, iniciamos la cuenta atrás de 1 segundo (1000 ms)
+    const timer = setTimeout(() => {
+      lastReanalyzedTextRef.current = currentText;
+
+      if (onReanalyze) {
+        if (isTextFile) {
+          onReanalyze(txtContent);
+        } else if (isDocxFile && docxPlainText) {
+          onReanalyze(docxPlainText);
+        } else if (cvData) {
+          onReanalyze(cvData); 
+        }
+      }
+    }, 1000);
+
+    return () => clearTimeout(timer);
+    
+  }, [show, result, loading, txtContent, docxPlainText, cvData, getCurrentCVText, isTextFile, isDocxFile, onReanalyze]);
+ //end
 
   let textToHighlight = null;
   if (activeFocus === 'achievements') {
