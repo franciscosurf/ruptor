@@ -48,31 +48,31 @@ export function useAnalysis() {
     }
   };
 
-  const handleExportReport = async () => {
-    if (!file || !jobDescription.trim()) {
-      setError('Primero realiza un análisis completo');
-      return;
-    }
+  // const handleExportReport = async () => {
+  //   if (!file || !jobDescription.trim()) {
+  //     setError('Primero realiza un análisis completo');
+  //     return;
+  //   }
 
-    try {
-      const formData = new FormData();
-      formData.append('cv_file', file);
-      formData.append('job_description', jobDescription.trim());
-      formData.append('format', 'text');
+  //   try {
+  //     const formData = new FormData();
+  //     formData.append('cv_file', file);
+  //     formData.append('job_description', jobDescription.trim());
+  //     formData.append('format', 'text');
 
-      const { data } = await api.post(ENDPOINTS.EXPORT_REPORT, formData);
-      const blob = new Blob([data.report], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `ats_report_${new Date().toISOString().slice(0,19)}.txt`;
-      a.click();
-      URL.revokeObjectURL(url);
-      alert("cv exportado exitosamente");
-    } catch (err) {
-      setError('Error al exportar reporte: ' + err.message);
-    }
-  };
+  //     const { data } = await api.post(ENDPOINTS.EXPORT_REPORT, formData);
+  //     const blob = new Blob([data.report], { type: 'text/plain' });
+  //     const url = URL.createObjectURL(blob);
+  //     const a = document.createElement('a');
+  //     a.href = url;
+  //     a.download = `ats_report_${new Date().toISOString().slice(0,19)}.txt`;
+  //     a.click();
+  //     URL.revokeObjectURL(url);
+  //     alert("cv exportado exitosamente");
+  //   } catch (err) {
+  //     setError('Error al exportar reporte: ' + err.message);
+  //   }
+  // };
   
   const analyzeWithCvText = async (cvText, jobDesc, mode) => {
     setLoading(true);
@@ -114,10 +114,10 @@ export function useAnalysis() {
     setError(null);
     setLoading(false);
   };
-
+ //handleExportReport
   return {
     file, fileName, jobDescription, analysisMode, result, loading, error,
-    handleFileChange, setJobDescription, setAnalysisMode, handleSubmit, handleExportReport,
+    handleFileChange, setJobDescription, setAnalysisMode, handleSubmit, 
     setResult, analyzeWithCvText, resetAnalysis
   };
 }

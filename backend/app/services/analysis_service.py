@@ -86,7 +86,7 @@ async def analyze_cv_logic(
         r"(about the job|sobre el empleo|premium|job search|faster with|tiempo estimado|"
         r"estimado de proceso|semanas|postular|apply|solicitar|guardar|save|share|compartir|"
         r"report|denunciar|see more|ver más|linkedin|indeed|infojobs|publicado|posted|"
-        r"visitas|solicitantes|proceso de selección|unirse al equipo|estimado de|visualizaciones)", 
+        r"visitas|solicitantes|igualdad|proceso de selección|unirse al equipo|estimado de|visualizaciones)", 
         re.IGNORECASE
     )
 

@@ -1,6 +1,6 @@
 export const API_BASE_URL = 'http://localhost:8000';
 export const ENDPOINTS = {
   ANALYZE_CV: '/analyze-cv/',
-  EXPORT_REPORT: '/export-report/',
+  //EXPORT_REPORT: '/export-report22222222/',
   DOWNLOAD_PDF_REPORT: '/api/download-pdf-report/',
 };

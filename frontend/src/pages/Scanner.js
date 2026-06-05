@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAnalysis } from '../hooks/useAnalysis';
 
-// NUEVOS ESTRATEGIA HOOKS (Conversion-First)
 import { useCvData } from '../components/scanner/strategy/useCvData';
 import { useTemplateExport } from '../components/scanner/strategy/useTemplateExport';
 
@@ -33,7 +32,7 @@ export default function Scanner() {
   const {
     file, fileName, jobDescription, analysisMode, result, loading,
     handleFileChange, setJobDescription, setAnalysisMode, handleSubmit, 
-    handleExportReport, analyzeWithCvText, resetAnalysis, // <-- Importamos resetAnalysis
+    analyzeWithCvText, resetAnalysis, // <-- Importamos resetAnalysis
   } = useAnalysis();
 
   const [showModal, setShowModal] = useState(false);
@@ -115,7 +114,7 @@ export default function Scanner() {
         onJobDescriptionChange={setJobDescription}
         onModeChange={setAnalysisMode}
         onSubmit={handleSubmit}
-        onExport={handleExportReport}
+        //onExport={handleExportReport}
         loading={loading}
         //ref={editorRef}
         onReanalyze={handleReanalyze} 
