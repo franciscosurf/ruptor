@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Header } from '../components/layout/Header';
+import { Header } from './components/layout/Header';
 
 export default function Blog() {
   // Estado para el filtro activo (solo UI, sin funcionalidad real)

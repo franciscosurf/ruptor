@@ -5,9 +5,16 @@ import { useAnalysis } from '../hooks/useAnalysis';
 import { useCvData } from '../components/scanner/strategy/useCvData';
 import { useTemplateExport } from '../components/scanner/strategy/useTemplateExport';
 
-import { HeroSection, HowItWorks, Footer, ScannerModal } from '../components/scanner';
+import { Header } from './components/layout/Header';
+import { HeroSection } from './components/scanner/HeroSection';
+import { HowItWorks } from './components/scanner/HowItWorks';
+import { Footer } from './components/scanner/Footer';
+import { ScannerModal } from './components/scanner/ScannerModal';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
-import { Header } from '../components/layout/Header';  
+
+import { ThemeProvider } from '../contexts/ThemeContext';   // ✅ corregido
+import '../styles/themes.css';         
+import { useTheme } from '../contexts/ThemeContext';                    // ✅ corregido
 
 const cvDataToPlainText = (cvData) => {
   if (!cvData) return '';
@@ -58,19 +65,19 @@ export default function Scanner() {
 
   // Manejador para reanalizar con el CV editado
   const handleReanalyze = async (editedData) => {
-  if (!editedData) return;
-  
-  let cvText = '';
-  if (typeof editedData === 'string') {
-    // Si viene del visor de TXT directo, ya es una cadena de texto
-    cvText = editedData;
-  } else {
-    // Si viene del editor estructurado de PDFs
-    cvText = cvDataToPlainText(editedData);
-  }
-  
-  await analyzeWithCvText(cvText, jobDescription, analysisMode);
-};
+    if (!editedData) return;
+    
+    let cvText = '';
+    if (typeof editedData === 'string') {
+      // Si viene del visor de TXT directo, ya es una cadena de texto
+      cvText = editedData;
+    } else {
+      // Si viene del editor estructurado de PDFs
+      cvText = cvDataToPlainText(editedData);
+    }
+    
+    await analyzeWithCvText(cvText, jobDescription, analysisMode);
+  };
 
   const handleStartAnalysis = () => {
     resetAnalysis();      // Limpia todo el rastro de un análisis anterior

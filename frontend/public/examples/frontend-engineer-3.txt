@@ -1,0 +1,41 @@
+About the job
+En CellsIA desarrollamos producto (Software as Medical Device) para redefinir la patología con inteligencia artificial. Desde nuestro hub híbrido en Madrid impulsamos ciencia, datos y producto con un equipo enfocado a la excelencia en ingeniería y con mentalidad de producto.
+El perfil ideal debe tener pasión por escribir código limpio, trabajar con feedback loops constantes y aplicar prácticas de Extreme Programming (Pair Programming, TDD, Small Safe Steps).
+
+
+🚀 Tus responsabilidades
+Colaborar con otros miembros del equipo para lanzar funcionalidades de extremo a extremo (responsabilidad e2e).
+Diseñar, desarrollar, y mantener aplicaciones web intuitivas, accesibles y centradas en el usuario que escalen en contextos clínicos exigentes.
+Cultivar la calidad del software mediante tests unitarios/integración (vitest/jest), code reviews, pipelines CI/CD y observabilidad (logs, métricas, alertas).
+Mejorar la arquitectura y optimizar el rendimiento y la escalabilidad de las aplicaciones.
+Diseñar y desarrollar sistemas de componentes sólidos y reutilizables con Typescript, Vue 3, PrimeVue, y Pinia (gestión de estados).
+Mejorar la autonomía y la capacidad de actuación de la IA generativa aplicada a la Ingeniería de Software.
+
+
+🛠️ ¿Qué necesitas para tener éxito?
+≥3-5 años desarrollando aplicaciones frontend en producción.
+Dominio de Vue 3 (y PrimeVue), TypeScript, HTML5, CSS3, y principios de diseño responsive.
+Conocimiento práctico de OpenLayers.
+Conocimientos de Docker y pipelines CI/CD (Jenkins, GitHub Actions, o similares)
+Inglés funcional para colaborar con partners internacionales.
+
+
+✨ Valorable
+Experiencia práctica con formatos médicos (e.g. DICOM)
+Experiencia en el sector sanitario o en productos de alto impacto clínico.
+Familiaridad con herramientas de observabilidad y monitoreo (Sentry, DataDog, o similares).
+Esperiencia en context/harness engineering para IA generativa.
+
+
+👋 ¿Por qué CellsIA?
+MedTech con fuerte componente de IA, stack tecnológico moderno, y en crecimiento.
+Ámbito sanitario con impacto clínico real en la salud de las personas.
+
+
+Tipo de contrato: Indefinido.
+
+Ubicación: España (100% remoto).
+
+Educación requerida: DAM, Física, Tecnología de la Información y Operaciones o similar.
+
+Experiencia requerida: De 3 a 5 años.

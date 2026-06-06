@@ -1,13 +1,13 @@
 // src/components/scanner/ScannerModal.jsx
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { API_BASE_URL, ENDPOINTS } from '../../constants/endpoints';
-import { CvTemplateEditor } from './CvTemplateEditor';
-import { TxtFocusEditor } from './TxtFocusEditor';
-import { ResultsPanel } from './ResultsPanel';
-import { JobForm } from '../forms/JobForm';
-import { LoadingSpinner } from './../common/LoadingSpinner';
+import { API_BASE_URL, ENDPOINTS } from '../../../constants/endpoints';
+import { CvTemplateEditor } from '../../../components/scanner/CvTemplateEditor';
+import { TxtFocusEditor } from '../../../components/scanner/TxtFocusEditor';
+import { ResultsPanel } from '../../../components/scanner/ResultsPanel';
+import { JobForm } from '../../../components/forms/JobForm';
+import { LoadingSpinner } from '../../../components/common/LoadingSpinner';
 import mammoth from 'mammoth';
-import { useTemplateExport } from './strategy/useTemplateExport';
+import { useTemplateExport } from '../../../components/scanner/strategy/useTemplateExport';
 
 
 // Subcomponente Editor Ligero para DOCX ---

@@ -1,0 +1,54 @@
+About the job
+¿Tienes experiencia en desarrollo frontend con Vue.js y te interesa participar en un proyecto innovador dentro del sector de la inteligencia artificial aplicado a plataformas de contact-center y helpdesk?
+Buscamos un/a Frontend Developer (Mid/Senior) para incorporarse a un equipo de innovación, trabajando en el diseño y desarrollo de una plataforma escalable basada en microfrontend, con foco en UX, rendimiento y arquitectura moderna frontend.
+
+
+🌱 Lo que vas a hacer (y consolidar):
+
+Aquí trabajarás en un entorno moderno, orientado a producto, con foco en calidad, escalabilidad y experiencia de usuario:
+• Diseño, desarrollo y mantenimiento de aplicaciones frontend escalables
+• Creación de componentes reutilizables en Vue.js
+• Integración de APIs REST y servicios backend
+• Optimización de rendimiento, accesibilidad y experiencia de usuario
+• Resolución de bugs en entornos productivos
+• Participación en code reviews y buenas prácticas de desarrollo
+• Documentación técnica y funcional de componentes y flujos
+• Colaboración con diseño UX/UI para mejorar la experiencia de usuario
+• Participación en evolución de arquitectura frontend basada en microfrontends
+👉 En resumen: un rol técnico moderno, con impacto directo en una plataforma de IA orientada a contact-center y evolución continua del producto.
+
+
+📍 Ubicación del proyecto: Sevilla (oficina de referencia) - Trabajo remoto, con posibilidad de asistencia puntual a oficina (se valorará cercanía a Sevilla).
+⌚Jornada: 42,5 h/semana (34,5 h/semana en verano)
+
+
+🧠 Stack tecnológico y experiencia deseada: Se valorará experiencia en:
+• JavaScript ES6+
+• Vue.js (Vuex o Pinia)
+• HTML5, CSS3, TailwindCSS
+• Microfrontends
+• Electron o Tauri
+• Vite o Webpack
+• Testing con Jest o Vitest
+• Optimización de rendimiento frontend
+• Diseño de dashboards y paneles administrativos
+• Integración con OAuth / OIDC
+• Experiencia en productos tipo contact-center o helpdesk
+
+
+🎁 Beneficios que suman:
+
+💻 Proyecto innovador en entorno tecnológico moderno
+📄 Contrato indefinido con Experis IT
+🚀 Equipo de innovación con foco en producto
+🏠 Trabajo remoto 100%
+🏖️ 23 días de vacaciones
+💳 Retribución flexible (restaurante, seguro médico, guardería…)
+🎟️ Descuentos en ocio, viajes y cultura
+💻 Equipamiento completo para trabajar en remoto
+🎓 Formación continua y desarrollo profesional
+
+
+💬 Si te ves en este rol…
+Si tienes experiencia en Vue.js y te interesa trabajar en una plataforma moderna de IA con arquitectura escalable y enfoque en producto, este puede ser tu siguiente paso profesional.
+👉 Envíanos tu perfil y valoraremos tu candidatura 🚀

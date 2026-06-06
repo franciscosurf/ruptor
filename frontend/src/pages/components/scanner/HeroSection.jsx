@@ -1,6 +1,6 @@
 // src/components/scanner/HeroSection.jsx
 import React from 'react';
-import { colors } from '../../styles/colors';
+import { colors } from '../../../styles/colors';
 
 export const HeroSection = ({ onStart }) => (
   

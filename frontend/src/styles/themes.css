@@ -1,0 +1,37 @@
+/* Definición de variables globales por defecto (se sobrescribirán via JS) */
+:root {
+  --bg-primary: #ffffff;
+  --text-primary: #0b1020;
+  --bg-surface: rgba(255, 255, 255, 0.8);
+  --border-color: rgba(0, 0, 0, 0.06);
+  --gradient-start: #7c3aed;
+  --gradient-end: #2563eb;
+  --card-bg: rgba(255, 255, 255, 0.8);
+  --hero-glow: rgba(99, 102, 241, 0.2);
+  --text-secondary: rgba(0, 0, 0, 0.6);
+}
+
+/* Clases temáticas que se aplicarán al body o a un contenedor */
+.theme-light {
+  --bg-primary: #ffffff;
+  --text-primary: #0b1020;
+  --bg-surface: rgba(255, 255, 255, 0.8);
+  --border-color: rgba(0, 0, 0, 0.06);
+  --gradient-start: #7c3aed;
+  --gradient-end: #2563eb;
+  --card-bg: rgba(255, 255, 255, 0.8);
+  --hero-glow: rgba(99, 102, 241, 0.2);
+  --text-secondary: rgba(0, 0, 0, 0.6);
+}
+
+.theme-dark {
+  --bg-primary: #0f172a;
+  --text-primary: #f1f5f9;
+  --bg-surface: rgba(30, 41, 59, 0.8);
+  --border-color: rgba(255, 255, 255, 0.1);
+  --gradient-start: #a855f7;
+  --gradient-end: #3b82f6;
+  --card-bg: rgba(30, 41, 59, 0.8);
+  --hero-glow: rgba(168, 85, 247, 0.25);
+  --text-secondary: rgba(255, 255, 255, 0.6);
+}

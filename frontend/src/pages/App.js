@@ -1,24 +1,39 @@
-import React from 'react';
-import { Header } from '../components/layout/Header';
+import React, { useEffect } from 'react'; 
+import { Header } from './components/layout/Header';
+import { Hero } from './components/home/Hero';
+import { Features } from './components/home/Features';
 import { Link } from 'react-router-dom';
+import { ThemeProvider } from '../contexts/ThemeContext';   // ✅ corregido
+import '../styles/themes.css';         
+import { useTheme } from '../contexts/ThemeContext';                    // ✅ corregido
 
-export default function App() {
+// Componente interno que aplica el tema al body
+const ThemedApp = () => {
+  const { theme, currentTheme } = useTheme();
+
+  useEffect(() => {
+    // Aplicar variables CSS globales al elemento root
+    const root = document.documentElement;
+    Object.entries(theme).forEach(([key, value]) => {
+      root.style.setProperty(`--${key}`, value);
+    });
+    // También se puede añadir una clase al body
+    document.body.className = `theme-${currentTheme}`;
+  }, [theme, currentTheme]);
 
   return (
     <>
       {/* Tailwind CSS CDN y estilos personalizados */}
       <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
-        <style>{` 
-      .bgPurple {background: linear-gradient(90deg,#7c3aed,#2563eb);}
-    `}</style>
       <style>{`
+        .bgPurple { background: linear-gradient(90deg, var(--gradientFrom), var(--gradientTo)); }
         body {
           font-family: 'Inter', sans-serif;
-          background: #ffffff;
-          color: #0b1020;
+          background: var(--bgPrimary);
+          color: var(--textPrimary);
         }
         .gradient-text {
-          background: linear-gradient(90deg, #7c3aed, #2563eb);
+          background: linear-gradient(90deg, var(--gradientFrom), var(--gradientTo));
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
         }
@@ -26,7 +41,7 @@ export default function App() {
           position: absolute;
           width: 500px;
           height: 500px;
-          background: radial-gradient(circle, rgba(99,102,241,0.20) 0%, rgba(255,255,255,0) 70%);
+          background: radial-gradient(circle, var(--heroGlow) 0%, transparent 70%);
           top: -120px;
           right: -120px;
           z-index: 0;
@@ -37,243 +52,37 @@ export default function App() {
           background-size: 40px 40px;
         }
         .card {
-          background: rgba(255,255,255,0.8);
+          background: var(--cardBg);
           backdrop-filter: blur(10px);
-          border: 1px solid rgba(0,0,0,0.06);
+          border: 1px solid var(--borderColor);
         }
       `}</style>
 
-      <div className="font-['Inter',sans-serif] bg-white text-[#0b1020] overflow-x-hidden">
-        {/* HEADER */}
+      <div className="font-['Inter',sans-serif] overflow-x-hidden" style={{ background: 'var(--bgPrimary)', color: 'var(--textPrimary)' }}>
         <Header />
+        <Hero />
+        <Features />
 
-        {/* HERO */}
-        <section className="relative overflow-hidden grid-bg">
-
-          <div class="max-w-7xl mx-auto px-6 py-28 relative z-10">
-            <div class="grid lg:grid-cols-2 gap-20 items-center">
-
-              {/* <!-- LEFT --> */}
-              <div>
-                <div className="hero-glow"></div>
-                <div className="max-w-7xl mx-auto px-6 py-28 relative z-10">
-                  <div className="max-w-4xl">
-                    <div className="inline-flex items-center gap-2 bg-white border border-black/5 rounded-full px-4 py-2 mb-8">
-                      <span className="w-2 h-2 rounded-full bg-green-500"></span>
-                      <span className="text-sm font-medium">Optimizado para ATS modernos con IA</span>
-                    </div>
-                    <h1 className="text-6xl md:text-7xl font-black tracking-tight leading-none mb-8">
-                      <span className="gradient-text">La IA </span>rechaza tu CV antes de que alguien lo lea
-                    </h1>
-                    <p className="text-xl md:text-2xl text-black/60 leading-relaxed max-w-3xl mb-12">
-                      Analízalo contra la oferta y corrígelo en tiempo real.              
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-4">
-                      <Link to="/scanner" className="px-8 py-5 rounded-2xl bgPurple text-white text-lg font-semibold hover:scale-105 transition shadow-2xl inline-block">
-                        Analizar mi CV
-                      </Link>
-                      <button className="px-8 py-5 rounded-2xl border border-black/10 bg-white text-lg font-semibold hover:bg-black/5 transition">
-                        Ver demo
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {/* <!-- RIGHT --> */}
-              <div class="relative">
-
-                <div class="glass rounded-[40px] p-8 shadow-2xl relative overflow-hidden">
-
-                  <div class="scanner-line"></div>
-
-                  <div class="flex items-center justify-between mb-8">
-
-                    <div>
-                      <p class="text-sm text-black/40 font-semibold uppercase tracking-wider">
-                        ATS SCORE
-                      </p>
-
-                      <h2 class="text-3xl font-black mt-2">
-                        CV Analysis
-                      </h2>
-                    </div>
-
-                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center text-white text-xl">
-                      ⚡
-                    </div>
-
-                  </div>
-
-
-                  <div class="flex flex-col items-center mb-10">
-
-                    <div class="score-ring mb-6">
-
-                      <div class="score-inner">
-
-                        <span class="text-5xl font-black">
-                          82
-                        </span>
-
-                        <span class="text-black/40 text-sm font-semibold">
-                          ATS SCORE
-                        </span>
-
-                      </div>
-
-                    </div>
-
-                    <p class="text-black/60 text-center max-w-sm">
-                      Tu CV tiene buena compatibilidad ATS, pero todavía hay mejoras clave para aumentar visibilidad.
-                    </p>
-
-                  </div>
-
-
-
-                  <div class="space-y-5">
-
-                    <div class="bg-black/3 rounded-2xl p-5 border border-black/5">
-
-                      <div class="flex items-center justify-between mb-2">
-                        <span class="font-semibold">
-                          Keywords Match
-                        </span>
-
-                        <span class="font-bold text-blue-600">
-                          91%
-                        </span>
-                      </div>
-
-                      <div class="w-full h-2 rounded-full bg-black/5 overflow-hidden">
-                        <div class="h-full w-[91%] bg-gradient-to-r from-purple-600 to-blue-500 rounded-full"></div>
-                      </div>
-
-                    </div>
-
-
-
-                    <div class="bg-black/3 rounded-2xl p-5 border border-black/5">
-
-                      <div class="flex items-center justify-between mb-2">
-                        <span class="font-semibold">
-                          ATS Formatting
-                        </span>
-
-                        <span class="font-bold text-blue-600">
-                          76%
-                        </span>
-                      </div>
-
-                      <div class="w-full h-2 rounded-full bg-black/5 overflow-hidden">
-                        <div class="h-full w-[76%] bg-gradient-to-r from-purple-600 to-blue-500 rounded-full"></div>
-                      </div>
-
-                    </div>
-
-
-
-                    <div class="bg-black/3 rounded-2xl p-5 border border-black/5">
-
-                      <div class="flex items-center justify-between mb-2">
-                        <span class="font-semibold">
-                          Recruiter Visibility
-                        </span>
-
-                        <span class="font-bold text-blue-600">
-                          69%
-                        </span>
-                      </div>
-
-                      <div class="w-full h-2 rounded-full bg-black/5 overflow-hidden">
-                        <div class="h-full w-[69%] bg-gradient-to-r from-purple-600 to-blue-500 rounded-full"></div>
-                      </div>
-
-                    </div>
-
-                  </div>
-
-                </div>
-
-              </div>
-              
-            </div>
-          </div>
-
-        </section>
-
-        {/* FEATURES - Cómo funciona */}
-        <section className="py-28">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="text-center mb-20">
-              <span className="gradient-text font-bold uppercase tracking-widest text-sm">Cómo funciona</span>
-              <h2 className="text-5xl font-black mt-4 mb-6">Hackea el proceso ATS</h2>
-              <p className="text-xl text-black/60 max-w-2xl mx-auto">Convierte un CV invisible para IA en una candidatura optimizada para superar filtros automáticos.</p>
-            </div>
-            <div className="grid md:grid-cols-3 gap-8">
-              <div className="card rounded-3xl p-8 shadow-xl">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center text-2xl mb-6">📄</div>
-                <h3 className="text-2xl font-bold mb-4">Escaneo ATS</h3>
-                <p className="text-black/60 leading-relaxed">Analizamos cómo interpreta tu CV un sistema ATS moderno y detectamos puntos débiles automáticamente.</p>
-              </div>
-              <div className="card rounded-3xl p-8 shadow-xl">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center text-2xl mb-6">⚡</div>
-                <h3 className="text-2xl font-bold mb-4">Optimización IA</h3>
-                <p className="text-black/60 leading-relaxed">Mejoramos keywords, estructura y compatibilidad para aumentar tu score ATS y pasar filtros.</p>
-              </div>
-              <div className="card rounded-3xl p-8 shadow-xl">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center text-2xl mb-6">🎯</div>
-                <h3 className="text-2xl font-bold mb-4">Más entrevistas</h3>
-                <p className="text-black/60 leading-relaxed">Porque el objetivo real no es “tener un CV bonito”, sino llegar al recruiter humano.</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* SOCIAL PROOF - El mercado cambió */}
-        <section className="py-24 bg-black text-white relative overflow-hidden">
-          <div className="absolute inset-0 opacity-20">
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full bg-purple-600 blur-3xl"></div>
-          </div>
-          <div className="max-w-6xl mx-auto px-6 relative z-10 text-center">
-            <h2 className="text-5xl font-black mb-8">El mercado cambió.</h2>
-            <p className="text-2xl text-white/70 max-w-3xl mx-auto leading-relaxed mb-16">
-              Hoy la mayoría de candidatos son rechazados antes de que un humano lea su CV. ruptor nace para cambiar eso.
-            </p>
-            <div className="grid md:grid-cols-3 gap-8">
-              <div><div className="text-6xl font-black gradient-text mb-3">75%</div><p className="text-white/60">de CVs nunca llegan a un recruiter</p></div>
-              <div><div className="text-6xl font-black gradient-text mb-3">+3x</div><p className="text-white/60">más posibilidades de pasar ATS</p></div>
-              <div><div className="text-6xl font-black gradient-text mb-3">IA</div><p className="text-white/60">optimizando cada candidatura</p></div>
-            </div>
-          </div>
-        </section>
-
-        {/* CTA - Tu próximo trabajo */}
-        <section className="py-28">
-          <div className="max-w-5xl mx-auto px-6">
-            <div className="rounded-[40px] p-14 bg-gradient-to-br from-purple-600 to-blue-500 text-white text-center shadow-2xl">
-              <h2 className="text-5xl font-black mb-6">Tu próximo trabajo no debería perderse en un algoritmo.</h2>
-              <p className="text-xl text-white/80 max-w-2xl mx-auto mb-10">Empieza gratis y descubre cómo los ATS están leyendo realmente tu CV.</p>
-              <button onClick={() => setShowModal(true)} className="px-10 py-5 bg-white text-black rounded-2xl text-lg font-bold hover:scale-105 transition">
-                Probar ruptor gratis
-              </button>
-            </div>
-          </div>
-        </section>
-
-        {/* FOOTER */}
-        <footer className="border-t border-black/5 py-10">
+        <footer className="border-t py-10" style={{ borderTopColor: 'var(--borderColor)' }}>
           <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center text-white font-bold">⚡</div>
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white font-bold" style={{ background: 'linear-gradient(135deg, var(--gradientFrom), var(--gradientTo))' }}>
+                ⚡
+              </div>
               <span className="font-bold text-lg">ruptor</span>
             </div>
-            <p className="text-black/40 text-sm">© 2026 ruptor — Supera el filtro. Llega al humano.</p>
+            <p className="text-sm" style={{ color: 'var(--textTertiary)' }}>© 2026 ruptor — Supera el filtro. Llega al humano.</p>
           </div>
         </footer>
-
-        
       </div>
     </>
+  );
+};
+
+export default function App() {
+  return (
+    <ThemeProvider>
+      <ThemedApp />
+    </ThemeProvider>
   );
 }
