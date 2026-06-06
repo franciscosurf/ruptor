@@ -4,8 +4,11 @@ import { Hero } from './components/home/Hero';
 import { Features } from './components/home/Features';
 import { Link } from 'react-router-dom';
 import { ThemeProvider } from '../contexts/ThemeContext';   // ✅ corregido
-import '../styles/themes.css';         
+//import '../styles/themes.css';         
 import { useTheme } from '../contexts/ThemeContext';                    // ✅ corregido
+
+import { HeaderDark } from './components/layout/HeaderDark';
+import { HeroDark } from './components/home/HeroDark';
 
 // Componente interno que aplica el tema al body
 const ThemedApp = () => {
@@ -59,8 +62,8 @@ const ThemedApp = () => {
       `}</style>
 
       <div className="font-['Inter',sans-serif] overflow-x-hidden" style={{ background: 'var(--bgPrimary)', color: 'var(--textPrimary)' }}>
-        <Header />
-        <Hero />
+        <HeaderDark />
+        <HeroDark />
         <Features />
 
         <footer className="border-t py-10" style={{ borderTopColor: 'var(--borderColor)' }}>
