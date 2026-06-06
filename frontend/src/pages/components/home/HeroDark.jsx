@@ -19,8 +19,8 @@ export const HeroDark = () => {
           position: fixed;
           inset: 0;
           background: 
-            linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+            linear-gradient(rgba(255,255,255,.07) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,.07) 1px, transparent 1px);
           background-size: 60px 60px;
         }
         .orb {
@@ -189,7 +189,7 @@ export const HeroDark = () => {
       <div className="skill" style={{ top: '50%', right: '10%', animationDelay: '1.5s' }}>+ AI</div>
 
       {/* Tarjeta ATS Score (posiciones inline) */}
-      <div className="absolute glass rounded-3xl p-6 shadow-2xl" style={{ right: '16%', top: '35%', animationDelay: '1.5s' }}>
+      <div className="absolute glass rounded-3xl p-6 shadow-2xl" style={{ right: '15%', top: '12%', animationDelay: '1.5s' }}>
         <div className="text-white/50 text-xs uppercase tracking-widest">ATS SCORE</div>
         <div className="text-6xl font-black gradient">92</div>
         <div className="text-green-400 mt-2 text-sm">Recruiter Ready</div>
@@ -201,7 +201,7 @@ export const HeroDark = () => {
           <div className="w-2 h-2 rounded-full bg-green-500" />
           <span className="text-white/70 text-sm">ATS Optimization Platform</span>
         </div>
-        <h1 className="text-white font-black leading-none text-7xl md:text-9xl">
+        <h1 className="text-white font-black leading-none text-7xl md:text-8xl">
           {/* Supera el filtro.
           <span className="block gradient">Llega al humano.</span> */}
           <span className="gradient-text">La IA </span><span className="textWhiteDark">rechaza tu CV antes de que alguien lo lea</span>
