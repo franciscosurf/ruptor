@@ -90,6 +90,71 @@ export const HeroDark = () => {
           50% { transform: translateY(120px); }
           100% { transform: translateY(-120px); }
         }
+
+
+        /* Estilos base para los skills (tus valores originales) */
+          .skill {
+            position: absolute;
+            padding: 12px 18px;
+            border-radius: 999px;
+            background: rgba(255,255,255,.04);
+            border: 1px solid rgba(255,255,255,.08);
+            color: white;
+            backdrop-filter: blur(20px);
+            animation: float 6s ease-in-out infinite;
+            white-space: nowrap;       /* Evita que se parta el texto */
+            z-index: 10;
+          }
+
+          /* Ajustes para pantallas medianas (tablets, < 1200px) */
+          @media (max-width: 1200px) {
+            .skill {
+              padding: 8px 14px;
+              font-size: 0.9rem;
+            }
+            /* Reubicación de cada skill */
+            .skill:nth-child(1) { top: 15%; left: 8%; }
+            .skill:nth-child(2) { top: 20%; right: 10%; }
+            .skill:nth-child(3) { bottom: 30%; left: 10%; }
+            .skill:nth-child(4) { bottom: 35%; right: 10%; }
+            .skill:nth-child(5) { top: 45%; right: 8%; }
+          }
+
+          /* Ajustes para pantallas pequeñas (móviles, < 768px) */
+          @media (max-width: 768px) {
+            .skill {
+              padding: 6px 12px;
+              font-size: 0.8rem;
+              white-space: nowrap;
+            }
+            /* Acercamos todos los skills al centro vertical/horizontal */
+            .skill:nth-child(1) { top: 10%; left: 5%; }
+            .skill:nth-child(2) { top: 15%; right: 5%; }
+            .skill:nth-child(3) { bottom: 20%; left: 5%; }
+            .skill:nth-child(4) { bottom: 25%; right: 5%; }
+            .skill:nth-child(5) { top: 40%; right: 5%; }
+          }
+
+          /* Ajustes para móviles muy pequeños (< 480px) */
+          @media (max-width: 480px) {
+            .skill {
+              padding: 4px 10px;
+              font-size: 0.7rem;
+            }
+            /* Los escondemos o los ponemos muy cerca de los bordes, pero siempre visibles */
+            .skill:nth-child(1) { top: 5%; left: 2%; }
+            .skill:nth-child(2) { top: 10%; right: 2%; }
+            .skill:nth-child(3) { bottom: 10%; left: 2%; }
+            .skill:nth-child(4) { bottom: 15%; right: 2%; }
+            .skill:nth-child(5) { top: 35%; right: 2%; }
+          }
+
+          /* Opcional: evita que los skills se salgan del contenedor en pantallas extremadamente altas */
+          @media (min-height: 900px) {
+            .skill:nth-child(1) { top: 18%; }
+            .skill:nth-child(2) { top: 24%; }
+            .skill:nth-child(5) { top: 45%; }
+          }
       `}</style>
 
       {/* Capas decorativas */}
@@ -137,9 +202,11 @@ export const HeroDark = () => {
           <span className="text-white/70 text-sm">ATS Optimization Platform</span>
         </div>
         <h1 className="text-white font-black leading-none text-7xl md:text-9xl">
-          Supera el filtro.
-          <span className="block gradient">Llega al humano.</span>
+          {/* Supera el filtro.
+          <span className="block gradient">Llega al humano.</span> */}
+          <span className="gradient-text">La IA </span><span className="textWhiteDark">rechaza tu CV antes de que alguien lo lea</span>
         </h1>
+        
         <p className="mt-10 text-white/60 text-xl max-w-3xl mx-auto leading-relaxed">
           Tu CV compite contra algoritmos antes que contra personas.
           Ruptor analiza, optimiza y adapta tu candidatura para superar ATS modernos y conseguir más entrevistas.
