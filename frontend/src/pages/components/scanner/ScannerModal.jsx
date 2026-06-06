@@ -9,73 +9,50 @@ import { LoadingSpinner } from '../../../components/common/LoadingSpinner';
 import mammoth from 'mammoth';
 import { useTemplateExport } from '../../../components/scanner/strategy/useTemplateExport';
 
-
 // Subcomponente Editor Ligero para DOCX ---
 const EditableDocx = ({ initialHtml, onUpdate, focusText }) => {
   const editorRef = useRef(null);
-  // Guardamos el HTML "limpio" (sin las marcas de resaltado) para cuando el usuario guarde o descargue
   const cleanHtmlRef = useRef(initialHtml);
 
-// --- NUEVO: Evita el pegado con formato (Filtro Anti-Estilos) ---
   const handlePaste = (e) => {
-    // 1. Frenamos el pegado por defecto del navegador
     e.preventDefault();
-
-    // 2. Extraemos explícitamente el contenido como TEXTO PLANO
     const text = (e.originalEvent || e).clipboardData.getData('text/plain');
-
-    // 3. Insertamos el texto limpio de forma segura en la posición del cursor
     document.execCommand('insertText', false, text);
-
-    // 4. Forzamos la actualización del estado del documento
     handleInput();
   };
 
-  // --- Only for EditableDocx LÓGICA DE RESALTADO EN HTML (Sin romper estilos ni etiquetas) ---
   const applyHighlightsToHtml = (html, focusData) => {
     if (!focusData || !html) return html;
-
-    // 1. Extraemos y limpiamos asegurando que todo sea texto (Igual que en tu código)
     let textsToFocus = Array.isArray(focusData) ? focusData : [focusData];
     textsToFocus = textsToFocus.map(t => {
       let text = typeof t === 'object' ? (t.text || t.keyword || '') : String(t);
       return text.trim();
     }).filter(Boolean);
-
     if (textsToFocus.length === 0) return html;
 
-    // 2. Construimos un bloque Regex tolerante a espacios y caracteres especiales
     const regexParts = textsToFocus.map(text => {
       let safeText = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       return safeText.replace(/\s+/g, '\\s+');
     });
-    
     const splitRegex = new RegExp(`(${regexParts.join('|')})`, 'gi');
     const matchRegex = new RegExp(`^(?:${regexParts.join('|')})$`, 'i');
 
-    // 3. Creamos un DOM temporal para recorrer SOLO los nodos de texto (protegiendo el HTML)
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = html;
-
     const walker = document.createTreeWalker(tempDiv, NodeFilter.SHOW_TEXT, null, false);
     const textNodes = [];
     let node;
-    while ((node = walker.nextNode())) {
-      textNodes.push(node);
-    }
+    while ((node = walker.nextNode())) textNodes.push(node);
 
-    // 4. Envolvemos las coincidencias en etiquetas <mark>
     textNodes.forEach(textNode => {
       if (splitRegex.test(textNode.nodeValue)) {
-        splitRegex.lastIndex = 0; 
+        splitRegex.lastIndex = 0;
         const fragments = textNode.nodeValue.split(splitRegex);
         const fragmentWrapper = document.createDocumentFragment();
-
         fragments.forEach(part => {
           if (!part) return;
           if (matchRegex.test(part)) {
             const mark = document.createElement('mark');
-            // Usamos clases de Tailwind para darle el estilo visual al foco
             mark.className = 'focus-highlight bg-purple-200/70 text-purple-900 rounded-sm font-semibold transition-all';
             mark.textContent = part;
             fragmentWrapper.appendChild(mark);
@@ -83,16 +60,12 @@ const EditableDocx = ({ initialHtml, onUpdate, focusText }) => {
             fragmentWrapper.appendChild(document.createTextNode(part));
           }
         });
-        
         textNode.parentNode.replaceChild(fragmentWrapper, textNode);
       }
     });
-
     return tempDiv.innerHTML;
   };
 
-  // --- LÓGICA DE LIMPIEZA ---
-  // Elimina las etiquetas <mark> antes de enviar el HTML al estado principal (para que no se guarden en la descarga)
   const removeHighlightsFromHtml = (html) => {
     if (!html.includes('focus-highlight')) return html;
     const tempDiv = document.createElement('div');
@@ -105,7 +78,6 @@ const EditableDocx = ({ initialHtml, onUpdate, focusText }) => {
     return tempDiv.innerHTML;
   };
 
-  // 1. Carga Inicial
   useEffect(() => {
     if (editorRef.current && initialHtml && !editorRef.current.innerHTML) {
       cleanHtmlRef.current = initialHtml;
@@ -113,53 +85,43 @@ const EditableDocx = ({ initialHtml, onUpdate, focusText }) => {
     }
   }, [initialHtml]);
 
-  // 2. Reaccionar cuando el usuario hace clic en el botón de la IA (focusText cambia)
   useEffect(() => {
     if (!editorRef.current) return;
-    // Aplicamos los highlights sobre la versión LIMPIA más reciente (protege las ediciones del usuario)
     editorRef.current.innerHTML = applyHighlightsToHtml(cleanHtmlRef.current, focusText);
   }, [focusText]);
 
-  // 3. Capturar lo que el usuario escribe
   const handleInput = () => {
     if (editorRef.current) {
       const currentHtml = editorRef.current.innerHTML;
-      // Quitamos visualmente las marcas en background para guardar un documento limpio
       const cleanedHtml = removeHighlightsFromHtml(currentHtml);
       cleanHtmlRef.current = cleanedHtml;
-      
-      onUpdate({
-        html: cleanedHtml,
-        text: editorRef.current.innerText
-      });
+      onUpdate({ html: cleanedHtml, text: editorRef.current.innerText });
     }
   };
 
   const execCommand = (command) => {
     document.execCommand(command, false, null);
     editorRef.current.focus();
-    handleInput(); 
+    handleInput();
   };
 
   return (
-    <div className="flex flex-col h-full bg-white relative editable-docx">
-      {/* Barra de herramientas */}
-      <div className="flex items-center gap-2 p-2 border-b border-gray-200 bg-gray-50 shrink-0 sticky top-0 z-10">
-        <button onClick={() => execCommand('bold')} className="p-1.5 hover:bg-gray-200 rounded font-bold" title="Negrita">B</button>
-        <button onClick={() => execCommand('italic')} className="p-1.5 hover:bg-gray-200 rounded italic" title="Cursiva">I</button>
-        <button onClick={() => execCommand('underline')} className="p-1.5 hover:bg-gray-200 rounded underline" title="Subrayado">U</button>
-        <div className="w-px h-4 bg-gray-300 mx-1"></div>
-        <button onClick={() => execCommand('insertUnorderedList')} className="p-1.5 hover:bg-gray-200 rounded" title="Lista de viñetas">• Lista</button>
+    <div className="flex flex-col h-full relative editable-docx" style={{ background: 'var(--bgPrimary)' }}>
+      <div className="flex items-center gap-2 p-2 border-b shrink-0 sticky top-0 z-10" style={{ borderBottomColor: 'var(--borderColor)', background: 'var(--bgSurface)' }}>
+        <button onClick={() => execCommand('bold')} className="p-1.5 hover:bg-gray-200 rounded font-bold" style={{ color: 'var(--textPrimary)' }}>B</button>
+        <button onClick={() => execCommand('italic')} className="p-1.5 hover:bg-gray-200 rounded italic" style={{ color: 'var(--textPrimary)' }}>I</button>
+        <button onClick={() => execCommand('underline')} className="p-1.5 hover:bg-gray-200 rounded underline" style={{ color: 'var(--textPrimary)' }}>U</button>
+        <div className="w-px h-4 bg-gray-300 mx-1" style={{ background: 'var(--borderColor)' }}></div>
+        <button onClick={() => execCommand('insertUnorderedList')} className="p-1.5 hover:bg-gray-200 rounded" style={{ color: 'var(--textPrimary)' }}>• Lista</button>
       </div>
-      
-      {/* Área de texto editable */}
       <div
         ref={editorRef}
         contentEditable
         onInput={handleInput}
         onPaste={handlePaste}
         spellCheck="false"
-        className="prose max-w-none p-8 flex-1 overflow-y-auto outline-none focus:ring-inset focus:ring-2 focus:ring-purple-200 transition-all docx-preview leading-relaxed text-gray-800"
+        className="prose max-w-none p-8 flex-1 overflow-y-auto outline-none focus:ring-inset focus:ring-2 focus:ring-purple-200 transition-all docx-preview leading-relaxed"
+        style={{ color: 'var(--textPrimary)' }}
       />
     </div>
   );
@@ -170,26 +132,23 @@ export const ScannerModal = ({
   onFileChange, onJobDescriptionChange, onModeChange, onSubmit, loading,
   onReanalyze, cvData, isExtracting, updateSection, templateRef, onDownload
 }) => {
-
   const { exportToPdf, isExporting } = useTemplateExport();
-  const [reportDownloading, setReportDownloading] = useState(false); // 🆕 estado para el informe PDF
-
+  const [reportDownloading, setReportDownloading] = useState(false);
 
   const handleDownloadPdf = async () => {
     const success = await exportToPdf(cvData, fileName);
     if (success) console.log('PDF generado correctamente');
   };
 
-   // 🆕 Función para descargar el informe de análisis ATS
   const handleDownloadReport = async () => {
     if (!result) return;
     setReportDownloading(true);
     try {
       const response = await fetch(`${API_BASE_URL}${ENDPOINTS.DOWNLOAD_PDF_REPORT}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ data: result })
-    });
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: result })
+      });
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(errorText || 'Error al generar el informe');
@@ -198,19 +157,11 @@ export const ScannerModal = ({
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-
-      // --- NUEVO NOMBRE DINÁMICO ---
-      // Obtener nombre base del CV (sin extensión)
       let baseName = fileName ? fileName.replace(/\.[^/.]+$/, '') : 'informe';
-      // Reemplazar espacios y caracteres especiales
       baseName = baseName.replace(/[^a-zA-Z0-9áéíóúüñÁÉÍÓÚÜÑ]/g, '_');
-      // Añadir fecha y hora
       const now = new Date();
       const dateStr = now.toISOString().slice(0,19).replace(/[-:]/g, '').replace('T', '_');
-      const finalName = `informe_ATS_${baseName}_${dateStr}.pdf`;
-      a.download = finalName;   // ← aquí se asigna el nombre
-      // -------------------------
-
+      a.download = `informe_ATS_${baseName}_${dateStr}.pdf`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -223,91 +174,53 @@ export const ScannerModal = ({
     }
   };
 
-  // Estados para TXT
   const [txtContent, setTxtContent] = useState('');
-  // Estados para DOCX (HTML editable y texto plano)
   const [docxHtml, setDocxHtml] = useState('');
   const [docxPlainText, setDocxPlainText] = useState('');
   const [isExtractingDocx, setIsExtractingDocx] = useState(false);
-
   const [activeFocus, setActiveFocus] = useState(null);
+  const [selectedSentence, setSelectedSentence] = useState(null);
 
   const isDocxFile = file && (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || file.name?.toLowerCase().endsWith('.docx'));
   const isTextFile = file && (file.type === 'text/plain' || file.name?.toLowerCase().endsWith('.txt'));
 
-  const [selectedSentence, setSelectedSentence] = useState(null);
-
-
-  // ========================
-  // DEBOUNCE PARA REANÁLISIS AUTOMÁTICO
-  // ========================
+  // Debounce automático
   const lastReanalyzedTextRef = useRef(null);
-
-  // 1. OBTENER TEXTO (Convierte el objeto en un solo string para poder compararlo)
   const getCurrentCVText = useCallback(() => {
     if (isTextFile) return txtContent;
     if (isDocxFile) return docxPlainText;
-    if (cvData) {
-      return typeof cvData === 'object' ? Object.values(cvData).join('\n') : cvData;
-    }
+    if (cvData) return typeof cvData === 'object' ? Object.values(cvData).join('\n') : cvData;
     return null;
   }, [isTextFile, txtContent, isDocxFile, docxPlainText, cvData]);
 
-  // 2. ESTABLECER LA LÍNEA BASE INICIAL (Solo se ejecuta al abrir el CV por primera vez)
   useEffect(() => {
     if (show && result && !lastReanalyzedTextRef.current) {
       lastReanalyzedTextRef.current = getCurrentCVText();
     }
-    if (!show) {
-      lastReanalyzedTextRef.current = null; // Limpiar cuando se cierra el modal
-    }
+    if (!show) lastReanalyzedTextRef.current = null;
   }, [show, result, getCurrentCVText]);
 
-  // 3. MOTOR DE AUTOGUARDADO (El Debounce Real)
-  // 3. MOTOR DE AUTOGUARDADO (El Debounce Real)
   useEffect(() => {
-    // CAMBIO CRÍTICO: Añadido !result para que el autoguardado NUNCA 
-    // se active si el usuario está en el formulario principal.
     if (!show || !result || loading) return;
-
     const currentText = getCurrentCVText();
-    if (!currentText) return;
-
-    // Si el texto es idéntico al último que analizamos, no hacemos nada
-    if (currentText === lastReanalyzedTextRef.current) return;
-
-    // Si hubo cambios, iniciamos la cuenta atrás de 1 segundo (1000 ms)
+    if (!currentText || currentText === lastReanalyzedTextRef.current) return;
     const timer = setTimeout(() => {
       lastReanalyzedTextRef.current = currentText;
-
       if (onReanalyze) {
-        if (isTextFile) {
-          onReanalyze(txtContent);
-        } else if (isDocxFile && docxPlainText) {
-          onReanalyze(docxPlainText);
-        } else if (cvData) {
-          onReanalyze(cvData); 
-        }
+        if (isTextFile) onReanalyze(txtContent);
+        else if (isDocxFile && docxPlainText) onReanalyze(docxPlainText);
+        else if (cvData) onReanalyze(cvData);
       }
     }, 1000);
-
     return () => clearTimeout(timer);
-    
   }, [show, result, loading, txtContent, docxPlainText, cvData, getCurrentCVText, isTextFile, isDocxFile, onReanalyze]);
- //end
 
   let textToHighlight = null;
   if (activeFocus === 'achievements') {
     let rawSentences = result?.quantified_achievements_metrics?.sentences || [];
-    // Convierte a string si es objeto
-    textToHighlight = rawSentences.map(s => 
-      typeof s === 'string' ? s : (s.text || s.keyword || '')
-    ).filter(Boolean);
+    textToHighlight = rawSentences.map(s => typeof s === 'string' ? s : (s.text || s.keyword || '')).filter(Boolean);
   }
-  console.log('🔍 activeFocus:', activeFocus, 'textToHighlight:', textToHighlight);
 
-
-  // --- TXT: leer como texto plano ---
   useEffect(() => {
     if (isTextFile && show && file) {
       const reader = new FileReader();
@@ -317,20 +230,15 @@ export const ScannerModal = ({
     }
   }, [file, isTextFile, show]);
 
-  // --- DOCX: extraer HTML con mammoth ---
   useEffect(() => {
     if (isDocxFile && show && file) {
       setIsExtractingDocx(true);
-      
       const reader = new FileReader();
       reader.onload = async (e) => {
         const arrayBuffer = e.target.result;
         try {
-          // Extraemos HTML inicial; el texto plano lo manejará ahora nuestro componente editable
           const htmlResult = await mammoth.convertToHtml({ arrayBuffer });
           setDocxHtml(htmlResult.value);
-          
-          // Generamos un DOM temporal solo para sacar el texto inicial
           const tempDiv = document.createElement("div");
           tempDiv.innerHTML = htmlResult.value;
           setDocxPlainText(tempDiv.innerText);
@@ -350,7 +258,6 @@ export const ScannerModal = ({
     }
   }, [file, isDocxFile, show]);
 
-  // Efecto para el scroll global
   useEffect(() => {
     if (!show) return;
     const originalOverflow = document.body.style.overflow;
@@ -360,20 +267,15 @@ export const ScannerModal = ({
 
   if (!show) return null;
 
-  // --- MANEJADORES ---
   const handleDownloadClick = () => {
     if (isDocxFile) {
-      // TRUCO AVANZADO: Envolvemos el HTML editado en etiquetas de Office para que Word lo lea nativamente como documento.
       const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>CV Optimizado</title></head><body>";
       const footer = "</body></html>";
       const sourceHTML = header + docxHtml + footer;
-      
-      // Especificamos el MIME type de MS Word
       const blob = new Blob(['\ufeff', sourceHTML], { type: 'application/msword' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      // Guardamos como .doc (más estable para esta conversión desde el frontend)
       link.download = fileName ? fileName.replace('.docx', '_optimizado.doc') : 'cv_optimizado.doc';
       link.click();
       URL.revokeObjectURL(url);
@@ -392,20 +294,13 @@ export const ScannerModal = ({
 
   const handleReanalyzeClick = () => {
     if (onReanalyze) {
-      if (isTextFile) {
-        onReanalyze(txtContent);
-      } else if (isDocxFile && docxPlainText) {
-        // La IA recibe el texto limpio con las nuevas ediciones del usuario
-        onReanalyze(docxPlainText);
-      } else if (cvData) {
-        onReanalyze(cvData);
-      } else {
-        onReanalyze(file);
-      }
+      if (isTextFile) onReanalyze(txtContent);
+      else if (isDocxFile && docxPlainText) onReanalyze(docxPlainText);
+      else if (cvData) onReanalyze(cvData);
+      else onReanalyze(file);
     }
   };
 
-  // --- RENDERIZADO DE VISTA PREVIA SEGÚN TIPO DE ARCHIVO ---
   const renderPreview = () => {
     if (isTextFile) {
       return (
@@ -418,30 +313,18 @@ export const ScannerModal = ({
         />
       );
     }
-
     if (isDocxFile) {
-      if (isExtractingDocx) {
-        return (
-          <div className="flex-1 flex items-center justify-center text-gray-500 font-medium">
-            📄 Procesando documento Word...
-          </div>
-        );
-      }
+      if (isExtractingDocx) return <div className="flex-1 flex items-center justify-center font-medium" style={{ color: 'var(--textSecondary)' }}>📄 Procesando documento Word...</div>;
       return (
-        <div className="flex-1 flex flex-col h-full bg-white">
-          <EditableDocx 
-            initialHtml={docxHtml} 
-            focusText={textToHighlight} // <--- AÑADIMOS EL PROP AQUÍ
-            selectedSentence={selectedSentence} // <--- AÑADIMOS EL PROP AQUÍ
-            onUpdate={({ html, text }) => {
-              setDocxHtml(html);
-              setDocxPlainText(text);
-            }} 
+        <div className="flex-1 flex flex-col h-full">
+          <EditableDocx
+            initialHtml={docxHtml}
+            focusText={textToHighlight}
+            onUpdate={({ html, text }) => { setDocxHtml(html); setDocxPlainText(text); }}
           />
         </div>
       );
     }
-
     if (cvData) {
       return (
         <CvTemplateEditor
@@ -454,21 +337,13 @@ export const ScannerModal = ({
         />
       );
     }
-
-    if (isExtracting) {
-      return (
-        <div className="flex-1 flex items-center justify-center text-gray-500 font-medium">
-          🔄 Transcribiendo estructura del documento original...
-        </div>
-      );
-    }
-
+    if (isExtracting) return <div className="flex-1 flex items-center justify-center font-medium" style={{ color: 'var(--textSecondary)' }}>🔄 Transcribiendo estructura del documento original...</div>;
     return (
-      <div className="flex-1 p-8 overflow-y-auto flex items-center justify-center bg-gray-100">
-        <div className="w-full max-w-lg bg-white rounded-2xl shadow-md border border-gray-200 p-8 text-center">
+      <div className="flex-1 p-8 overflow-y-auto flex items-center justify-center bg-gray-100" style={{ background: 'var(--bgSurface)' }}>
+        <div className="w-full max-w-lg rounded-2xl shadow-md p-8 text-center" style={{ background: 'var(--cardBg)', border: `1px solid var(--borderColor)` }}>
           <div className="text-4xl mb-3">📂</div>
-          <h3 className="text-md font-bold text-gray-700 mb-1">{fileName}</h3>
-          <p className="text-xs text-gray-400">Procesando el documento en el servidor para renderizar el contenido...</p>
+          <h3 className="text-md font-bold mb-1" style={{ color: 'var(--textPrimary)' }}>{fileName}</h3>
+          <p className="text-xs" style={{ color: 'var(--textTertiary)' }}>Procesando el documento en el servidor para renderizar el contenido...</p>
         </div>
       </div>
     );
@@ -476,20 +351,14 @@ export const ScannerModal = ({
 
   const handleSelectSentence = (sentence) => {
     setSelectedSentence(sentence);
-    
-    // Hacemos scroll suave hacia el nuevo elemento resaltado una vez React lo dibuje
     setTimeout(() => {
       const highlightedElement = document.querySelector('.focus-highlight-single');
-      if (highlightedElement) {
-        highlightedElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
+      if (highlightedElement) highlightedElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 60);
   };
 
   return (
     <div className="fixed inset-0 z-50 flex bg-black bg-opacity-80 backdrop-filter backdrop-blur-sm animate-fadeIn">
-      
-      {/* Estilos dinámicos para proteger la apariencia del DOCX editado */}
       <style>{`
         .docx-preview h1 { font-size: 1.2rem; font-weight: bold; margin: 1rem 0; }
         .docx-preview h2 { font-size: 1rem; font-weight: bold; margin: 0.75rem 0; }
@@ -498,15 +367,15 @@ export const ScannerModal = ({
         .docx-preview ol { margin: 0.5rem 0 0.5rem 1.5rem; list-style-type: decimal; }
         .docx-preview li { margin: 0.25rem 0; }
       `}</style>
-      
-      <div className="bg-white w-screen h-screen flex flex-col overflow-hidden">
+
+      <div className="w-screen h-screen flex flex-col overflow-hidden" style={{ background: 'var(--bgPrimary)' }}>
         {/* CABECERA */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0 bg-gradient-to-r from-gray-50 to-white">
+        <div className="flex items-center justify-between px-6 py-4 border-b shrink-0" style={{ borderBottomColor: 'var(--borderColor)', background: 'var(--bgSurface)' }}>
           <div className="flex items-center gap-3">
             <span className="text-2xl">🧠</span>
             <div>
-              <h2 className="text-lg font-bold text-gray-800">Optimización de CV con IA</h2>
-              <p className="text-sm text-gray-400">Ajusta tu perfil en tiempo real según la oferta de empleo</p>
+              <h2 className="text-lg font-bold" style={{ color: 'var(--textPrimary)' }}>Optimización de CV con IA</h2>
+              <p className="text-sm" style={{ color: 'var(--textTertiary)' }}>Ajusta tu perfil en tiempo real según la oferta de empleo</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -515,57 +384,50 @@ export const ScannerModal = ({
                 <button
                   onClick={handleReanalyzeClick}
                   disabled={loading || isExtracting || isExtractingDocx}
-                  className="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 transition-all disabled:opacity-50"
+                  className="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider border transition-all disabled:opacity-50"
+                  style={{ background: 'var(--bgSurface)', color: 'var(--textPrimary)', borderColor: 'var(--borderColor)' }}
                 >
                   {loading ? '⏳ Analizando...' : '🔄 Reanalizar CV'}
                 </button>
-                {/* 🆕 BOTÓN PARA DESCARGAR INFORME PDF */}
                 <button
                   onClick={handleDownloadReport}
                   disabled={loading || isExtracting || isExtractingDocx || reportDownloading}
-                  className="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition-all disabled:opacity-50"
+                  className="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider border transition-all disabled:opacity-50"
+                  style={{ background: 'var(--bgSurface)', color: 'var(--textPrimary)', borderColor: 'var(--borderColor)' }}
                 >
                   {reportDownloading ? '⏳ Generando...' : '📄 Descargar Informe'}
                 </button>
                 <button
                   onClick={() => {
-                    if (isTextFile || isDocxFile) {
-                      handleDownloadClick();
-                    } else {
-                      handleDownloadPdf();
-                    }
+                    if (isTextFile || isDocxFile) handleDownloadClick();
+                    else handleDownloadPdf();
                   }}
                   disabled={isExtracting || isExtractingDocx || isExporting}
-                  className="bg-purple-600 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-50"
+                  className="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-50 text-white"
+                  style={{ background: 'linear-gradient(90deg, var(--gradientFrom), var(--gradientTo))' }}
                 >
                   {isExporting
                     ? '⏳ Generando PDF...'
-                    : isTextFile
-                    ? '📥 Descargar TXT'
-                    : isDocxFile
-                    ? '📥 Descargar DOC'
+                    : isTextFile ? '📥 Descargar TXT'
+                    : isDocxFile ? '📥 Descargar DOC'
                     : '📥 Descargar PDF'}
                 </button>
               </>
             )}
-            <button onClick={onClose} className="py-2 px-3 text-gray-400 hover:text-gray-600 border border-gray-300 rounded-md">✕</button>
+            <button onClick={onClose} className="py-2 px-3 rounded-md" style={{ color: 'var(--textTertiary)', border: `1px solid var(--borderColor)`, background: 'var(--bgSurface)' }}>✕</button>
           </div>
         </div>
 
-        {/* CUERPO PRINCIPAL */}
         {result ? (
-          <div className={`flex flex-1 overflow-hidden bg-gray-100 ${activeFocus ? 'focus-mode-active' : ''}`}>
-            {/* LADO IZQUIERDO: Vista previa del CV */}
-            <div className="w-1/2 flex flex-col min-h-0 border-r border-gray-200">
+          <div className={`flex flex-1 overflow-hidden ${activeFocus ? 'focus-mode-active' : ''}`} style={{ background: 'var(--bgSurface)' }}>
+            <div className="w-1/2 flex flex-col min-h-0 border-r" style={{ borderRightColor: 'var(--borderColor)' }}>
               {renderPreview()}
             </div>
-
-            {/* LADO DERECHO: Resultados ATS */}
-            <div className="w-1/2 flex flex-col min-h-0 bg-white">
+            <div className="w-1/2 flex flex-col min-h-0" style={{ background: 'var(--bgPrimary)' }}>
               {loading ? (
-                <div className="flex-1 flex flex-col items-center justify-center bg-gray-50/50">
+                <div className="flex-1 flex flex-col items-center justify-center" style={{ background: 'var(--bgSurface)' }}>
                   <LoadingSpinner />
-                  <p className="mt-4 text-sm text-gray-500 font-medium animate-pulse">Recalculando métricas ATS...</p>
+                  <p className="mt-4 text-sm font-medium animate-pulse" style={{ color: 'var(--textSecondary)' }}>Recalculando métricas ATS...</p>
                 </div>
               ) : (
                 <ResultsPanel
@@ -573,23 +435,22 @@ export const ScannerModal = ({
                   activeFocus={activeFocus}
                   onToggleFocus={(focusType) => {
                     setActiveFocus(activeFocus === focusType ? null : focusType);
-                    setSelectedSentence(null); // Limpiamos el resaltado individual al cambiar de pestaña
+                    setSelectedSentence(null);
                   }}
-                  onSelectSentence={handleSelectSentence} // Usa la nueva función basada en estado
+                  onSelectSentence={handleSelectSentence}
                 />
               )}
             </div>
           </div>
         ) : (
-          /* FORMULARIO INICIAL */
-          <div className="flex-1 overflow-y-auto p-8 bg-gray-50 flex items-center justify-center">
+          <div className="flex-1 overflow-y-auto p-8 flex items-center justify-center" style={{ background: 'var(--bgSurface)' }}>
             {loading ? (
-              <div className="w-full max-w-2xl bg-white p-16 rounded-2xl shadow-sm border border-gray-200 flex flex-col items-center justify-center">
+              <div className="w-full max-w-2xl p-16 rounded-2xl shadow-sm flex flex-col items-center justify-center" style={{ background: 'var(--cardBg)', border: `1px solid var(--borderColor)` }}>
                 <LoadingSpinner />
-                <p className="mt-6 text-gray-600 font-medium animate-pulse">La IA está analizando tu perfil contra la oferta...</p>
+                <p className="mt-6 font-medium animate-pulse" style={{ color: 'var(--textSecondary)' }}>La IA está analizando tu perfil contra la oferta...</p>
               </div>
             ) : (
-              <div className="w-full max-w-2xl bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
+              <div className="w-full max-w-2xl p-8 rounded-2xl shadow-sm" style={{ background: 'var(--cardBg)', border: `1px solid var(--borderColor)` }}>
                 <JobForm
                   fileName={fileName}
                   jobDescription={jobDescription}
